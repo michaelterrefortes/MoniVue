@@ -1,0 +1,27 @@
+import { StyleSheet, Text, View } from "react-native";
+
+export default function Index() {
+  return (
+    <View style={styles.container}>
+      <Text>Index</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  button: {
+    backgroundColor: "#0080FF",
+    color: "#fff",
+    paddingBottom: 10,
+    paddingTop: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderRadius: 10,
+    fontSize: 20,
+  },
+});
