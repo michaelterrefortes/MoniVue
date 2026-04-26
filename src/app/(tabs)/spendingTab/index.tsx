@@ -1,6 +1,6 @@
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { addWeeks, endOfWeek, format, startOfWeek, subWeeks } from "date-fns";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import {
@@ -11,23 +11,25 @@ import {
   View,
 } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
-import Card from "../../../components/Card";
+import AccountButton from "../../../../components/AccountButton";
+import Card from "../../../../components/Card";
 import {
   formatPlotData,
   formatWeeklyData,
   formatYearly,
-} from "../../../constants/functions";
-import { DebtContext } from "../../../context/DebtContext";
+} from "../../../../constants/functions";
+import { DebtContext } from "../../../../context/DebtContext";
 import {
   fetchSpending,
   fetchSpendingWeek,
   fetchSpendingYear,
-} from "../../../services/api";
+} from "../../../../services/api";
 
 const TABS = ["Month", "Week", "Year"];
 
 const SpendingTab = () => {
   const router = useRouter();
+  const navigation = useNavigation();
 
   const {
     spending,
@@ -75,53 +77,33 @@ const SpendingTab = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (prevMonth !== date) {
-          //console.log(date);
-          console.log("\nFetch Month Data", date);
-          if (
-            date.getMonth() === new Date().getMonth() &&
-            date.getFullYear() === new Date().getFullYear()
-          ) {
-            const result = await fetchSpending(date);
+        //console.log(date);
+        console.log("\nFetch Month Data", date);
+        if (
+          date.getMonth() === new Date().getMonth() &&
+          date.getFullYear() === new Date().getFullYear()
+        ) {
+          const result = await fetchSpending(date);
 
-            setSpending(result);
-            setLocalSpending(result);
-          } else {
-            const result = await fetchSpending(date);
+          setSpending(result);
+          setLocalSpending(result);
+        } else {
+          const result = await fetchSpending(date);
 
-            //setSpending(result);
-            setLocalSpending(result);
-          }
-
-          //console.log(spending);
-          //console.log(date);
-        }
-        if (prevWeekly !== currentWeek) {
-          console.log("\nFetch Week Data", currentWeek);
-          const result = await fetchSpendingWeek(
-            format(start, "yyyy-M-d"),
-            format(end, "yyyy-M-d"),
-          );
-
-          setWeekly(result);
+          //setSpending(result);
+          setLocalSpending(result);
         }
 
-        if (prevYear !== selectedYear) {
-          console.log("\nFetch Year Data", selectedYear);
-
-          const result = await fetchSpendingYear(selectedYear);
-
-          setYearSpending(result);
-        }
+        //console.log(spending);
+        //console.log(date);
       } catch (error) {
         console.error("Fetch error:", error);
       }
     };
 
     fetchData();
-  }, [date, selectedYear, currentWeek]);
+  }, [date]);
 
-  /*
   useEffect(() => {
     const fetchData = async () => {
       console.log("Fetch Week Data", currentWeek);
@@ -154,7 +136,7 @@ const SpendingTab = () => {
         //console.log(result);
 
         setYearSpending(result);
-        console.log("\ndata week", yearSummary);
+        //console.log("\ndata week", yearSummary);
         //console.log(yearSummary);
       } catch (error) {
         console.error("Fetch error:", error);
@@ -165,7 +147,7 @@ const SpendingTab = () => {
 
     fetchData();
     //}
-  }, [selectedYear]);*/
+  }, [selectedYear]);
 
   useEffect(() => {
     setTotalSpending(spending.reduce((acc, curr) => acc + curr.amount, 0));
@@ -202,12 +184,39 @@ const SpendingTab = () => {
     });
   };
 
+  useEffect(() => {
+    navigation.setOptions({
+      unstable_headerRightItems: () => [
+        {
+          type: "custom",
+          element: (
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: `/spending/addSpending`,
+                  params: {
+                    selectedMonth: date.getMonth() + 1,
+                    selectedYear: date.getFullYear(),
+                  },
+                })
+              }
+            >
+              <SymbolView name={{ ios: "plus" }} tintColor="black" size={20} />
+            </TouchableOpacity>
+          ),
+        },
+        {
+          type: "custom",
+          element: <AccountButton />,
+        },
+      ],
+    });
+  }, [navigation, date]);
+
   //formatPlotData(localSpending, date);
 
   return (
     <View style={styles.container}>
-      <View style={{ height: 70 }} />
-
       {/*<Text
         style={{
           fontWeight: "bold",
@@ -476,45 +485,52 @@ const SpendingTab = () => {
             <Text style={styles.textSpendingNumber}>
               ${yearTotal.toFixed(2)}
             </Text>
-
-            <BarChart
-              data={formatYearly(yearSummary)}
-              height={200}
-              //width={220}
-              barWidth={20}
-              //horizontal
-              //minHeight={3}
-              barBorderRadius={3}
-              spacing={5}
-              noOfSections={4}
-              yAxisThickness={0}
-              xAxisThickness={0}
-              xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-              yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-              isAnimated
-              animationDuration={300}
-              gradientColor={"#12ff00"} // Default top color
-              frontColor={"#d3ff00"} // Default bottom color
-              //showGradient
-            />
+            {yearSummary.length !== 0 ? (
+              <BarChart
+                data={formatYearly(yearSummary)}
+                height={200}
+                //width={220}
+                barWidth={20}
+                //horizontal
+                //minHeight={3}
+                barBorderRadius={3}
+                spacing={5}
+                noOfSections={4}
+                yAxisThickness={0}
+                xAxisThickness={0}
+                xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+                yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+                isAnimated
+                animationDuration={300}
+                gradientColor={"#12ff00"} // Default top color
+                frontColor={"#d3ff00"} // Default bottom color
+                //showGradient
+              />
+            ) : (
+              <BarChart
+                data={[]}
+                height={200}
+                //width={220}
+                barWidth={20}
+                //horizontal
+                //minHeight={3}
+                barBorderRadius={3}
+                spacing={5}
+                noOfSections={4}
+                yAxisThickness={0}
+                xAxisThickness={0}
+                xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+                yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+                isAnimated
+                animationDuration={300}
+                gradientColor={"#12ff00"} // Default top color
+                frontColor={"#d3ff00"} // Default bottom color
+                //showGradient
+              />
+            )}
           </View>
         </>
       ) : null}
-
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() =>
-          router.push({
-            pathname: `/spending/addSpending`,
-            params: {
-              selectedMonth: date.getMonth() + 1,
-              selectedYear: date.getFullYear(),
-            },
-          })
-        }
-      >
-        <SymbolView name={{ ios: "plus" }} tintColor="white" size={20} />
-      </TouchableOpacity>
     </View>
   );
 };
@@ -524,12 +540,13 @@ export default SpendingTab;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: 150,
     //alignItems: "center",
     //justifyContent: "center",
   },
   fab: {
     position: "absolute",
-    bottom: 20, // adjust if your tab bar is different
+    bottom: 100, // adjust if your tab bar is different
     right: 20,
     backgroundColor: "#0080FF",
     width: 50,

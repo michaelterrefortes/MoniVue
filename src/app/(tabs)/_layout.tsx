@@ -1,6 +1,8 @@
-import { Tabs } from "expo-router";
+import { createNativeBottomTabNavigator } from "@react-navigation/bottom-tabs/unstable";
+import { withLayoutContext } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import { useContext } from "react";
+import { Platform } from "react-native";
 import { DebtContext } from "../../../context/DebtContext";
 
 const Icons = ({ focused, title }) => {
@@ -24,6 +26,9 @@ const Icons = ({ focused, title }) => {
     );
   }
 };
+
+const Tab = createNativeBottomTabNavigator();
+const Tabs = withLayoutContext(Tab.Navigator);
 
 export default function TabLayout() {
   const { isDarkMode } = useContext(DebtContext);
@@ -63,13 +68,22 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="(index)"
         options={{
           title: "Home",
           tabBarActiveTintColor: isDarkMode ? "#000" : "#fff",
-          tabBarIcon: ({ focused }) => (
+          //headerTitle: "as",
+
+          /*tabBarIcon: ({ focused }) => (
             <Icons focused={focused} title={"house"} />
-          ),
+          ),*/
+          tabBarIcon: ({ focused }) =>
+            Platform.select({
+              ios: {
+                type: "sfSymbol",
+                name: focused ? "house.fill" : "house",
+              },
+            }),
         }}
       />
       <Tabs.Screen
@@ -78,9 +92,17 @@ export default function TabLayout() {
           title: "Spending",
           tabBarActiveTintColor: isDarkMode ? "#000" : "#fff",
 
-          tabBarIcon: ({ focused }) => (
+          /*tabBarIcon: ({ focused }) => (
             <Icons focused={focused} title={"cart"} />
-          ),
+          ),*/
+
+          tabBarIcon: ({ focused }) =>
+            Platform.select({
+              ios: {
+                type: "sfSymbol",
+                name: focused ? "cart.fill" : "cart",
+              },
+            }),
         }}
       />
       <Tabs.Screen
@@ -89,9 +111,17 @@ export default function TabLayout() {
           title: "Bills",
           tabBarActiveTintColor: isDarkMode ? "#000" : "#fff",
 
-          tabBarIcon: ({ focused }) => (
+          /*tabBarIcon: ({ focused }) => (
             <Icons focused={focused} title={"tray"} />
-          ),
+          ),*/
+
+          tabBarIcon: ({ focused }) =>
+            Platform.select({
+              ios: {
+                type: "sfSymbol",
+                name: focused ? "tray.fill" : "tray",
+              },
+            }),
         }}
       />
       <Tabs.Screen
@@ -99,9 +129,16 @@ export default function TabLayout() {
         options={{
           title: "Credit",
           tabBarActiveTintColor: isDarkMode ? "#000" : "#fff",
-          tabBarIcon: ({ focused }) => (
+          /*tabBarIcon: ({ focused }) => (
             <Icons focused={focused} title={"creditcard"} />
-          ),
+          ),*/
+          tabBarIcon: ({ focused }) =>
+            Platform.select({
+              ios: {
+                type: "sfSymbol",
+                name: focused ? "creditcard.fill" : "creditcard",
+              },
+            }),
         }}
       />
       <Tabs.Screen
@@ -109,9 +146,18 @@ export default function TabLayout() {
         options={{
           title: "Savings",
           tabBarActiveTintColor: isDarkMode ? "#000" : "#fff",
-          tabBarIcon: ({ focused }) => (
+          /*tabBarIcon: ({ focused }) => (
             <Icons focused={focused} title={"dollarsign.bank.building"} />
-          ),
+          ),*/
+          tabBarIcon: ({ focused }) =>
+            Platform.select({
+              ios: {
+                type: "sfSymbol",
+                name: focused
+                  ? "dollarsign.bank.building.fill"
+                  : "dollarsign.bank.building",
+              },
+            }),
         }}
       />
     </Tabs>

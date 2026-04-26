@@ -9,10 +9,10 @@ import {
   View,
 } from "react-native";
 import { BarChart, PieChart } from "react-native-gifted-charts";
-import { categoriesSpending } from "../../../constants/categories";
-import { formatPlotData, getMonthStats } from "../../../constants/functions";
-import { DebtContext } from "../../../context/DebtContext";
-import { fetchSpending, fetchTotals } from "../../../services/api";
+import { categoriesSpending } from "../../../../constants/categories";
+import { formatPlotData, getMonthStats } from "../../../../constants/functions";
+import { DebtContext } from "../../../../context/DebtContext";
+import { fetchSpending, fetchTotals } from "../../../../services/api";
 
 // ...
 const data = [{ value: 50 }, { value: 80 }, { value: 90 }, { value: 70 }];
@@ -98,9 +98,9 @@ const Index = () => {
         { backgroundColor: isDarkMode ? "rgb(242, 242, 242)" : "#000" },
       ]}
     >
-      <Text style={[styles.title, { color: isDarkMode ? "#000" : "#fff" }]}>
+      {/*<Text style={[styles.title, { color: isDarkMode ? "#000" : "#fff" }]}>
         Budget
-      </Text>
+      </Text>*/}
 
       <View
         style={[
@@ -133,7 +133,23 @@ const Index = () => {
           </View>
 
           <View>
-            <Text style={styles.label}>Bills</Text>
+            <TouchableOpacity
+              style={{
+                paddingHorizontal: 2,
+                flexDirection: "row",
+                //justifyContent: "center",
+
+                alignItems: "center",
+              }}
+              onPress={() => router.push("/(tabs)/billsTab")}
+            >
+              <Text style={[styles.label]}>Bills</Text>
+              <SymbolView
+                name={{ ios: "chevron.right" }}
+                tintColor="gray"
+                size={12}
+              />
+            </TouchableOpacity>
             <Text style={[styles.value, styles.expense]}>${totalBills}</Text>
           </View>
         </View>
@@ -238,26 +254,49 @@ const Index = () => {
           {new Date().getFullYear()}
         </Text>
         <View style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}>
-          <BarChart
-            data={formatPlotData(spending, new Date())}
-            height={200}
-            //width={220}
-            //barWidth={20}
-            //minHeight={3}
-            barBorderRadius={3}
-            spacing={20}
-            noOfSections={4}
-            yAxisThickness={0}
-            xAxisThickness={0}
-            xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-            yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-            isAnimated
-            animationDuration={300}
-            gradientColor={"#12ff00"} // Default top color
-            frontColor={"#d3ff00"} // Default bottom color
-            //frontColor={"#drgb(0, 162, 255)"}
-            //showGradient
-          />
+          {spending.length !== 0 ? (
+            <BarChart
+              data={formatPlotData(spending, new Date())}
+              height={200}
+              //width={220}
+              //barWidth={20}
+              //minHeight={3}
+              barBorderRadius={3}
+              spacing={20}
+              noOfSections={4}
+              yAxisThickness={0}
+              xAxisThickness={0}
+              xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+              yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+              isAnimated
+              animationDuration={300}
+              gradientColor={"#12ff00"} // Default top color
+              frontColor={"#d3ff00"} // Default bottom color
+              //frontColor={"#drgb(0, 162, 255)"}
+              //showGradient
+            />
+          ) : (
+            <BarChart
+              data={[]}
+              height={200}
+              //width={220}
+              //barWidth={20}
+              //minHeight={3}
+              barBorderRadius={3}
+              spacing={20}
+              noOfSections={4}
+              yAxisThickness={0}
+              xAxisThickness={0}
+              xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+              yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+              isAnimated
+              animationDuration={300}
+              gradientColor={"#12ff00"} // Default top color
+              frontColor={"#d3ff00"} // Default bottom color
+              //frontColor={"#drgb(0, 162, 255)"}
+              //showGradient
+            />
+          )}
         </View>
       </View>
 
@@ -266,17 +305,21 @@ const Index = () => {
           Spending Categories:
         </Text>
         <View style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}>
-          <PieChart
-            radius={90}
-            innerRadius={60}
-            data={formatDataType(spending, totalSpending)}
-            donut
-          />
+          {spending.length !== 0 ? (
+            <PieChart
+              radius={90}
+              innerRadius={60}
+              data={formatDataType(spending, totalSpending)}
+              donut
+            />
+          ) : (
+            <PieChart radius={90} innerRadius={60} data={[]} donut />
+          )}
         </View>
-        {formatDataType(spending, totalSpending)?.map((item) => {
+        {formatDataType(spending, totalSpending)?.map((item, index) => {
           return (
             <View
-              key={item.key}
+              key={`${item.key}-${index}`}
               style={{ flexDirection: "row", alignSelf: "center" }}
             >
               <View
@@ -305,8 +348,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F7FA",
-    paddingTop: 80,
+    //paddingTop: 80,
     paddingHorizontal: 20,
+    //marginHorizontal: 20,
   },
   cardBudget: {
     marginTop: 15,

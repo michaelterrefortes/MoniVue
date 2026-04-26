@@ -10,11 +10,11 @@ const Card = ({ item, params }) => {
     <TouchableOpacity style={styles.card} onPress={() => router.push(params)}>
       <View style={styles.cardLeft}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
+          {/* ICON */}
           <View
             style={{
               width: 35,
               height: 35,
-              paddingHorizontal: 10,
               backgroundColor: categoriesSpending[item.type_spending].color,
               borderRadius: 50,
               alignItems: "center",
@@ -25,13 +25,15 @@ const Card = ({ item, params }) => {
               name={{
                 ios: categoriesSpending[item.type_spending].icon,
               }}
-              tintColor="black"
-              size={25}
+              tintColor="white"
+              size={20}
             />
           </View>
-          <View style={{ alignItems: "center" }}>
+
+          {/* TEXT */}
+          <View style={{ marginLeft: 10 }}>
             <Text style={styles.cardTitle}>{item.spending_name}</Text>
-            <Text style={{ paddingTop: 5, fontSize: 12, color: "gray" }}>
+            <Text style={{ fontSize: 12, color: "grey" }}>
               {categoriesSpending[item.type_spending].name}
             </Text>
           </View>
@@ -49,7 +51,7 @@ const Card = ({ item, params }) => {
       </View>
 
       <SymbolView
-        style={{ marginLeft: 5 }}
+        style={{ marginLeft: 8, alignSelf: "center" }}
         name={{ ios: "chevron.forward" }}
         tintColor="gray"
         size={15}
@@ -84,26 +86,53 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  cardRight: {
-    justifyContent: "center",
+  leftContent: {
+    flexDirection: "row",
     alignItems: "center",
   },
 
+  iconContainer: {
+    width: 35,
+    height: 35,
+    borderRadius: 50,
+    backgroundColor: "gray", // replace with your dynamic color
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  textContainer: {
+    marginLeft: 10,
+  },
+
   cardTitle: {
-    paddingLeft: 10,
-    fontSize: 16,
-    fontWeight: "700",
-    //marginBottom: 1,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+
+  cardCategory: {
+    fontSize: 12,
+    //color: "red",
+  },
+
+  cardRight: {
+    alignItems: "flex-end",
+    justifyContent: "center",
+    marginRight: 8,
   },
 
   cardPrice: {
     fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 4,
+    fontWeight: "600",
+    //textAlign: "center",
   },
 
   cardDate: {
     fontSize: 12,
-    color: "#6b7280",
+    color: "gray",
+    //textAlign: "center",
+  },
+
+  chevron: {
+    alignSelf: "center",
   },
 });

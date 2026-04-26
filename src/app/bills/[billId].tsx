@@ -198,18 +198,22 @@ const BillDetails = () => {
             style={{
               width: 35,
               height: 35,
-              paddingHorizontal: 10,
               backgroundColor: itemColor,
-
               borderRadius: 50,
               alignItems: "center",
               justifyContent: "center",
               alignSelf: "center",
             }}
           >
-            <SymbolView name={{ ios: iconImage }} tintColor="black" size={25} />
+            <SymbolView
+              name={{ ios: `${iconImage}.fill` }}
+              tintColor="white"
+              size={20}
+            />
           </View>
-          <Text style={styles.textVaries}>{categoryName}</Text>
+          <Text style={[styles.textVaries, { paddingTop: 5 }]}>
+            {categoryName}
+          </Text>
         </View>
         <View
           style={[

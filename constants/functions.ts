@@ -171,7 +171,7 @@ export const formatYearly = (yearlySpending) => {
 
   //console.log(summaryWeekly);
 
-  console.log("en format year data", yearlySpending);
+  //console.log("en format year data", yearlySpending);
 
   return summaryMonths;
 };

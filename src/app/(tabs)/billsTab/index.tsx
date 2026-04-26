@@ -8,10 +8,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { categories } from "../../../constants/categories";
-import { validateDate } from "../../../constants/functions";
-import { DebtContext } from "../../../context/DebtContext";
-import { fetchBills } from "../../../services/api";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { categories } from "../../../../constants/categories";
+import { validateDate } from "../../../../constants/functions";
+import { DebtContext } from "../../../../context/DebtContext";
+import { fetchBills } from "../../../../services/api";
 /*const bills = [
   { id: 1, name: "T-Mobile", price: 248, variable: 0, type: 8 },
   { id: 2, name: "Elecric Bill", price: 120.32, variable: 10, type: 4 },
@@ -51,27 +52,16 @@ export default function BillsTab() {
     setVariance(bills.reduce((acc, curr) => acc + curr.variable, 0));
   }, [bills]);
 
+  const { top } = useSafeAreaInsets();
+
   return (
     <View
       style={[
         styles.container,
+        { paddingTop: top - 36 },
         { backgroundColor: isDarkMode ? "rgb(242, 242, 242)" : "#000" },
       ]}
     >
-      <View style={{ height: 70 }} />
-
-      <Text
-        style={{
-          fontWeight: "bold",
-          fontSize: 28,
-          paddingTop: 10,
-          paddingLeft: 15,
-          color: isDarkMode ? "#000" : "#fff",
-        }}
-      >
-        Bills & Utilities
-      </Text>
-
       <View
         style={[
           styles.billsBalance,
@@ -142,8 +132,8 @@ export default function BillsTab() {
                     }}
                   >
                     <SymbolView
-                      name={{ ios: categories[item.type_bill].icon }}
-                      tintColor="black"
+                      name={{ ios: `${categories[item.type_bill].icon}.fill` }}
+                      tintColor="white"
                       size={25}
                     />
                   </View>
@@ -201,13 +191,6 @@ export default function BillsTab() {
         //</View>  </Text>
         //}
       />
-
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => router.push(`/bills/addBill`)}
-      >
-        <SymbolView name={{ ios: "plus" }} tintColor="white" size={20} />
-      </TouchableOpacity>
     </View>
   );
 }

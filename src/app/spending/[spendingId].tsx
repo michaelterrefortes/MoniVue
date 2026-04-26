@@ -194,18 +194,18 @@ const SpendingDetails = () => {
             style={{
               width: 35,
               height: 35,
-              paddingHorizontal: 10,
               backgroundColor: itemColor,
-
               borderRadius: 50,
               alignItems: "center",
               justifyContent: "center",
               alignSelf: "center",
             }}
           >
-            <SymbolView name={{ ios: iconImage }} tintColor="black" size={25} />
+            <SymbolView name={{ ios: iconImage }} tintColor="white" size={20} />
           </View>
-          <Text style={styles.textCategory}>{categoryName}</Text>
+          <Text style={[styles.textCategory, { paddingTop: 5 }]}>
+            {categoryName}
+          </Text>
         </View>
         <View style={styles.squares}>
           <Text style={styles.label}>Date:</Text>

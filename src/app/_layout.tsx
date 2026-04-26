@@ -14,6 +14,7 @@ export default function RootLayout() {
 
             headerShown: false,
             headerTitle: "",
+            //headerLargeTitle: true,
             //headerLargeTitleEnabled: true,
             //headerRight: () => <AccountButton />,
           }}

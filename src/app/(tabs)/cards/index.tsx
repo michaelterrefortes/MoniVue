@@ -11,9 +11,9 @@ import {
 } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { validateDate } from "../../../constants/functions";
-import { DebtContext } from "../../../context/DebtContext";
-import { fetchCredit } from "../../../services/api";
+import { validateDate } from "../../../../constants/functions";
+import { DebtContext } from "../../../../context/DebtContext";
+import { fetchCredit } from "../../../../services/api";
 
 /*const debts = [
   { id: 1, name: "AMEX", apr: 28.99, limit: 5000, balance: 143.87 },
