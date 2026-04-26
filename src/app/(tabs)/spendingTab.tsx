@@ -1,7 +1,8 @@
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import { addWeeks, endOfWeek, format, startOfWeek, subWeeks } from "date-fns";
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -9,77 +10,21 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { BarChart, PieChart } from "react-native-gifted-charts";
+import { BarChart } from "react-native-gifted-charts";
 import Card from "../../../components/Card";
+import {
+  formatPlotData,
+  formatWeeklyData,
+  formatYearly,
+} from "../../../constants/functions";
 import { DebtContext } from "../../../context/DebtContext";
-import { fetchSpending } from "../../../services/api";
+import {
+  fetchSpending,
+  fetchSpendingWeek,
+  fetchSpendingYear,
+} from "../../../services/api";
 
 const TABS = ["Month", "Week", "Year"];
-
-const pieData = [
-  {
-    value: 47,
-    color: "#009FFF",
-    gradientCenterColor: "#006DFF",
-    focused: true,
-  },
-  { value: 40, color: "#93FCF8", gradientCenterColor: "#3BE9DE" },
-  { value: 16, color: "#BDB2FA", gradientCenterColor: "#8F80F3" },
-  { value: 3, color: "#FFA5BA", gradientCenterColor: "#FF7F97" },
-];
-
-const formatPlotData = (localSpending, selectedDate) => {
-  const weeklyTotals = new Map();
-
-  const year = new Date(selectedDate).getFullYear();
-  const month = new Date(selectedDate).getMonth();
-
-  //const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const numDays = lastDay.getDate();
-
-  // Loop through weeks in 7-day increments
-  for (let i = 1; i <= numDays; i += 7) {
-    const start = i;
-    const end = Math.min(i + 6, numDays);
-    const key = `${start}-${end}`;
-    weeklyTotals.set(key, 0); // Initialize with empty array
-    //console.log(weeklyTotals);
-  }
-
-  //console.log(weeklyTotals);
-
-  localSpending.forEach((t) => {
-    const day = new Date(t.date_spending).getDate();
-    // Determine 7-day bucket (1-7, 8-14, 15-21, 22-31)
-    const weekBucket = Math.ceil(day / 7);
-    const startDay = (weekBucket - 1) * 7 + 1;
-    let endDay = weekBucket * 7;
-
-    // Adjust end day for last week of month
-    const lastDayOfMonth = new Date(
-      new Date(t.date_spending).getFullYear(),
-      new Date(t.date_spending).getMonth() + 1,
-      0,
-    ).getDate();
-    if (endDay > lastDayOfMonth) endDay = lastDayOfMonth;
-
-    const label = `${startDay}-${endDay}`;
-
-    weeklyTotals.set(label, (weeklyTotals.get(label) || 0) + t.amount);
-  });
-
-  //console.log("aqui", JSON.stringify(Object.fromEntries(weeklyTotals)));
-
-  const arrayTotals = Array.from(weeklyTotals, ([label, value]) => ({
-    label,
-    value,
-  }));
-
-  //console.log(arrayTotals);
-
-  return arrayTotals;
-};
 
 const SpendingTab = () => {
   const router = useRouter();
@@ -95,38 +40,132 @@ const SpendingTab = () => {
     setLocalTotalSpending,
   } = useContext(DebtContext);
 
+  const year = new Date().getFullYear();
+
   const [date, setDate] = useState(new Date());
+  const [selectedYear, setSelectedYear] = useState(year);
+  const [currentWeek, setCurrentWeek] = useState(new Date());
   const [selected, setSelected] = useState(0);
+
+  const [weekly, setWeekly] = useState([]);
+  const [weeklyTotal, setLocalWeeklyTotalSpending] = useState(0);
+
+  const [yearSummary, setYearSpending] = useState([]);
+  const [yearTotal, setYearTotalSpending] = useState(0);
+
+  const start = startOfWeek(currentWeek, { weekStartsOn: 1 });
+  const end = endOfWeek(currentWeek, { weekStartsOn: 1 });
+
+  function usePrevious(value) {
+    const ref = useRef();
+
+    // Store current value in ref after every render
+    useEffect(() => {
+      ref.current = value;
+    }, [value]);
+
+    // Return the value from the previous render (which was stored in the last effect run)
+    return ref.current;
+  }
+
+  const prevMonth = usePrevious(date);
+  const prevWeekly = usePrevious(currentWeek);
+  const prevYear = usePrevious(selectedYear);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        //console.log(date);
+        if (prevMonth !== date) {
+          //console.log(date);
+          console.log("\nFetch Month Data", date);
+          if (
+            date.getMonth() === new Date().getMonth() &&
+            date.getFullYear() === new Date().getFullYear()
+          ) {
+            const result = await fetchSpending(date);
 
-        if (
-          date.getMonth() === new Date().getMonth() &&
-          date.getFullYear() === new Date().getFullYear()
-        ) {
-          const result = await fetchSpending(date);
+            setSpending(result);
+            setLocalSpending(result);
+          } else {
+            const result = await fetchSpending(date);
 
-          setSpending(result);
-          setLocalSpending(result);
-        } else {
-          const result = await fetchSpending(date);
+            //setSpending(result);
+            setLocalSpending(result);
+          }
 
-          //setSpending(result);
-          setLocalSpending(result);
+          //console.log(spending);
+          //console.log(date);
+        }
+        if (prevWeekly !== currentWeek) {
+          console.log("\nFetch Week Data", currentWeek);
+          const result = await fetchSpendingWeek(
+            format(start, "yyyy-M-d"),
+            format(end, "yyyy-M-d"),
+          );
+
+          setWeekly(result);
         }
 
-        //console.log(spending);
-        //console.log(date);
+        if (prevYear !== selectedYear) {
+          console.log("\nFetch Year Data", selectedYear);
+
+          const result = await fetchSpendingYear(selectedYear);
+
+          setYearSpending(result);
+        }
       } catch (error) {
         console.error("Fetch error:", error);
       }
     };
 
     fetchData();
-  }, [date]);
+  }, [date, selectedYear, currentWeek]);
+
+  /*
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log("Fetch Week Data", currentWeek);
+      try {
+        const result = await fetchSpendingWeek(
+          format(start, "yyyy-M-d"),
+          format(end, "yyyy-M-d"),
+        );
+
+        setWeekly(result);
+
+        //console.log("data week", result);
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    };
+    //if (selected === 1) {
+    //console.log(format(start, "yyyy-M-d"), format(end, "yyyy-M-d"));
+
+    fetchData();
+    //}
+  }, [currentWeek]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log("Fetch Year Data", selectedYear);
+      try {
+        const result = await fetchSpendingYear(selectedYear);
+
+        //console.log(result);
+
+        setYearSpending(result);
+        console.log("\ndata week", yearSummary);
+        //console.log(yearSummary);
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    };
+    //if (selected === 1) {
+    //console.log(format(start, "yyyy-M-d"), format(end, "yyyy-M-d"));
+
+    fetchData();
+    //}
+  }, [selectedYear]);*/
 
   useEffect(() => {
     setTotalSpending(spending.reduce((acc, curr) => acc + curr.amount, 0));
@@ -137,6 +176,18 @@ const SpendingTab = () => {
       localSpending.reduce((acc, curr) => acc + curr.amount, 0),
     );
   }, [localSpending]);
+
+  useEffect(() => {
+    setLocalWeeklyTotalSpending(
+      weekly.reduce((acc, curr) => acc + curr.amount, 0),
+    );
+  }, [weekly]);
+
+  useEffect(() => {
+    setYearTotalSpending(
+      yearSummary.reduce((acc, curr) => acc + curr.total_sum, 0),
+    );
+  }, [yearSummary]);
 
   const changeMonth = (direction) => {
     const newDate = new Date(date);
@@ -168,80 +219,78 @@ const SpendingTab = () => {
         Spending List
       </Text>*/}
 
-      <FlatList
-        data={localSpending}
-        renderItem={({ item }) => {
-          //console.log(categories[item.type].icon);
-          return (
-            <Card
-              item={item}
-              params={{
-                pathname: "spending/[spendingId]",
-                params: {
-                  id: item.id,
-                  name: item.spending_name,
-                  amount: item.amount,
-                  category: item.type_spending,
-                  date: item.date_spending,
-                  selectedMonth: date.getMonth() + 1,
-                  selectedYear: date.getFullYear(),
-                },
-              }}
-            />
-          );
+      <SegmentedControl
+        values={TABS}
+        style={{ width: "80%", alignSelf: "center", margin: 20 }}
+        selectedIndex={selected}
+        onChange={(event) => {
+          setSelected(event.nativeEvent.selectedSegmentIndex);
         }}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
-        keyExtractor={(item) => item.id.toString()}
-        //scrollEnabled={false}
-        ListHeaderComponent={() => {
-          return (
-            <>
-              <View style={styles.datePickerCard}>
-                <TouchableOpacity
-                  style={{ paddingHorizontal: 10 }}
-                  onPress={() => changeMonth(-1)}
-                >
-                  <SymbolView
-                    name={{ ios: "chevron.left" }}
-                    tintColor="gray"
-                    size={20}
-                  />
-                </TouchableOpacity>
+      />
 
-                <Text
-                  style={{
-                    fontSize: 28,
-                    textAlign: "center",
-                    justifyContent: "center",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {formatMonth(date)}
-                </Text>
-
-                <TouchableOpacity
-                  style={{ paddingHorizontal: 10 }}
-                  onPress={() => changeMonth(1)}
-                >
-                  <SymbolView
-                    name={{ ios: "chevron.right" }}
-                    tintColor="gray"
-                    size={20}
-                  />
-                </TouchableOpacity>
-              </View>
-              <SegmentedControl
-                values={TABS}
-                style={{ width: "80%", alignSelf: "center", margin: 20 }}
-                selectedIndex={selected}
-                onChange={(event) => {
-                  setSelected(event.nativeEvent.selectedSegmentIndex);
-                }}
-                onValueChange={(value) => {
-                  console.log("Selected value:", value);
+      {selected === 0 ? (
+        <FlatList
+          data={localSpending}
+          renderItem={({ item }) => {
+            //console.log(categories[item.type].icon);
+            return (
+              <Card
+                item={item}
+                params={{
+                  pathname: "spending/[spendingId]",
+                  params: {
+                    id: item.id,
+                    name: item.spending_name,
+                    amount: item.amount,
+                    category: item.type_spending,
+                    date: item.date_spending,
+                    selectedMonth: date.getMonth() + 1,
+                    selectedYear: date.getFullYear(),
+                  },
                 }}
               />
-              {selected === 0 ? (
+            );
+          }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
+          keyExtractor={(item) => item.id.toString()}
+          //scrollEnabled={false}
+          ListHeaderComponent={() => {
+            return (
+              <>
+                <View style={styles.datePickerCard}>
+                  <TouchableOpacity
+                    style={{ paddingHorizontal: 10 }}
+                    onPress={() => changeMonth(-1)}
+                  >
+                    <SymbolView
+                      name={{ ios: "chevron.left" }}
+                      tintColor="gray"
+                      size={20}
+                    />
+                  </TouchableOpacity>
+
+                  <Text
+                    style={{
+                      fontSize: 28,
+                      textAlign: "center",
+                      justifyContent: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {formatMonth(date)}
+                  </Text>
+
+                  <TouchableOpacity
+                    style={{ paddingHorizontal: 10 }}
+                    onPress={() => changeMonth(1)}
+                  >
+                    <SymbolView
+                      name={{ ios: "chevron.right" }}
+                      tintColor="gray"
+                      size={20}
+                    />
+                  </TouchableOpacity>
+                </View>
                 <View style={styles.spendingBalance}>
                   <Text style={styles.text}>Total:</Text>
                   <Text style={styles.textSpendingNumber}>
@@ -253,58 +302,204 @@ const SpendingTab = () => {
                     height={200}
                     //width={220}
                     //barWidth={20}
-                    minHeight={3}
+                    //minHeight={3}
                     barBorderRadius={3}
                     spacing={20}
                     noOfSections={4}
                     yAxisThickness={0}
                     xAxisThickness={0}
-                    xAxisLabelTextStyle={{ color: "gray", fontSize: 12 }}
-                    yAxisTextStyle={{ color: "gray", fontSize: 12 }}
+                    xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+                    yAxisTextStyle={{ color: "gray", fontSize: 10 }}
                     isAnimated
                     animationDuration={300}
-                    //showGradient={true}
+                    gradientColor={"#12ff00"} // Default top color
+                    frontColor={"#d3ff00"} // Default bottom color
+                    //showGradient
                   />
                 </View>
-              ) : selected === 1 ? (
-                <View style={styles.spendingBalance}>
-                  <Text style={styles.text}>Pie:</Text>
-                  <View style={{ padding: 20, alignItems: "center" }}>
-                    <PieChart
-                      data={pieData}
-                      donut
-                      showGradient
-                      sectionAutoFocus
-                      radius={50}
-                      innerRadius={30}
-                      //innerCircleColor={"#232B5D"}
+              </>
+            );
+          }}
+        />
+      ) : selected === 1 ? (
+        <FlatList
+          data={weekly}
+          renderItem={({ item }) => {
+            //console.log(categories[item.type].icon);
+            return (
+              <Card
+                item={item}
+                params={{
+                  pathname: "spending/[spendingId]",
+                  params: {
+                    id: item.id,
+                    name: item.spending_name,
+                    amount: item.amount,
+                    category: item.type_spending,
+                    date: item.date_spending,
+                    selectedMonth: date.getMonth() + 1,
+                    selectedYear: date.getFullYear(),
+                  },
+                }}
+              />
+            );
+          }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
+          keyExtractor={(item) => item.id.toString()}
+          //scrollEnabled={false}
+          ListHeaderComponent={() => {
+            return (
+              <>
+                <View
+                  style={[
+                    styles.datePickerCard,
+                    {
+                      width: "90%",
+                      alignSelf: "center",
+                      alignContent: "center",
+                      justifyContent: "center",
+                    },
+                  ]}
+                >
+                  <TouchableOpacity
+                    style={{ paddingHorizontal: 10 }}
+                    onPress={() => setCurrentWeek(subWeeks(currentWeek, 1))}
+                  >
+                    <SymbolView
+                      name={{ ios: "chevron.left" }}
+                      tintColor="gray"
+                      size={20}
                     />
-                  </View>
-                </View>
-              ) : selected === 2 ? (
-                <View style={styles.spendingBalance}>
-                  <Text style={styles.text}>Weekly:</Text>
-                  <Text style={styles.textSpendingNumber}>
-                    ${localTotalSpending.toFixed(2)}
+                  </TouchableOpacity>
+
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      textAlign: "center",
+                      justifyContent: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {format(start, "MMM d")} - {format(end, "MMM d, yyyy")}
                   </Text>
+
+                  <TouchableOpacity
+                    style={{ paddingHorizontal: 10 }}
+                    onPress={() => setCurrentWeek(addWeeks(currentWeek, 1))}
+                  >
+                    <SymbolView
+                      name={{ ios: "chevron.right" }}
+                      tintColor="gray"
+                      size={20}
+                    />
+                  </TouchableOpacity>
                 </View>
-              ) : (
+
                 <View style={styles.spendingBalance}>
-                  <Text style={styles.text}>Monthly:</Text>
+                  <Text style={styles.text}>Total:</Text>
                   <Text style={styles.textSpendingNumber}>
-                    ${localTotalSpending.toFixed(2)}
+                    ${weeklyTotal.toFixed(2)}
                   </Text>
+
+                  <BarChart
+                    data={formatWeeklyData(weekly)}
+                    height={200}
+                    //width={220}
+                    //barWidth={20}
+                    //minHeight={3}
+                    barBorderRadius={3}
+                    spacing={5}
+                    noOfSections={4}
+                    yAxisThickness={0}
+                    xAxisThickness={0}
+                    xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+                    yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+                    isAnimated
+                    animationDuration={300}
+                    gradientColor={"#12ff00"} // Default top color
+                    frontColor={"#d3ff00"} // Default bottom color
+                    //showGradient
+                  />
                 </View>
-              )}
-            </>
-          );
-        }}
-        //ListHeaderComponent={
-        //  <Text style={{ fontWeight: "bold", fontSize: 28, paddingTop: 10 }}>
-        //    Card Balances:
-        //</View>  </Text>
-        //}
-      />
+              </>
+            );
+          }}
+        />
+      ) : selected == 2 ? (
+        <>
+          <View
+            style={[
+              styles.datePickerCard,
+              { paddingHorizontal: 16, paddingBottom: 16 },
+            ]}
+          >
+            <TouchableOpacity
+              style={{ paddingHorizontal: 10 }}
+              onPress={() => {
+                setSelectedYear((prev) => prev - 1);
+              }}
+            >
+              <SymbolView
+                name={{ ios: "chevron.left" }}
+                tintColor="gray"
+                size={20}
+              />
+            </TouchableOpacity>
+
+            <Text
+              style={{
+                fontSize: 28,
+                textAlign: "center",
+                justifyContent: "center",
+                fontWeight: "bold",
+              }}
+            >
+              {selectedYear}
+            </Text>
+
+            <TouchableOpacity
+              style={{ paddingHorizontal: 10 }}
+              onPress={() => {
+                setSelectedYear((prev) => prev + 1);
+              }}
+            >
+              <SymbolView
+                name={{ ios: "chevron.right" }}
+                tintColor="gray"
+                size={20}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={[styles.spendingBalance]}>
+            <Text style={styles.text}>Total:</Text>
+            <Text style={styles.textSpendingNumber}>
+              ${yearTotal.toFixed(2)}
+            </Text>
+
+            <BarChart
+              data={formatYearly(yearSummary)}
+              height={200}
+              //width={220}
+              barWidth={20}
+              //horizontal
+              //minHeight={3}
+              barBorderRadius={3}
+              spacing={5}
+              noOfSections={4}
+              yAxisThickness={0}
+              xAxisThickness={0}
+              xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+              yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+              isAnimated
+              animationDuration={300}
+              gradientColor={"#12ff00"} // Default top color
+              frontColor={"#d3ff00"} // Default bottom color
+              //showGradient
+            />
+          </View>
+        </>
+      ) : null}
 
       <TouchableOpacity
         style={styles.fab}
@@ -385,7 +580,7 @@ const styles = StyleSheet.create({
   },
 
   datePickerCard: {
-    marginTop: 15,
+    //marginTop: 15,
     flexDirection: "row",
     //justifyContent: "space-between",
     //backgroundColor: "#fff",

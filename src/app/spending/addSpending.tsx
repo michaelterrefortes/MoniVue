@@ -90,7 +90,7 @@ const AddSpending = () => {
     setLoading(false);
 
     if (result?.message) {
-      console.log(result);
+      //console.log(result);
       //router.setParams(result.data);
       const selectedMonth = Number(params?.selectedMonth);
       const selectedYear = Number(params?.selectedYear);

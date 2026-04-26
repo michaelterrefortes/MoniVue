@@ -92,7 +92,7 @@ const AddBill = () => {
     setLoading(false);
 
     if (result?.message) {
-      console.log(result.message);
+      //console.log(result.message);
       //router.setParams(result.data);
       setBills((prevBills) => [...prevBills, result.data]);
       //router.setParams({ refreshed: "true" });

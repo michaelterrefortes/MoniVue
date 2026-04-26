@@ -37,7 +37,7 @@ export default function BillsTab() {
         const result = await fetchBills();
 
         setBills(result);
-        console.log(result);
+        //console.log(result);
       } catch (error) {
         console.error("Fetch error:", error);
       }

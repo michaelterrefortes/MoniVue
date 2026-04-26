@@ -128,7 +128,7 @@ const DebtInfo = () => {
     setLoading(false);
 
     if (result?.message) {
-      console.log(result.message);
+      //console.log(result.message);
       //router.setParams(result.data);
       setDebts((prevCards) => [...prevCards, result.data]);
       //router.setParams({ refreshed: "true" });

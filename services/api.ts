@@ -31,7 +31,43 @@ export const fetchSpending = async (date = null) => {
   //console.log(date);
   const result = await response.json();
 
-  console.log(result);
+  //console.log(result);
+
+  if (!response.ok) {
+    // @ts-ignore
+    throw new Error("Failed to fetch spending", response.statusText);
+  }
+  //console.log(result);
+  return result;
+};
+
+export const fetchSpendingWeek = async (start, end) => {
+  //console.log(month, year);
+
+  const response = await fetch(`${url}/spending/week/${start}_${end}`);
+  //console.log(date);
+  const result = await response.json();
+
+  //console.log(result);
+
+  if (!response.ok) {
+    // @ts-ignore
+    throw new Error("Failed to fetch spending", response.statusText);
+  }
+  //console.log(result);
+  return result;
+};
+
+export const fetchSpendingYear = async (year) => {
+  //console.log(month, year);
+
+  const response = await fetch(`${url}/spending/year/${year}`);
+  //console.log(date);
+  const result = await response.json();
+
+  //console.log(result);
+
+  //console.log(result);
 
   if (!response.ok) {
     // @ts-ignore

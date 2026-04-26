@@ -1,13 +1,56 @@
 import { useRouter } from "expo-router";
+import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { PieChart } from "react-native-gifted-charts";
-import { getMonthStats } from "../../../constants/functions";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { BarChart, PieChart } from "react-native-gifted-charts";
+import { categoriesSpending } from "../../../constants/categories";
+import { formatPlotData, getMonthStats } from "../../../constants/functions";
 import { DebtContext } from "../../../context/DebtContext";
-import { fetchTotals } from "../../../services/api";
+import { fetchSpending, fetchTotals } from "../../../services/api";
 
 // ...
 const data = [{ value: 50 }, { value: 80 }, { value: 90 }, { value: 70 }];
+
+const formatDataType = (monthlyData, total) => {
+  let dataPlot = [];
+  //console.log(monthlyData);
+
+  if (monthlyData.length !== 0) {
+    const sumData = monthlyData.reduce(
+      (acc, curr) => {
+        // Initialize category if it doesn't exist
+        if (!acc[curr.type_spending]) {
+          acc[curr.type_spending] = 0;
+        }
+        // Sum the price
+        acc[curr.type_spending] += curr.amount;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    //console.log("\n", sumData);
+
+    for (const key in sumData) {
+      dataPlot.push({
+        key: Number[key],
+        label: categoriesSpending[Number(key)].name,
+        value: (sumData[key] / total) * 100,
+        color: categoriesSpending[Number(key)].color,
+      });
+    }
+
+    //console.log(dataPlot);
+
+    return dataPlot;
+  }
+};
 
 const Index = () => {
   const router = useRouter();
@@ -23,6 +66,9 @@ const Index = () => {
     totalCreditMinimum,
     setTotalCreditMinimum,
     isDarkMode,
+
+    spending,
+    setSpending,
   } = useContext(DebtContext);
 
   useEffect(() => {
@@ -33,6 +79,10 @@ const Index = () => {
         setTotalDebts(result.debts);
         setTotalCreditMinimum(result.minimum);
         setTotalSpending(result.spending);
+
+        const result2 = await fetchSpending();
+        setSpending(result2);
+        //console.log(result2);
       } catch (error) {
         console.error("Fetch error:", error);
       }
@@ -42,7 +92,7 @@ const Index = () => {
   }, []);
 
   return (
-    <View
+    <ScrollView
       style={[
         styles.container,
         { backgroundColor: isDarkMode ? "rgb(242, 242, 242)" : "#000" },
@@ -61,7 +111,24 @@ const Index = () => {
       >
         <View style={styles.row}>
           <View>
-            <Text style={styles.label}>Income</Text>
+            <TouchableOpacity
+              style={{
+                paddingHorizontal: 2,
+                flexDirection: "row",
+                justifyContent: "center",
+
+                alignItems: "center",
+              }}
+              onPress={() => console.log("pressed")}
+            >
+              <Text style={[styles.label]}>Income</Text>
+              <SymbolView
+                name={{ ios: "chevron.right" }}
+                tintColor="gray"
+                size={12}
+              />
+            </TouchableOpacity>
+
             <Text style={[styles.value, styles.income]}>${income}</Text>
           </View>
 
@@ -162,8 +229,73 @@ const Index = () => {
         </Text>
       </View>
 
-      <PieChart data={data} donut />
-    </View>
+      <View style={[styles.card, { marginTop: 15 }]}>
+        <Text style={[styles.label, { textAlign: "left" }]}>
+          Monthly Spending:
+        </Text>
+        <Text style={{ fontWeight: "bold" }}>
+          {new Date().toLocaleDateString("en-US", { month: "short" })}{" "}
+          {new Date().getFullYear()}
+        </Text>
+        <View style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}>
+          <BarChart
+            data={formatPlotData(spending, new Date())}
+            height={200}
+            //width={220}
+            //barWidth={20}
+            //minHeight={3}
+            barBorderRadius={3}
+            spacing={20}
+            noOfSections={4}
+            yAxisThickness={0}
+            xAxisThickness={0}
+            xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+            yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+            isAnimated
+            animationDuration={300}
+            gradientColor={"#12ff00"} // Default top color
+            frontColor={"#d3ff00"} // Default bottom color
+            //frontColor={"#drgb(0, 162, 255)"}
+            //showGradient
+          />
+        </View>
+      </View>
+
+      <View style={[styles.card, { marginTop: 15, marginBottom: 15 }]}>
+        <Text style={[styles.label, { textAlign: "left" }]}>
+          Spending Categories:
+        </Text>
+        <View style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}>
+          <PieChart
+            radius={90}
+            innerRadius={60}
+            data={formatDataType(spending, totalSpending)}
+            donut
+          />
+        </View>
+        {formatDataType(spending, totalSpending)?.map((item) => {
+          return (
+            <View
+              key={item.key}
+              style={{ flexDirection: "row", alignSelf: "center" }}
+            >
+              <View
+                style={{
+                  height: 10,
+                  width: 10,
+                  borderRadius: 5,
+                  backgroundColor: item.color,
+                  marginRight: 10,
+                }}
+              />
+              <Text style={styles.label}>
+                {item.label}: {item.value.toFixed(0)}%
+              </Text>
+            </View>
+          );
+        })}
+      </View>
+    </ScrollView>
   );
 };
 
