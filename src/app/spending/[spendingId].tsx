@@ -22,7 +22,6 @@ const SpendingDetails = () => {
   const [name, setName] = useState(params.name);
   const [amount, setAmount] = useState(Number(params.amount));
   const [type, setType] = useState(params.category);
-
   const [date, setDate] = useState(params.date);
 
   const [categoryName, setCategoryName] = useState(
@@ -113,7 +112,18 @@ const SpendingDetails = () => {
         headerRight: () => (
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <TouchableOpacity
-              onPress={() => setEditing(true)}
+              onPress={() =>
+                router.push({
+                  pathname: "spending/editSpending",
+                  params: {
+                    id: params.id,
+                    name: name,
+                    amount: amount,
+                    type: type,
+                    date: date,
+                  },
+                })
+              } //setEditing(true)}
               style={{
                 width: 35,
                 height: 35,

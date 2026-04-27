@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
+import { SafeAreaView } from "react-native-safe-area-context";
 import AccountButton from "../../../../components/AccountButton";
 import Card from "../../../../components/Card";
 import {
@@ -189,6 +190,7 @@ const SpendingTab = () => {
       unstable_headerRightItems: () => [
         {
           type: "custom",
+
           element: (
             <TouchableOpacity
               onPress={() =>
@@ -216,7 +218,7 @@ const SpendingTab = () => {
   //formatPlotData(localSpending, date);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/*<Text
         style={{
           fontWeight: "bold",
@@ -227,15 +229,6 @@ const SpendingTab = () => {
       >
         Spending List
       </Text>*/}
-
-      <SegmentedControl
-        values={TABS}
-        style={{ width: "80%", alignSelf: "center", margin: 20 }}
-        selectedIndex={selected}
-        onChange={(event) => {
-          setSelected(event.nativeEvent.selectedSegmentIndex);
-        }}
-      />
 
       {selected === 0 ? (
         <FlatList
@@ -260,12 +253,24 @@ const SpendingTab = () => {
               />
             );
           }}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
+          //contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
           keyExtractor={(item) => item.id.toString()}
           //scrollEnabled={false}
           ListHeaderComponent={() => {
             return (
               <>
+                <SegmentedControl
+                  values={TABS}
+                  style={{
+                    width: "80%",
+                    alignSelf: "center",
+                    margin: 20,
+                  }}
+                  selectedIndex={selected}
+                  onChange={(event) => {
+                    setSelected(event.nativeEvent.selectedSegmentIndex);
+                  }}
+                />
                 <View style={styles.datePickerCard}>
                   <TouchableOpacity
                     style={{ paddingHorizontal: 10 }}
@@ -353,12 +358,24 @@ const SpendingTab = () => {
               />
             );
           }}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
+          //contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
           keyExtractor={(item) => item.id.toString()}
           //scrollEnabled={false}
           ListHeaderComponent={() => {
             return (
               <>
+                <SegmentedControl
+                  values={TABS}
+                  style={{
+                    width: "80%",
+                    alignSelf: "center",
+                    margin: 20,
+                  }}
+                  selectedIndex={selected}
+                  onChange={(event) => {
+                    setSelected(event.nativeEvent.selectedSegmentIndex);
+                  }}
+                />
                 <View
                   style={[
                     styles.datePickerCard,
@@ -436,102 +453,120 @@ const SpendingTab = () => {
         />
       ) : selected == 2 ? (
         <>
-          <View
-            style={[
-              styles.datePickerCard,
-              { paddingHorizontal: 16, paddingBottom: 16 },
-            ]}
-          >
-            <TouchableOpacity
-              style={{ paddingHorizontal: 10 }}
-              onPress={() => {
-                setSelectedYear((prev) => prev - 1);
-              }}
-            >
-              <SymbolView
-                name={{ ios: "chevron.left" }}
-                tintColor="gray"
-                size={20}
-              />
-            </TouchableOpacity>
+          <FlatList
+            data={[]}
+            ListHeaderComponent={
+              <>
+                <SegmentedControl
+                  values={TABS}
+                  style={{
+                    width: "80%",
+                    alignSelf: "center",
+                    margin: 20,
+                  }}
+                  selectedIndex={selected}
+                  onChange={(event) => {
+                    setSelected(event.nativeEvent.selectedSegmentIndex);
+                  }}
+                />
+                <View
+                  style={[
+                    styles.datePickerCard,
+                    { paddingHorizontal: 16, paddingBottom: 16 },
+                  ]}
+                >
+                  <TouchableOpacity
+                    style={{ paddingHorizontal: 10 }}
+                    onPress={() => {
+                      setSelectedYear((prev) => prev - 1);
+                    }}
+                  >
+                    <SymbolView
+                      name={{ ios: "chevron.left" }}
+                      tintColor="gray"
+                      size={20}
+                    />
+                  </TouchableOpacity>
 
-            <Text
-              style={{
-                fontSize: 28,
-                textAlign: "center",
-                justifyContent: "center",
-                fontWeight: "bold",
-              }}
-            >
-              {selectedYear}
-            </Text>
+                  <Text
+                    style={{
+                      fontSize: 28,
+                      textAlign: "center",
+                      justifyContent: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {selectedYear}
+                  </Text>
 
-            <TouchableOpacity
-              style={{ paddingHorizontal: 10 }}
-              onPress={() => {
-                setSelectedYear((prev) => prev + 1);
-              }}
-            >
-              <SymbolView
-                name={{ ios: "chevron.right" }}
-                tintColor="gray"
-                size={20}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View style={[styles.spendingBalance]}>
-            <Text style={styles.text}>Total:</Text>
-            <Text style={styles.textSpendingNumber}>
-              ${yearTotal.toFixed(2)}
-            </Text>
-            {yearSummary.length !== 0 ? (
-              <BarChart
-                data={formatYearly(yearSummary)}
-                height={200}
-                //width={220}
-                barWidth={20}
-                //horizontal
-                //minHeight={3}
-                barBorderRadius={3}
-                spacing={5}
-                noOfSections={4}
-                yAxisThickness={0}
-                xAxisThickness={0}
-                xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-                yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-                isAnimated
-                animationDuration={300}
-                gradientColor={"#12ff00"} // Default top color
-                frontColor={"#d3ff00"} // Default bottom color
-                //showGradient
-              />
-            ) : (
-              <BarChart
-                data={[]}
-                height={200}
-                //width={220}
-                barWidth={20}
-                //horizontal
-                //minHeight={3}
-                barBorderRadius={3}
-                spacing={5}
-                noOfSections={4}
-                yAxisThickness={0}
-                xAxisThickness={0}
-                xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-                yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-                isAnimated
-                animationDuration={300}
-                gradientColor={"#12ff00"} // Default top color
-                frontColor={"#d3ff00"} // Default bottom color
-                //showGradient
-              />
-            )}
-          </View>
+                  <TouchableOpacity
+                    style={{ paddingHorizontal: 10 }}
+                    onPress={() => {
+                      setSelectedYear((prev) => prev + 1);
+                    }}
+                  >
+                    <SymbolView
+                      name={{ ios: "chevron.right" }}
+                      tintColor="gray"
+                      size={20}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View style={[styles.spendingBalance]}>
+                  <Text style={styles.text}>Total:</Text>
+                  <Text style={styles.textSpendingNumber}>
+                    ${yearTotal.toFixed(2)}
+                  </Text>
+                  {yearSummary.length !== 0 ? (
+                    <BarChart
+                      data={formatYearly(yearSummary)}
+                      height={200}
+                      //width={220}
+                      barWidth={20}
+                      //horizontal
+                      //minHeight={3}
+                      barBorderRadius={3}
+                      spacing={5}
+                      noOfSections={4}
+                      yAxisThickness={0}
+                      xAxisThickness={0}
+                      xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+                      yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+                      isAnimated
+                      animationDuration={300}
+                      gradientColor={"#12ff00"} // Default top color
+                      frontColor={"#d3ff00"} // Default bottom color
+                      //showGradient
+                    />
+                  ) : (
+                    <BarChart
+                      data={[]}
+                      height={200}
+                      //width={220}
+                      barWidth={20}
+                      //horizontal
+                      //minHeight={3}
+                      barBorderRadius={3}
+                      spacing={5}
+                      noOfSections={4}
+                      yAxisThickness={0}
+                      xAxisThickness={0}
+                      xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+                      yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+                      isAnimated
+                      animationDuration={300}
+                      gradientColor={"#12ff00"} // Default top color
+                      frontColor={"#d3ff00"} // Default bottom color
+                      //showGradient
+                    />
+                  )}
+                </View>
+              </>
+            }
+          />
         </>
       ) : null}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -540,7 +575,7 @@ export default SpendingTab;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 150,
+    //marginTop: 150,
     //alignItems: "center",
     //justifyContent: "center",
   },

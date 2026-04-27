@@ -132,10 +132,12 @@ export default function TabLayout() {
           /*tabBarIcon: ({ focused }) => (
             <Icons focused={focused} title={"creditcard"} />
           ),*/
+
           tabBarIcon: ({ focused }) =>
             Platform.select({
               ios: {
                 type: "sfSymbol",
+
                 name: focused ? "creditcard.fill" : "creditcard",
               },
             }),
@@ -149,6 +151,7 @@ export default function TabLayout() {
           /*tabBarIcon: ({ focused }) => (
             <Icons focused={focused} title={"dollarsign.bank.building"} />
           ),*/
+
           tabBarIcon: ({ focused }) =>
             Platform.select({
               ios: {

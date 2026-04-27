@@ -8,7 +8,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { categories } from "../../../../constants/categories";
 import { validateDate } from "../../../../constants/functions";
 import { DebtContext } from "../../../../context/DebtContext";
@@ -55,42 +58,15 @@ export default function BillsTab() {
   const { top } = useSafeAreaInsets();
 
   return (
-    <View
+    <SafeAreaView
       style={[
         styles.container,
-        { paddingTop: top - 36 },
-        { backgroundColor: isDarkMode ? "rgb(242, 242, 242)" : "#000" },
+        //{ paddingTop: top - 36 },
+        //{ marginTop: 170 },
+        //{ backgroundColor: isDarkMode ? "rgb(242, 242, 242)" : "#000" },
       ]}
     >
-      <View
-        style={[
-          styles.billsBalance,
-          { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-        ]}
-      >
-        <Text style={styles.textVaries}>Total:</Text>
-        <Text
-          style={[styles.textBills, { color: isDarkMode ? "#000" : "#fff" }]}
-        >
-          ${totalBills.toFixed(2)}
-        </Text>
-        <Text style={styles.textVaries}>Variation:</Text>
-        <Text style={styles.textVaries}>
-          ${(totalBills - variance).toFixed(2)} - $
-          {(totalBills + variance).toFixed(2)}
-        </Text>
-      </View>
-
-      <View style={{ height: 20 }} />
-
       <FlatList
-        style={{
-          backgroundColor: isDarkMode ? "#fff" : "#1c1c1c",
-          //borderRadius: 50,
-          paddingTop: 30,
-          borderTopLeftRadius: 50,
-          borderTopRightRadius: 50,
-        }}
         data={bills}
         renderItem={({ item }) => {
           //console.log(categories[item.type].icon);
@@ -181,17 +157,42 @@ export default function BillsTab() {
             </TouchableOpacity>
           );
         }}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
+        //contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
         keyExtractor={(item) => item.id.toString()}
         //scrollEnabled={false}
-
+        ListHeaderComponent={
+          <>
+            <View
+              style={[
+                styles.billsBalance,
+                { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
+              ]}
+            >
+              <Text style={styles.textVaries}>Total:</Text>
+              <Text
+                style={[
+                  styles.textBills,
+                  { color: isDarkMode ? "#000" : "#fff" },
+                ]}
+              >
+                ${totalBills.toFixed(2)}
+              </Text>
+              <Text style={styles.textVaries}>Variation:</Text>
+              <Text style={styles.textVaries}>
+                ${(totalBills - variance).toFixed(2)} - $
+                {(totalBills + variance).toFixed(2)}
+              </Text>
+            </View>
+            <View style={{ height: 20 }} />
+          </>
+        }
         //ListHeaderComponent={
         //  <Text style={{ fontWeight: "bold", fontSize: 28, paddingTop: 10 }}>
         //    Card Balances:
         //</View>  </Text>
         //}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -1,5 +1,4 @@
 import { useRouter } from "expo-router";
-import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,7 +9,10 @@ import {
   View,
 } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { validateDate } from "../../../../constants/functions";
 import { DebtContext } from "../../../../context/DebtContext";
 import { fetchCredit } from "../../../../services/api";
@@ -76,192 +78,149 @@ export default function Cards() {
   const { top } = useSafeAreaInsets();
 
   return (
-    <View
+    <SafeAreaView
       style={[
         styles.container,
         { backgroundColor: isDarkMode ? "rgb(242, 242, 242)" : "#000" },
       ]}
     >
-      {/*{ paddingTop: top - 36 }]}>*/}
-      <View style={{ height: 70 }} />
-      {loading ? (
-        <View style={styles.containerLoading}>
-          <ActivityIndicator
-            size="large"
-            //color="#0000ff"
-            //className="mt-10 self-center"
-          />
-        </View>
-      ) : (
-        <>
-          <Text
-            style={{
-              fontWeight: "bold",
-              fontSize: 28,
-              //paddingTop: 10,
-              paddingLeft: 15,
-              color: isDarkMode ? "#000" : "#fff",
-            }}
-          >
-            Credit Cards
-          </Text>
+      <FlatList
+        data={debts}
+        renderItem={({ item }) => {
+          const utilization = (item.balance / item.credit_limit) * 100 || 0;
 
-          <View
-            style={[
-              styles.viewBalance,
-              { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-            ]}
-          >
-            <Text style={{ fontSize: 12, color: "gray", textAlign: "center" }}>
-              Total Balance:
-            </Text>
-            <Text
+          return (
+            <TouchableOpacity
               style={[
-                styles.balanceNumber,
-                { color: isDarkMode ? "#000" : "#fff" },
+                styles.card,
+                {
+                  backgroundColor: isDarkMode ? "#fff" : "#1c1c1c",
+                  shadowColor: isDarkMode ? "#000" : "#838383",
+                },
               ]}
+              onPress={() =>
+                router.push({
+                  pathname: "/debts/[debtId]",
+                  params: {
+                    id: item.id,
+                    name: item.credit_name,
+                    balance: item.balance,
+                    limit: item.credit_limit,
+                    apr: item.apr,
+                    minimum: item.minimum,
+                    date: item.statement_date,
+                  },
+                })
+              }
             >
-              ${totalDebts.toFixed(2)}
-            </Text>
-            <Text style={{ fontSize: 12, color: "gray", textAlign: "center" }}>
-              Total Min Payment:
-            </Text>
-            <Text style={{ fontSize: 12, color: "gray", textAlign: "center" }}>
-              ${totalCreditMinimum.toFixed(2)}
-            </Text>
-          </View>
-          <View style={{ height: 20 }} />
-          {/*<Text
-            style={{
-              fontWeight: "bold",
-              fontSize: 28,
-              paddingTop: 10,
-              paddingLeft: 15,
-              paddingBottom: 10,
-            }}
-          >
-            Card Balances
-          </Text>*/}
-          <FlatList
-            style={{
-              //backgroundColor: "white",
-              //borderRadius: 50,
-              //borderr
-              paddingTop: 30,
-              borderTopLeftRadius: 50,
-              borderTopRightRadius: 50,
-              backgroundColor: isDarkMode ? "#fff" : "#1c1c1c",
-            }}
-            data={debts}
-            /*ListHeaderComponent={() => (
-            <>
-             
-            </>
-          )}*/
-            renderItem={({ item }) => {
-              const utilization = (item.balance / item.credit_limit) * 100 || 0;
-
-              return (
-                <TouchableOpacity
+              <View style={styles.cardLeft}>
+                <Text
                   style={[
-                    styles.card,
-                    {
-                      backgroundColor: isDarkMode ? "#fff" : "#1c1c1c",
-                      shadowColor: isDarkMode ? "#000" : "#838383",
-                    },
+                    styles.cardTitle,
+                    { color: isDarkMode ? "#000" : "#fff" },
                   ]}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/debts/[debtId]",
-                      params: {
-                        id: item.id,
-                        name: item.credit_name,
-                        balance: item.balance,
-                        limit: item.credit_limit,
-                        apr: item.apr,
-                        minimum: item.minimum,
-                        date: item.statement_date,
-                      },
-                    })
-                  }
                 >
-                  <View style={styles.cardLeft}>
+                  {item.credit_name}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.cardBalance,
+                    { color: isDarkMode ? "#000" : "#fff" },
+                  ]}
+                >
+                  ${item.balance.toFixed(2)}
+                </Text>
+
+                <Text style={styles.cardSub}>Limit: ${item.credit_limit}</Text>
+
+                <Text style={styles.cardAPR}>APR {item.apr}%</Text>
+              </View>
+
+              <View style={styles.cardRight}>
+                <AnimatedCircularProgress
+                  size={65}
+                  width={7}
+                  backgroundWidth={3}
+                  fill={utilization}
+                  tintColor={getUtilizationColor(utilization)}
+                  backgroundColor={isDarkMode ? "#e5e7eb" : "#000"}
+                  arcSweepAngle={240}
+                  rotation={240}
+                  lineCap="round"
+                >
+                  {(fill) => (
                     <Text
                       style={[
-                        styles.cardTitle,
+                        styles.progressText,
                         { color: isDarkMode ? "#000" : "#fff" },
                       ]}
                     >
-                      {item.credit_name}
+                      {Math.round(fill)}%
                     </Text>
+                  )}
+                </AnimatedCircularProgress>
+                <Text style={styles.cardSub}>
+                  Due: {validateDate(item.statement_date)}
+                </Text>
+                <Text style={styles.cardSub}>Minimum: ${item.minimum}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        }}
+        //contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
+        keyExtractor={(item) => item.id.toString()}
+        //scrollEnabled={false}
 
-                    <Text
-                      style={[
-                        styles.cardBalance,
-                        { color: isDarkMode ? "#000" : "#fff" },
-                      ]}
-                    >
-                      ${item.balance.toFixed(2)}
-                    </Text>
-
-                    <Text style={styles.cardSub}>
-                      Limit: ${item.credit_limit}
-                    </Text>
-
-                    <Text style={styles.cardAPR}>APR {item.apr}%</Text>
-                  </View>
-
-                  <View style={styles.cardRight}>
-                    <AnimatedCircularProgress
-                      size={65}
-                      width={7}
-                      backgroundWidth={3}
-                      fill={utilization}
-                      tintColor={getUtilizationColor(utilization)}
-                      backgroundColor={isDarkMode ? "#e5e7eb" : "#000"}
-                      arcSweepAngle={240}
-                      rotation={240}
-                      lineCap="round"
-                    >
-                      {(fill) => (
-                        <Text
-                          style={[
-                            styles.progressText,
-                            { color: isDarkMode ? "#000" : "#fff" },
-                          ]}
-                        >
-                          {Math.round(fill)}%
-                        </Text>
-                      )}
-                    </AnimatedCircularProgress>
-                    <Text style={styles.cardSub}>
-                      Due: {validateDate(item.statement_date)}
-                    </Text>
-                    <Text style={styles.cardSub}>Minimum: ${item.minimum}</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            }}
-            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
-            keyExtractor={(item) => item.id.toString()}
-            //scrollEnabled={false}
-
-            //ListHeaderComponent={
-            //  <Text style={{ fontWeight: "bold", fontSize: 28, paddingTop: 10 }}>
-            //    Card Balances:
-            //</View>  </Text>
-            //}
-          />
-        </>
-      )}
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={[styles.fab]}
-        onPress={() => router.push(`/debts/addDebt`)}
-      >
-        <SymbolView name={{ ios: "plus" }} tintColor="white" size={20} />
-      </TouchableOpacity>
-    </View>
+        ListHeaderComponent={
+          <>
+            {loading ? (
+              <View style={styles.containerLoading}>
+                <ActivityIndicator
+                  size="large"
+                  //color="#0000ff"
+                  //className="mt-10 self-center"
+                />
+              </View>
+            ) : (
+              <>
+                <View
+                  style={[
+                    styles.viewBalance,
+                    { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
+                  ]}
+                >
+                  <Text
+                    style={{ fontSize: 12, color: "gray", textAlign: "center" }}
+                  >
+                    Total Balance:
+                  </Text>
+                  <Text
+                    style={[
+                      styles.balanceNumber,
+                      { color: isDarkMode ? "#000" : "#fff" },
+                    ]}
+                  >
+                    ${totalDebts.toFixed(2)}
+                  </Text>
+                  <Text
+                    style={{ fontSize: 12, color: "gray", textAlign: "center" }}
+                  >
+                    Total Min Payment:
+                  </Text>
+                  <Text
+                    style={{ fontSize: 12, color: "gray", textAlign: "center" }}
+                  >
+                    ${totalCreditMinimum.toFixed(2)}
+                  </Text>
+                </View>
+                <View style={{ height: 20 }} />
+              </>
+            )}
+          </>
+        }
+      />
+    </SafeAreaView>
   );
 }
 

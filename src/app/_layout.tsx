@@ -394,6 +394,84 @@ export default function RootLayout() {
             //navigationBarHidden: false,
           })}
         />
+
+        <Stack.Screen
+          name="spending/editSpending"
+          options={({ navigation }) => ({
+            headerBackTitle: "",
+            headerShown: true,
+            headerTransparent: true,
+            headerTitle: "Edit Expense",
+            headerShadowVisible: false,
+            headerBlurEffect: "none",
+
+            presentation: "modal",
+
+            //sheetGrabberVisible: true,
+            //sheetAllowedDetents: "all",
+
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={{
+                  //backgroundColor: "grey",
+                  width: 35,
+                  height: 35,
+                  borderRadius: 30,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <SymbolView
+                  name={{ ios: "xmark" }}
+                  tintColor="black"
+                  size={20}
+                />
+              </TouchableOpacity>
+            ),
+
+            headerRight: () => (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity
+                  onPress={() => Alert.alert("EDIT", "PRESSED EDIT")}
+                  style={{
+                    width: 35,
+                    height: 35,
+                    borderRadius: 30,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginRight: 10, // space between buttons
+                  }}
+                >
+                  <SymbolView
+                    name={{ ios: "pencil" }}
+                    tintColor="black"
+                    size={20}
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => Alert.alert("DELETE", "PRESSED DELETE")}
+                  style={{
+                    width: 35,
+                    height: 35,
+                    borderRadius: 30,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <SymbolView
+                    name={{ ios: "trash" }}
+                    tintColor="black"
+                    size={20}
+                  />
+                </TouchableOpacity>
+              </View>
+            ),
+
+            //navigationBarHidden: false,
+          })}
+        />
       </Stack>
     </DebtProvider>
   );
