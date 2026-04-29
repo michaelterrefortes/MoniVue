@@ -15,8 +15,8 @@ export function DebtProvider({ children }) {
   const [totalSpending, setTotalSpending] = useState(0);
   const [totalCreditMinimum, setTotalCreditMinimum] = useState(0);
   const [localTotalSpending, setLocalTotalSpending] = useState(0);
-  const [isDarkMode, setIdDarkMode] = useState(true);
-  //console.log(isDarkMode);
+  const [weekly, setWeekly] = useState([]);
+  const [yearSummary, setYearSpending] = useState([]);
 
   return (
     <DebtContext.Provider
@@ -35,11 +35,14 @@ export function DebtProvider({ children }) {
         setTotalSpending,
         totalCreditMinimum,
         setTotalCreditMinimum,
-        isDarkMode,
         localSpending,
         setLocalSpending,
         localTotalSpending,
         setLocalTotalSpending,
+        weekly,
+        setWeekly,
+        yearSummary,
+        setYearSpending,
       }}
     >
       {children}

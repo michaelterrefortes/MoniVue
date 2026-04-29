@@ -16,9 +16,33 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { DebtContext } from "../../../context/DebtContext";
 import { addSpending } from "../../../services/api";
 
+const options = [
+  "Food & Dining",
+  "Groceries",
+  "Transport",
+  "Gas",
+  "Shopping",
+  "Entertainment",
+  "Subscriptions",
+  "Health & Fitness",
+  "Travel",
+  "Education",
+  "Personal Care",
+  "Gifts & Donations",
+  "Bills & Fees",
+  "Others",
+];
+
 const AddSpending = () => {
-  const { spending, setSpending, localSpending, setLocalSpending } =
-    useContext(DebtContext);
+  const {
+    spending,
+    setSpending,
+    localSpending,
+    setLocalSpending,
+    setWeekly,
+    setYearSpending,
+    yearSummary,
+  } = useContext(DebtContext);
   const router = useRouter();
   const params = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
@@ -132,6 +156,45 @@ const AddSpending = () => {
         setLocalSpending(updateList);
       }
 
+      const start = new Date(params.startWeek);
+      const end = new Date(params.endWeek);
+
+      if (date >= start && date <= end) {
+        const updateList = (prev) =>
+          [...prev, result.data].sort(sortByDateDesc);
+        setWeekly(updateList);
+      }
+
+      if (Number(params.year) === date.getFullYear()) {
+        // start with your existing array (not just one item)
+        let elementsYear = [...yearSummary];
+
+        let exists = false;
+
+        for (const element of elementsYear) {
+          // use "of", not "in"
+          if (new Date(element.month_start).getMonth() === date.getMonth()) {
+            element.total_sum += Number(amount);
+            exists = true;
+            break;
+          }
+        }
+
+        if (!exists) {
+          elementsYear.push({
+            month_start: new Date(
+              date.getFullYear(),
+              date.getMonth(),
+              1,
+            ).toISOString(),
+            total_sum: Number(amount),
+          });
+        }
+
+        //console.log(elementsYear);
+        setYearSpending(elementsYear);
+      }
+
       //router.setParams({ refreshed: "true" });
       //console.log("spending:", spending);
       router.back();
@@ -157,6 +220,8 @@ const AddSpending = () => {
     { label: "Bills & Fees", value: "13" },
     { label: "Others", value: "14" },
   ]);
+
+  const [selectedTag, setSelectedTag] = useState("");
 
   return (
     <ScrollView>
@@ -196,7 +261,7 @@ const AddSpending = () => {
       <Text style={styles.title}>Date</Text>
 
       <View style={styles.input2}>
-        <Text>Date:</Text>
+        <Text style={{ color: "grey" }}>Date:</Text>
         <View style={{ transform: [{ scale: 0.85 }] }}>
           <DateTimePicker
             value={date}
@@ -239,6 +304,35 @@ const AddSpending = () => {
           color: "gray",
         }}
       />
+
+      {/*
+      <View style={[styles.input2, { justifyContent: "space-between" }]}>
+        {selectedTag.length !== 0 ? (
+          <Text>{options[selectedTag]}</Text>
+        ) : (
+          <Text style={{ color: "grey" }}>Select Category</Text>
+        )}
+
+       <Host matchContents>
+          <Picker
+            modifiers={[pickerStyle("menu")]}
+            //modifiers={[pickerStyle("wheel")]}
+            //label="Select a fruit"
+            //selection={selectedTag}
+
+            onSelectionChange={(selection) => {
+              setSelectedTag(String(options.indexOf(selection)));
+            }}
+          >
+            {options.map((option) => (
+              <Text2 key={option} modifiers={[tag(option)]}>
+                {option}
+              </Text2>
+            ))}
+          </Picker>
+        </Host>
+      </View> */}
+
       {typeWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
       ) : null}

@@ -1,20 +1,13 @@
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useContext } from "react";
+import React from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
-import { DebtContext } from "../context/DebtContext";
 
 const AccountButton = () => {
-  const { isDarkMode } = useContext(DebtContext);
-
   const router = useRouter();
   return (
     <TouchableOpacity onPress={() => router.push(`/settings/account`)}>
-      <SymbolView
-        name={{ ios: "person.fill" }}
-        tintColor={isDarkMode ? "#000" : "#fff"}
-        size={20}
-      />
+      <SymbolView name={{ ios: "person.fill" }} tintColor={"#000"} size={20} />
     </TouchableOpacity>
   );
 };

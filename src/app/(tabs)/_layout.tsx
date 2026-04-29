@@ -1,28 +1,21 @@
 import { createNativeBottomTabNavigator } from "@react-navigation/bottom-tabs/unstable";
 import { withLayoutContext } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import { useContext } from "react";
 import { Platform } from "react-native";
-import { DebtContext } from "../../../context/DebtContext";
 
 const Icons = ({ focused, title }) => {
-  const { isDarkMode } = useContext(DebtContext);
   //console.log(focused);
   if (focused) {
     return (
       <SymbolView
         name={{ ios: `${title}.fill` }}
-        tintColor={isDarkMode ? "#000" : "#fff"}
+        tintColor={"#000"}
         size={30}
       />
     );
   } else {
     return (
-      <SymbolView
-        name={{ ios: `${title}` }}
-        tintColor={isDarkMode ? "#000" : "#fff"}
-        size={30}
-      />
+      <SymbolView name={{ ios: `${title}` }} tintColor={"#000"} size={30} />
     );
   }
 };
@@ -31,7 +24,6 @@ const Tab = createNativeBottomTabNavigator();
 const Tabs = withLayoutContext(Tab.Navigator);
 
 export default function TabLayout() {
-  const { isDarkMode } = useContext(DebtContext);
   return (
     <Tabs
       screenOptions={{
@@ -62,8 +54,8 @@ export default function TabLayout() {
         },*/
 
         tabBarStyle: {
-          backgroundColor: isDarkMode ? "#fff" : "#2b2b2b",
-          borderColor: isDarkMode ? "#fff" : "#2b2b2b",
+          backgroundColor: "#fff",
+          borderColor: "#fff",
         },
       }}
     >
@@ -71,7 +63,8 @@ export default function TabLayout() {
         name="(index)"
         options={{
           title: "Home",
-          tabBarActiveTintColor: isDarkMode ? "#000" : "#fff",
+          //tabBarActiveTintColor: "#2f95dc",
+
           //headerTitle: "as",
 
           /*tabBarIcon: ({ focused }) => (
@@ -90,7 +83,7 @@ export default function TabLayout() {
         name="spendingTab"
         options={{
           title: "Spending",
-          tabBarActiveTintColor: isDarkMode ? "#000" : "#fff",
+          //tabBarActiveTintColor: "#2f95dc",
 
           /*tabBarIcon: ({ focused }) => (
             <Icons focused={focused} title={"cart"} />
@@ -109,7 +102,7 @@ export default function TabLayout() {
         name="billsTab"
         options={{
           title: "Bills",
-          tabBarActiveTintColor: isDarkMode ? "#000" : "#fff",
+          //tabBarActiveTintColor: "#2f95dc",
 
           /*tabBarIcon: ({ focused }) => (
             <Icons focused={focused} title={"tray"} />
@@ -128,7 +121,7 @@ export default function TabLayout() {
         name="cards"
         options={{
           title: "Credit",
-          tabBarActiveTintColor: isDarkMode ? "#000" : "#fff",
+          //tabBarActiveTintColor: "#2f95dc",
           /*tabBarIcon: ({ focused }) => (
             <Icons focused={focused} title={"creditcard"} />
           ),*/
@@ -147,7 +140,7 @@ export default function TabLayout() {
         name="savingsTab"
         options={{
           title: "Savings",
-          tabBarActiveTintColor: isDarkMode ? "#000" : "#fff",
+          //tabBarActiveTintColor: "#2f95dc",
           /*tabBarIcon: ({ focused }) => (
             <Icons focused={focused} title={"dollarsign.bank.building"} />
           ),*/

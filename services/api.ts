@@ -96,7 +96,7 @@ export const addCreditCard = async (
   minimum,
   date,
 ) => {
-  const response = await fetch(`${url}/credit/add`, {
+  const response = await fetch(`${url}/credit`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -116,13 +116,48 @@ export const addCreditCard = async (
     throw new Error("Failed to save credit cards", response.statusText);
   }
 
-  const result = response.json();
+  const result = await response.json();
+
+  return result;
+};
+
+export const editCreditCard = async (
+  id,
+  name,
+  balance,
+  limit,
+  apr,
+  minimum,
+  date,
+) => {
+  const response = await fetch(`${url}/credit`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: id,
+      credit_name: name,
+      balance: balance,
+      credit_limit: limit,
+      apr: apr,
+      minimum: minimum,
+      statement_date: date.getDate(),
+    }),
+  });
+
+  if (!response.ok) {
+    // @ts-ignore
+    throw new Error("Failed to edit credit", response.statusText);
+  }
+
+  const result = await response.json();
 
   return result;
 };
 
 export const addBills = async (name, variation, price, type, date) => {
-  const response = await fetch(`${url}/bills/add`, {
+  const response = await fetch(`${url}/bills`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -141,13 +176,39 @@ export const addBills = async (name, variation, price, type, date) => {
     throw new Error("Failed to save bill", response.statusText);
   }
 
-  const result = response.json();
+  const result = await response.json();
+
+  return result;
+};
+
+export const editBills = async (id, name, variation, price, type, date) => {
+  const response = await fetch(`${url}/bills`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: id,
+      bill_name: name,
+      type_bill: type,
+      price: price,
+      variable: variation,
+      payment_date: date.getDate(),
+    }),
+  });
+
+  if (!response.ok) {
+    // @ts-ignore
+    throw new Error("Failed to edit bill", response.statusText);
+  }
+
+  const result = await response.json();
 
   return result;
 };
 
 export const addSpending = async (name, amount, type, date) => {
-  const response = await fetch(`${url}/spending/add`, {
+  const response = await fetch(`${url}/spending`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -165,7 +226,32 @@ export const addSpending = async (name, amount, type, date) => {
     throw new Error("Failed to save spending", response.statusText);
   }
 
-  const result = response.json();
+  const result = await response.json();
+
+  return result;
+};
+
+export const editSpending = async (id, name, amount, type, date) => {
+  const response = await fetch(`${url}/spending`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: id,
+      spending_name: name,
+      type_spending: type,
+      amount: amount,
+      spending_date: date,
+    }),
+  });
+
+  if (!response.ok) {
+    // @ts-ignore
+    throw new Error("Failed to edit spending", response.statusText);
+  }
+
+  const result = await response.json();
 
   return result;
 };

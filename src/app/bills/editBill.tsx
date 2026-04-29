@@ -1,31 +1,49 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useNavigation, useRouter } from "expo-router";
-import { SymbolView } from "expo-symbols";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { DebtContext } from "../../../context/DebtContext";
-import { addBills } from "../../../services/api";
+import { editBills } from "../../../services/api";
 
-const AddBill = () => {
+const EditBill = () => {
   const { bills, setBills } = useContext(DebtContext);
+  const params = useLocalSearchParams();
+
   const router = useRouter();
+
   const [loading, setLoading] = useState(false);
 
-  const [name, setName] = useState("");
-  const [variation, setVariation] = useState("");
-  const [price, setPrice] = useState("");
-  const [type, setType] = useState("");
-  const [date, setDate] = useState(new Date());
+  const [name, setName] = useState(params.name);
+  const [variation, setVariation] = useState(params.variable);
+  const [price, setPrice] = useState(params.price);
+  const [type, setType] = useState(params.type);
+  const [date, setDate] = useState(
+    new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      Number(params.date),
+    ),
+  );
+
+  const [nameOld, setNameOld] = useState(params.name);
+  const [variationOld, setVariationOld] = useState(params.variable);
+  const [priceOld, setPriceOld] = useState(params.price);
+  const [typeOld, setTypeOld] = useState(params.type);
+  const [dateOld, setDateOld] = useState(
+    new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      Number(params.date),
+    ),
+  );
 
   const [nameWarning, setNameWarning] = useState(false);
   const [priceWarning, setPriceWarning] = useState(false);
@@ -36,30 +54,21 @@ const AddBill = () => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={processForm}
-          style={{
-            width: 35,
-            height: 35,
-            borderRadius: 30,
-            justifyContent: "center",
-            alignItems: "center",
-            //backgroundColor: "blue",
-            //borderColor: "blue",
-          }}
-        >
-          {loading ? (
-            <ActivityIndicator size={10} />
-          ) : (
-            <SymbolView
-              name={{ ios: "checkmark" }}
-              tintColor="black"
-              size={20}
-            />
-          )}
-        </TouchableOpacity>
-      ),
+      unstable_headerRightItems: () => [
+        {
+          type: "button",
+          label: "Add",
+
+          icon: {
+            type: "sfSymbol",
+            name: "checkmark",
+          },
+          onPress: () => {
+            // Do something
+            processForm();
+          },
+        },
+      ],
     });
   }, [navigation, name, variation, price, type, date]);
 
@@ -87,16 +96,55 @@ const AddBill = () => {
 
     setLoading(true);
 
-    const result = await addBills(name, variation, price, type, date);
+    const result = await editBills(
+      params.id,
+      name,
+      variation,
+      price,
+      type,
+      date,
+    );
 
     setLoading(false);
 
-    if (result?.message) {
+    //console.log(result);
+
+    if (result?.success) {
       //console.log(result.message);
       //router.setParams(result.data);
-      setBills((prevBills) => [...prevBills, result.data]);
+      setBills((prevBills) =>
+        prevBills.map((bill) =>
+          bill.id === result.data.id ? result.data : bill,
+        ),
+      );
+
+      router.dismissAll();
+
+      //router.back();
+      //router.back();
+      /*router.setParams({
+        id: result.data.id,
+        name: result.data.bill_name,
+        price: result.data.price,
+        type: result.data.type_bill,
+        variable: result.data.variable,
+        date: result.data.payment_date,
+      });*/
       //router.setParams({ refreshed: "true" });
-      router.back();
+
+      //navigation.navigate("/(tabs)/cards");
+
+      /*router.dismissTo({
+        pathname: `bills/${result.data.id}`,
+        params: {
+          id: result.data.id,
+          name: result.data.bill_name,
+          price: result.data.price,
+          type: result.data.type_bill,
+          variable: result.data.variable,
+          date: result.data.payment_date,
+        },
+      });*/
     } else {
       Alert.alert("Problem", result.wrong);
     }
@@ -230,7 +278,7 @@ const AddBill = () => {
   );
 };
 
-export default AddBill;
+export default EditBill;
 
 const styles = StyleSheet.create({
   overlay: {

@@ -2,6 +2,8 @@ import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,9 +15,6 @@ import { categoriesSpending } from "../../../../constants/categories";
 import { formatPlotData, getMonthStats } from "../../../../constants/functions";
 import { DebtContext } from "../../../../context/DebtContext";
 import { fetchSpending, fetchTotals } from "../../../../services/api";
-
-// ...
-const data = [{ value: 50 }, { value: 80 }, { value: 90 }, { value: 70 }];
 
 const formatDataType = (monthlyData, total) => {
   let dataPlot = [];
@@ -65,14 +64,19 @@ const Index = () => {
     setTotalSpending,
     totalCreditMinimum,
     setTotalCreditMinimum,
-    isDarkMode,
-
     spending,
     setSpending,
   } = useContext(DebtContext);
 
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      await sleep(1000);
       try {
         const result = await fetchTotals();
         setTotalBills(result.bills);
@@ -85,259 +89,280 @@ const Index = () => {
         //console.log(result2);
       } catch (error) {
         console.error("Fetch error:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await sleep(1000);
+    try {
+      const result = await fetchTotals();
+      setTotalBills(result.bills);
+      setTotalDebts(result.debts);
+      setTotalCreditMinimum(result.minimum);
+      setTotalSpending(result.spending);
+
+      const result2 = await fetchSpending();
+      setSpending(result2);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
     <ScrollView
-      style={[
-        styles.container,
-        { backgroundColor: isDarkMode ? "rgb(242, 242, 242)" : "#000" },
-      ]}
+      style={[styles.container, { backgroundColor: "rgb(242, 242, 242)" }]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
-      {/*<Text style={[styles.title, { color: isDarkMode ? "#000" : "#fff" }]}>
-        Budget
-      </Text>*/}
-
-      <View
-        style={[
-          styles.card,
-          ,
-          { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-        ]}
-      >
-        <View style={styles.row}>
-          <View>
-            <TouchableOpacity
-              style={{
-                paddingHorizontal: 2,
-                flexDirection: "row",
-                justifyContent: "center",
-
-                alignItems: "center",
-              }}
-              onPress={() => console.log("pressed")}
-            >
-              <Text style={[styles.label]}>Income</Text>
-              <SymbolView
-                name={{ ios: "chevron.right" }}
-                tintColor="gray"
-                size={12}
-              />
-            </TouchableOpacity>
-
-            <Text style={[styles.value, styles.income]}>${income}</Text>
-          </View>
-
-          <View>
-            <TouchableOpacity
-              style={{
-                paddingHorizontal: 2,
-                flexDirection: "row",
-                //justifyContent: "center",
-
-                alignItems: "center",
-              }}
-              onPress={() => router.push("/(tabs)/billsTab")}
-            >
-              <Text style={[styles.label]}>Bills</Text>
-              <SymbolView
-                name={{ ios: "chevron.right" }}
-                tintColor="gray"
-                size={12}
-              />
-            </TouchableOpacity>
-            <Text style={[styles.value, styles.expense]}>${totalBills}</Text>
-          </View>
-        </View>
-
+      {loading ? (
         <View
-          style={[
-            styles.divider,
-            { backgroundColor: isDarkMode ? "#eee" : "#424242" },
-          ]}
-        />
+          style={{ justifyContent: "center", alignItems: "center", flex: 1 }}
+        >
+          <ActivityIndicator size={"large"} />
+        </View>
+      ) : (
+        <>
+          <View style={[styles.card, , { backgroundColor: "#fff" }]}>
+            <Text style={{ paddingBottom: 10 }}>
+              Budget for{" "}
+              {new Date().toLocaleString("default", { month: "long" })}{" "}
+              {new Date().getFullYear()}
+            </Text>
+            <View style={styles.row}>
+              <View>
+                <TouchableOpacity
+                  style={{
+                    paddingHorizontal: 2,
+                    flexDirection: "row",
+                    justifyContent: "center",
 
-        <View style={styles.row}>
-          <View>
-            <Text style={styles.label}>Credit Card</Text>
-            <Text style={[styles.value, styles.expense]}>
-              ${totalCreditMinimum.toFixed(2)}
+                    alignItems: "center",
+                  }}
+                  onPress={() => console.log("pressed")}
+                >
+                  <Text style={[styles.label]}>Income</Text>
+                  <SymbolView
+                    name={{ ios: "chevron.right" }}
+                    tintColor="gray"
+                    size={12}
+                  />
+                </TouchableOpacity>
+
+                <Text style={[styles.value, styles.income]}>${income}</Text>
+              </View>
+
+              <View>
+                <TouchableOpacity
+                  style={{
+                    paddingHorizontal: 2,
+                    flexDirection: "row",
+                    //justifyContent: "center",
+
+                    alignItems: "center",
+                  }}
+                  onPress={() => router.push("/(tabs)/billsTab")}
+                >
+                  <Text style={[styles.label]}>Bills</Text>
+                  <SymbolView
+                    name={{ ios: "chevron.right" }}
+                    tintColor="gray"
+                    size={12}
+                  />
+                </TouchableOpacity>
+                <Text style={[styles.value, styles.expense]}>
+                  ${totalBills.toFixed(2)}
+                </Text>
+              </View>
+            </View>
+
+            <View style={[styles.divider, { backgroundColor: "#eee" }]} />
+
+            <View style={styles.row}>
+              <View>
+                <Text style={styles.label}>Credit Card</Text>
+                <Text style={[styles.value, styles.expense]}>
+                  ${totalCreditMinimum.toFixed(2)}
+                </Text>
+              </View>
+              <View>
+                <Text style={styles.label}>Spending</Text>
+                <Text style={[styles.value, styles.expense]}>
+                  ${totalSpending.toFixed(2)}
+                </Text>
+              </View>
+            </View>
+
+            <View style={[styles.divider, { backgroundColor: "#eee" }]} />
+          </View>
+          <View
+            style={[
+              styles.cardBudget,
+              {
+                flexDirection: "row",
+                justifyContent: "space-between",
+                backgroundColor: "#fff",
+              },
+            ]}
+          >
+            <Text style={styles.label}>Left This Month:</Text>
+            <Text
+              style={[
+                styles.value,
+                income - totalBills - totalCreditMinimum - totalSpending >= 0
+                  ? styles.income
+                  : styles.expense,
+              ]}
+            >
+              $
+              {(
+                income -
+                totalBills -
+                totalCreditMinimum -
+                totalSpending
+              ).toFixed(2)}
             </Text>
           </View>
-          <View>
-            <Text style={styles.label}>Spending</Text>
-            <Text style={[styles.value, styles.expense]}>
-              ${totalSpending.toFixed(2)}
-            </Text>
-          </View>
-        </View>
-
-        <View
-          style={[
-            styles.divider,
-            { backgroundColor: isDarkMode ? "#eee" : "#424242" },
-          ]}
-        />
-      </View>
-
-      <View
-        style={[
-          styles.cardBudget,
-          {
-            flexDirection: "row",
-            justifyContent: "space-between",
-            backgroundColor: isDarkMode ? "#fff" : "#1c1c1c",
-          },
-        ]}
-      >
-        <Text style={styles.label}>Left This Month:</Text>
-        <Text
-          style={[
-            styles.value,
-            income - totalBills - totalCreditMinimum - totalSpending >= 0
-              ? styles.income
-              : styles.expense,
-          ]}
-        >
-          $
-          {(income - totalBills - totalCreditMinimum - totalSpending).toFixed(
-            2,
-          )}
-        </Text>
-      </View>
-
-      <View
-        style={[
-          styles.cardBudget,
-          {
-            flexDirection: "row",
-            justifyContent: "space-between",
-            backgroundColor: isDarkMode ? "#fff" : "#1c1c1c",
-          },
-        ]}
-      >
-        <View style={{ flexDirection: "column" }}>
-          <Text style={styles.label}>Daily Amount to Spend:</Text>
-          <Text style={styles.label}>
-            Remaining Days in Month: {getMonthStats().remainingDays}
-          </Text>
-        </View>
-        <Text
-          style={[
-            styles.value,
-            (income - totalBills - totalCreditMinimum - totalSpending) /
-              getMonthStats().totalDays >=
-            0
-              ? styles.income
-              : styles.expense,
-          ]}
-        >
-          $
-          {(
-            (income - totalBills - totalCreditMinimum - totalSpending) /
-            getMonthStats().totalDays
-          ).toFixed(2)}
-          /day
-        </Text>
-      </View>
-
-      <View style={[styles.card, { marginTop: 15 }]}>
-        <Text style={[styles.label, { textAlign: "left" }]}>
-          Monthly Spending:
-        </Text>
-        <Text style={{ fontWeight: "bold" }}>
-          {new Date().toLocaleDateString("en-US", { month: "short" })}{" "}
-          {new Date().getFullYear()}
-        </Text>
-        <View style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}>
-          {spending.length !== 0 ? (
-            <BarChart
-              data={formatPlotData(spending, new Date())}
-              height={200}
-              //width={220}
-              //barWidth={20}
-              //minHeight={3}
-              barBorderRadius={3}
-              spacing={20}
-              noOfSections={4}
-              yAxisThickness={0}
-              xAxisThickness={0}
-              xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-              yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-              isAnimated
-              animationDuration={300}
-              gradientColor={"#12ff00"} // Default top color
-              frontColor={"#d3ff00"} // Default bottom color
-              //frontColor={"#drgb(0, 162, 255)"}
-              //showGradient
-            />
-          ) : (
-            <BarChart
-              data={[]}
-              height={200}
-              //width={220}
-              //barWidth={20}
-              //minHeight={3}
-              barBorderRadius={3}
-              spacing={20}
-              noOfSections={4}
-              yAxisThickness={0}
-              xAxisThickness={0}
-              xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-              yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-              isAnimated
-              animationDuration={300}
-              gradientColor={"#12ff00"} // Default top color
-              frontColor={"#d3ff00"} // Default bottom color
-              //frontColor={"#drgb(0, 162, 255)"}
-              //showGradient
-            />
-          )}
-        </View>
-      </View>
-
-      <View style={[styles.card, { marginTop: 15, marginBottom: 15 }]}>
-        <Text style={[styles.label, { textAlign: "left" }]}>
-          Spending Categories:
-        </Text>
-        <View style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}>
-          {spending.length !== 0 ? (
-            <PieChart
-              radius={90}
-              innerRadius={60}
-              data={formatDataType(spending, totalSpending)}
-              donut
-            />
-          ) : (
-            <PieChart radius={90} innerRadius={60} data={[]} donut />
-          )}
-        </View>
-        {formatDataType(spending, totalSpending)?.map((item, index) => {
-          return (
-            <View
-              key={`${item.key}-${index}`}
-              style={{ flexDirection: "row", alignSelf: "center" }}
-            >
-              <View
-                style={{
-                  height: 10,
-                  width: 10,
-                  borderRadius: 5,
-                  backgroundColor: item.color,
-                  marginRight: 10,
-                }}
-              />
+          <View
+            style={[
+              styles.cardBudget,
+              {
+                flexDirection: "row",
+                justifyContent: "space-between",
+                backgroundColor: "#fff",
+              },
+            ]}
+          >
+            <View style={{ flexDirection: "column" }}>
+              <Text style={styles.label}>Daily Amount to Spend:</Text>
               <Text style={styles.label}>
-                {item.label}: {item.value.toFixed(0)}%
+                Remaining Days in Month: {getMonthStats().remainingDays}
               </Text>
             </View>
-          );
-        })}
-      </View>
+            <Text
+              style={[
+                styles.value,
+                (income - totalBills - totalCreditMinimum - totalSpending) /
+                  getMonthStats().totalDays >=
+                0
+                  ? styles.income
+                  : styles.expense,
+              ]}
+            >
+              $
+              {(
+                (income - totalBills - totalCreditMinimum - totalSpending) /
+                getMonthStats().totalDays
+              ).toFixed(2)}
+              /day
+            </Text>
+          </View>
+          <View style={[styles.card, { marginTop: 15 }]}>
+            <Text style={[styles.label, { textAlign: "left" }]}>
+              Monthly Spending:
+            </Text>
+            <Text style={{ fontWeight: "bold" }}>
+              {new Date().toLocaleDateString("en-US", { month: "short" })}{" "}
+              {new Date().getFullYear()}
+            </Text>
+            <View
+              style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}
+            >
+              {spending.length !== 0 ? (
+                <BarChart
+                  data={formatPlotData(spending, new Date())}
+                  height={200}
+                  //width={220}
+                  //barWidth={20}
+                  //minHeight={3}
+                  barBorderRadius={3}
+                  spacing={20}
+                  noOfSections={4}
+                  yAxisThickness={0}
+                  xAxisThickness={0}
+                  xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+                  yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+                  isAnimated
+                  animationDuration={300}
+                  //showGradient
+                  gradientColor={"#12ff00"} // Default top color
+                  frontColor={"#d3ff00"} // Default bottom color
+                  //frontColor={"#drgb(0, 162, 255)"}
+                />
+              ) : (
+                <BarChart
+                  data={[]}
+                  height={200}
+                  //width={220}
+                  //barWidth={20}
+                  //minHeight={3}
+                  barBorderRadius={3}
+                  spacing={20}
+                  noOfSections={4}
+                  yAxisThickness={0}
+                  xAxisThickness={0}
+                  xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+                  yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+                  isAnimated
+                  animationDuration={300}
+                  showGradient
+                  gradientColor={"#12ff00"} // Default top color
+                  frontColor={"#d3ff00"} // Default bottom color
+                  //frontColor={"#drgb(0, 162, 255)"}
+                />
+              )}
+            </View>
+          </View>
+          <View style={[styles.card, { marginTop: 15, marginBottom: 15 }]}>
+            <Text style={[styles.label, { textAlign: "left" }]}>
+              Spending Categories:
+            </Text>
+            <View
+              style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}
+            >
+              {spending.length !== 0 ? (
+                <PieChart
+                  radius={90}
+                  innerRadius={60}
+                  data={formatDataType(spending, totalSpending)}
+                  donut
+                />
+              ) : (
+                <PieChart radius={90} innerRadius={60} data={[]} donut />
+              )}
+            </View>
+            {formatDataType(spending, totalSpending)?.map((item, index) => {
+              return (
+                <View
+                  key={`${item.key}-${index}`}
+                  style={{ flexDirection: "row", alignSelf: "center" }}
+                >
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      borderRadius: 5,
+                      backgroundColor: item.color,
+                      marginRight: 10,
+                    }}
+                  />
+                  <Text style={styles.label}>
+                    {item.label}: {item.value.toFixed(0)}%
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+        </>
+      )}
     </ScrollView>
   );
 };

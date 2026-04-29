@@ -17,7 +17,7 @@ import { DebtContext } from "../../../context/DebtContext";
 const BillDetails = () => {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const { bills, setBills, isDarkMode } = useContext(DebtContext);
+  const { bills, setBills } = useContext(DebtContext);
   //console.log(params);
 
   const [name, setName] = useState(params.name);
@@ -26,11 +26,11 @@ const BillDetails = () => {
   const [variable, setVariable] = useState(Number(params.variable));
   const [date, setDate] = useState(params.date);
 
+  //console.log(dateNew);
+
   const [categoryName, setCategoryName] = useState(categories[type].name);
   const [iconImage, setIconImage] = useState(categories[type].icon);
   const [itemColor, setItemColor] = useState(categories[type].color);
-
-  const [editing, setEditing] = useState(false);
 
   const navigation = useNavigation();
 
@@ -67,13 +67,53 @@ const BillDetails = () => {
   };
 
   useEffect(() => {
-    if (!editing) {
-      navigation.setOptions({
-        headerLeft: () => (
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{
+            //backgroundColor: "grey",
+            width: 35,
+            height: 35,
+            borderRadius: 30,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <SymbolView name={{ ios: "xmark" }} tintColor={"#000"} size={20} />
+        </TouchableOpacity>
+      ),
+      headerRight: () => (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() =>
+              router.replace({
+                pathname: `/bills/editBill`,
+                params: {
+                  id: params.id,
+                  name: params.name,
+                  price: params.price,
+                  type: params.type,
+                  variable: params.variable,
+                  date: params.date,
+                },
+              })
+            }
             style={{
-              //backgroundColor: "grey",
+              width: 35,
+              height: 35,
+              borderRadius: 30,
+              justifyContent: "center",
+              alignItems: "center",
+              marginRight: 10,
+            }}
+          >
+            <SymbolView name={{ ios: "pencil" }} tintColor={"#000"} size={20} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={confirmDelete}
+            style={{
               width: 35,
               height: 35,
               borderRadius: 30,
@@ -81,98 +121,41 @@ const BillDetails = () => {
               alignItems: "center",
             }}
           >
-            <SymbolView
-              name={{ ios: "xmark" }}
-              tintColor={isDarkMode ? "#000" : "#fff"}
-              size={20}
-            />
+            <SymbolView name={{ ios: "trash" }} tintColor={"#000"} size={20} />
           </TouchableOpacity>
-        ),
-        headerRight: () => (
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TouchableOpacity
-              onPress={() => setEditing(true)}
-              style={{
-                width: 35,
-                height: 35,
-                borderRadius: 30,
-                justifyContent: "center",
-                alignItems: "center",
-                marginRight: 10,
-              }}
-            >
-              <SymbolView
-                name={{ ios: "pencil" }}
-                tintColor={isDarkMode ? "#000" : "#fff"}
-                size={20}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={confirmDelete}
-              style={{
-                width: 35,
-                height: 35,
-                borderRadius: 30,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <SymbolView
-                name={{ ios: "trash" }}
-                tintColor={isDarkMode ? "#000" : "#fff"}
-                size={20}
-              />
-            </TouchableOpacity>
-          </View>
-        ),
-      });
-    } else {
-      navigation.setOptions({
-        headerLeft: () => (
-          <TouchableOpacity onPress={() => setEditing(false)}>
-            <Text style={{ color: isDarkMode ? "#000" : "#fff" }}>Cancel</Text>
-          </TouchableOpacity>
-        ),
-
-        headerRight: () => (
-          <TouchableOpacity onPress={() => setEditing(false)}>
-            <SymbolView
-              name={{ ios: "checkmark" }}
-              tintColor={isDarkMode ? "#000" : "#fff"}
-              size={20}
-            />
-          </TouchableOpacity>
-        ),
-      });
-    }
-  }, [navigation, editing]);
-
+        </View>
+      ),
+    });
+  }, [navigation]);
+  const [layout, setLayout] = useState({ width: 0, height: 0 });
   return (
-    <ScrollView style={[styles.container]}>
+    <ScrollView
+      style={[
+        styles.container,
+        { backgroundColor: layout.height > 500 ? "#f2f2f2" : "" },
+      ]}
+      onLayout={(event) => {
+        const { width, height } = event.nativeEvent.layout;
+        setLayout({ width, height });
+      }}
+    >
       <View style={{ height: 70 }} />
+
       <Text
         style={{
           fontWeight: "bold",
           fontSize: 28,
           paddingTop: 10,
           paddingLeft: 15,
-          color: isDarkMode ? "#000" : "#fff",
+          color: "#000",
         }}
       >
         {name}
       </Text>
 
-      <View
-        style={[
-          styles.billsBalance,
-          { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-        ]}
-      >
+      <View style={[styles.billsBalance, { backgroundColor: "#fff" }]}>
         <Text style={styles.label}>Due Date: {validateDate(Number(date))}</Text>
-        <Text
-          style={[styles.textBills, { color: isDarkMode ? "#000" : "#fff" }]}
-        >
+        <Text style={[styles.textBills, { color: "#000" }]}>
           ${price.toFixed(2)}
         </Text>
         {variable !== 0 ? (
@@ -186,12 +169,7 @@ const BillDetails = () => {
         ) : null}
       </View>
       <View style={styles.content}>
-        <View
-          style={[
-            styles.squares,
-            { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-          ]}
-        >
+        <View style={[styles.squares, { backgroundColor: "#fff" }]}>
           <Text style={styles.label}>Type:</Text>
 
           <View
@@ -206,7 +184,7 @@ const BillDetails = () => {
             }}
           >
             <SymbolView
-              name={{ ios: `${iconImage}.fill` }}
+              name={{ ios: `${iconImage}` }}
               tintColor="white"
               size={20}
             />
@@ -215,14 +193,9 @@ const BillDetails = () => {
             {categoryName}
           </Text>
         </View>
-        <View
-          style={[
-            styles.squares,
-            { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-          ]}
-        >
+        <View style={[styles.squares, { backgroundColor: "#fff" }]}>
           <Text style={styles.label}>Variation:</Text>
-          <Text style={[styles.text, { color: isDarkMode ? "#000" : "#fff" }]}>
+          <Text style={[styles.text, { color: "#000" }]}>
             ${Number(variable).toFixed(2)}
           </Text>
         </View>

@@ -17,7 +17,13 @@ import { DebtContext } from "../../../context/DebtContext";
 const SpendingDetails = () => {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const { spending, setSpending, setLocalSpending } = useContext(DebtContext);
+  const {
+    setSpending,
+    setLocalSpending,
+    setYearSpending,
+    setWeekly,
+    yearSummary,
+  } = useContext(DebtContext);
 
   const [name, setName] = useState(params.name);
   const [amount, setAmount] = useState(Number(params.amount));
@@ -84,6 +90,32 @@ const SpendingDetails = () => {
         );
       }
 
+      const start = new Date(params.startWeek);
+      const end = new Date(params.endWeek);
+
+      if (new Date(params.date) >= start && new Date(params.date) <= end) {
+        setWeekly((prevItems) =>
+          prevItems.filter((item) => Number(item.id) !== Number(params.id)),
+        );
+      }
+
+      if (Number(params.year) === new Date(params.date).getFullYear()) {
+        setYearSpending((prevItems) => {
+          return prevItems.map((item) => {
+            if (
+              new Date(item.month_start).getMonth() ===
+              new Date(params.date).getMonth()
+            ) {
+              return {
+                ...item,
+                total_sum: Number(item.total_sum) - Number(params.amount),
+              };
+            }
+            return item; // IMPORTANT: always return something
+          });
+        });
+      }
+
       router.back();
     } catch (err) {
       Alert.alert("Error", "Could not delete item");
@@ -121,6 +153,9 @@ const SpendingDetails = () => {
                     amount: amount,
                     type: type,
                     date: date,
+                    start: params.startWeek,
+                    end: params.endWeek,
+                    year: params.year,
                   },
                 })
               } //setEditing(true)}

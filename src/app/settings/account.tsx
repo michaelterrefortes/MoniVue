@@ -1,18 +1,10 @@
-import React, { useContext } from "react";
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { DebtContext } from "../../../context/DebtContext";
 
 const Account = () => {
-  const { isDarkMode } = useContext(DebtContext);
-
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: isDarkMode ? "rgb(242, 242, 242)" : "#000" },
-      ]}
-    >
-      <Text style={{ color: isDarkMode ? "#000" : "#fff" }}>Account</Text>
+    <View style={[styles.container, { backgroundColor: "rgb(242, 242, 242)" }]}>
+      <Text style={{ color: "#000" }}>Account</Text>
     </View>
   );
 };

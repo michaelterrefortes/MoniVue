@@ -5,29 +5,15 @@ import {
   FlatList,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { AnimatedCircularProgress } from "react-native-circular-progress";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { validateDate } from "../../../../constants/functions";
+import CardDebts from "../../../../components/CardDebts";
 import { DebtContext } from "../../../../context/DebtContext";
 import { fetchCredit } from "../../../../services/api";
-
-/*const debts = [
-  { id: 1, name: "AMEX", apr: 28.99, limit: 5000, balance: 143.87 },
-  { id: 2, name: "AMEX Ex", apr: 29.99, limit: 1000, balance: 13.98 },
-  { id: 3, name: "CapOne", apr: 31.99, limit: 3000, balance: 0 },
-  { id: 4, name: "Citi", apr: 11.99, limit: 1600, balance: 0 },
-  { id: 5, name: "Premia", apr: 31.99, limit: 5200, balance: 1543.23 },
-  { id: 6, name: "CashReward", apr: 30.99, limit: 10500, balance: 2334.56 },
-  { id: 7, name: "Discover", apr: 21.99, limit: 3000, balance: 0 },
-];*/
-
-//const debt = 143.87 + 586.43;
 
 export default function Cards() {
   const router = useRouter();
@@ -40,22 +26,28 @@ export default function Cards() {
     totalDebts,
     totalCreditMinimum,
     setTotalCreditMinimum,
-    isDarkMode,
   } = useContext(DebtContext);
+
   //const [debt, setDebt] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      await sleep(1000);
       try {
-        setLoading(true);
         const result = await fetchCredit();
 
         setDebts(result);
-        setLoading(false);
+
         //console.log(result);
       } catch (error) {
         console.error("Fetch error:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -67,105 +59,51 @@ export default function Cards() {
     setTotalCreditMinimum(debts.reduce((acc, curr) => acc + curr.minimum, 0));
   }, [debts]);
 
-  const getUtilizationColor = (value) => {
-    if (value <= 10) return "#22c55e"; // green
-    if (value <= 30) return "#f59e0b"; // yellow
-    return "#ef4444"; // red
-  };
-
-  //const percentage = 100;
-
   const { top } = useSafeAreaInsets();
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+
+    await sleep(1000);
+
+    try {
+      const result = await fetchCredit();
+      setDebts(result);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   return (
     <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: isDarkMode ? "rgb(242, 242, 242)" : "#000" },
-      ]}
+      style={[styles.container, { backgroundColor: "rgb(242, 242, 242)" }]}
     >
       <FlatList
         data={debts}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
         renderItem={({ item }) => {
           const utilization = (item.balance / item.credit_limit) * 100 || 0;
 
           return (
-            <TouchableOpacity
-              style={[
-                styles.card,
-                {
-                  backgroundColor: isDarkMode ? "#fff" : "#1c1c1c",
-                  shadowColor: isDarkMode ? "#000" : "#838383",
+            <CardDebts
+              item={item}
+              params={{
+                pathname: "/debts/[debtId]",
+                params: {
+                  id: item.id,
+                  name: item.credit_name,
+                  balance: item.balance,
+                  limit: item.credit_limit,
+                  apr: item.apr,
+                  minimum: item.minimum,
+                  date: item.statement_date,
                 },
-              ]}
-              onPress={() =>
-                router.push({
-                  pathname: "/debts/[debtId]",
-                  params: {
-                    id: item.id,
-                    name: item.credit_name,
-                    balance: item.balance,
-                    limit: item.credit_limit,
-                    apr: item.apr,
-                    minimum: item.minimum,
-                    date: item.statement_date,
-                  },
-                })
-              }
-            >
-              <View style={styles.cardLeft}>
-                <Text
-                  style={[
-                    styles.cardTitle,
-                    { color: isDarkMode ? "#000" : "#fff" },
-                  ]}
-                >
-                  {item.credit_name}
-                </Text>
-
-                <Text
-                  style={[
-                    styles.cardBalance,
-                    { color: isDarkMode ? "#000" : "#fff" },
-                  ]}
-                >
-                  ${item.balance.toFixed(2)}
-                </Text>
-
-                <Text style={styles.cardSub}>Limit: ${item.credit_limit}</Text>
-
-                <Text style={styles.cardAPR}>APR {item.apr}%</Text>
-              </View>
-
-              <View style={styles.cardRight}>
-                <AnimatedCircularProgress
-                  size={65}
-                  width={7}
-                  backgroundWidth={3}
-                  fill={utilization}
-                  tintColor={getUtilizationColor(utilization)}
-                  backgroundColor={isDarkMode ? "#e5e7eb" : "#000"}
-                  arcSweepAngle={240}
-                  rotation={240}
-                  lineCap="round"
-                >
-                  {(fill) => (
-                    <Text
-                      style={[
-                        styles.progressText,
-                        { color: isDarkMode ? "#000" : "#fff" },
-                      ]}
-                    >
-                      {Math.round(fill)}%
-                    </Text>
-                  )}
-                </AnimatedCircularProgress>
-                <Text style={styles.cardSub}>
-                  Due: {validateDate(item.statement_date)}
-                </Text>
-                <Text style={styles.cardSub}>Minimum: ${item.minimum}</Text>
-              </View>
-            </TouchableOpacity>
+              }}
+              utilization={utilization}
+            />
           );
         }}
         //contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
@@ -174,49 +112,39 @@ export default function Cards() {
 
         ListHeaderComponent={
           <>
-            {loading ? (
-              <View style={styles.containerLoading}>
-                <ActivityIndicator
-                  size="large"
-                  //color="#0000ff"
-                  //className="mt-10 self-center"
-                />
+            <View style={[styles.viewBalance, { backgroundColor: "#fff" }]}>
+              <Text
+                style={{ fontSize: 12, color: "gray", textAlign: "center" }}
+              >
+                Total Balance:
+              </Text>
+              <Text style={[styles.balanceNumber, { color: "#000" }]}>
+                ${totalDebts.toFixed(2)}
+              </Text>
+              <Text
+                style={{ fontSize: 12, color: "gray", textAlign: "center" }}
+              >
+                Total Min Payment:
+              </Text>
+              <Text
+                style={{ fontSize: 12, color: "gray", textAlign: "center" }}
+              >
+                ${totalCreditMinimum.toFixed(2)}
+              </Text>
+            </View>
+            <View style={{ height: 20 }} />
+
+            {loading && (
+              <View style={{ alignItems: "center", marginTop: 20 }}>
+                <ActivityIndicator size="large" />
               </View>
-            ) : (
-              <>
-                <View
-                  style={[
-                    styles.viewBalance,
-                    { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-                  ]}
-                >
-                  <Text
-                    style={{ fontSize: 12, color: "gray", textAlign: "center" }}
-                  >
-                    Total Balance:
-                  </Text>
-                  <Text
-                    style={[
-                      styles.balanceNumber,
-                      { color: isDarkMode ? "#000" : "#fff" },
-                    ]}
-                  >
-                    ${totalDebts.toFixed(2)}
-                  </Text>
-                  <Text
-                    style={{ fontSize: 12, color: "gray", textAlign: "center" }}
-                  >
-                    Total Min Payment:
-                  </Text>
-                  <Text
-                    style={{ fontSize: 12, color: "gray", textAlign: "center" }}
-                  >
-                    ${totalCreditMinimum.toFixed(2)}
-                  </Text>
-                </View>
-                <View style={{ height: 20 }} />
-              </>
             )}
+
+            {debts.length === 0 && !loading ? (
+              <Text style={{ textAlign: "center", marginTop: 20 }}>
+                No Credit Cards
+              </Text>
+            ) : null}
           </>
         }
       />
@@ -285,61 +213,5 @@ const styles = StyleSheet.create({
     fontSize: 30,
 
     //fontWeight: "bold",
-  },
-
-  card: {
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 20,
-    marginTop: 12,
-    width: "92%",
-    alignSelf: "center",
-
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
-  },
-
-  cardLeft: {
-    flex: 1,
-  },
-
-  cardRight: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-
-  cardBalance: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-
-  cardSub: {
-    fontSize: 12,
-    color: "#6b7280",
-  },
-
-  cardAPR: {
-    fontSize: 12,
-    color: "#9ca3af",
-    marginTop: 2,
-  },
-
-  progressText: {
-    fontSize: 14,
-    fontWeight: "600",
   },
 });

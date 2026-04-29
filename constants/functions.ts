@@ -158,6 +158,8 @@ export const formatYearly = (yearlySpending) => {
     { label: "Dec", value: 0 },
   ];
 
+  //console.log(yearlySpending);
+
   for (const month of yearlySpending) {
     const monthElement = new Date(month.month_start).toLocaleDateString(
       "en-US",

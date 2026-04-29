@@ -1,4 +1,4 @@
-import { router, useNavigation } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -14,19 +14,26 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { SymbolView } from "expo-symbols";
 import { DebtContext } from "../../../context/DebtContext";
-import { addCreditCard } from "../../../services/api";
+import { editCreditCard } from "../../../services/api";
 
-const DebtInfo = () => {
+const EditDebt = () => {
   //console.log(params.setData);
+  const params = useLocalSearchParams();
 
   const { debts, setDebts } = useContext(DebtContext);
 
-  const [name, setName] = useState("");
-  const [balance, setBalance] = useState("");
-  const [limit, setLimit] = useState("");
-  const [apr, setApr] = useState("");
-  const [minimum, setMinimum] = useState("");
-  const [date, setDate] = useState(new Date());
+  const [name, setName] = useState(params.name);
+  const [balance, setBalance] = useState(params.balance);
+  const [limit, setLimit] = useState(params.limit);
+  const [apr, setApr] = useState(params.apr);
+  const [minimum, setMinimum] = useState(params.minimum);
+  const [date, setDate] = useState(
+    new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      Number(params.date),
+    ),
+  );
 
   const [aprWarning, setAprWarning] = useState(false);
   const [nameWarning, setNameWarning] = useState(false);
@@ -112,7 +119,8 @@ const DebtInfo = () => {
 
     setLoading(true);
 
-    const result = await addCreditCard(
+    const result = await editCreditCard(
+      params.id,
       name,
       balance,
       limit,
@@ -123,12 +131,19 @@ const DebtInfo = () => {
 
     setLoading(false);
 
-    if (result?.message) {
+    if (result?.success) {
       //console.log(result.message);
       //router.setParams(result.data);
-      setDebts((prevCards) => [...prevCards, result.data]);
+      //setDebts((prevCards) => [...prevCards, result.data]);
       //router.setParams({ refreshed: "true" });
-      router.back();
+      //router.back();
+      setDebts((prevDebt) =>
+        prevDebt.map((debt) =>
+          debt.id === result.data.id ? result.data : debt,
+        ),
+      );
+
+      router.dismissAll();
     } else {
       Alert.alert("Problem", result.wrong);
     }
@@ -264,7 +279,7 @@ const DebtInfo = () => {
   );
 };
 
-export default DebtInfo;
+export default EditDebt;
 
 const styles = StyleSheet.create({
   numberBalance: {

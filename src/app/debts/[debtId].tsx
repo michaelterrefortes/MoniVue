@@ -22,7 +22,7 @@ import { calculateInterest } from "../../../services/calculate";
 const DebtDetails = () => {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const { debts, setDebts, isDarkMode } = useContext(DebtContext);
+  const { debts, setDebts } = useContext(DebtContext);
   //console.log(params);
 
   const [balance, setBalance] = useState(params.balance);
@@ -86,13 +86,54 @@ const DebtDetails = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    if (!editing) {
-      navigation.setOptions({
-        headerLeft: () => (
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{
+            //backgroundColor: "grey",
+            width: 35,
+            height: 35,
+            borderRadius: 30,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <SymbolView name={{ ios: "xmark" }} tintColor={"#000"} size={20} />
+        </TouchableOpacity>
+      ),
+      headerRight: () => (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() =>
+              router.replace({
+                pathname: `/debts/editDebt`,
+                params: {
+                  id: params.id,
+                  name: params.name,
+                  balance: params.balance,
+                  limit: params.limit,
+                  apr: params.apr,
+                  minimum: params.minimum,
+                  date: params.date,
+                },
+              })
+            }
             style={{
-              //backgroundColor: "grey",
+              width: 35,
+              height: 35,
+              borderRadius: 30,
+              justifyContent: "center",
+              alignItems: "center",
+              marginRight: 10,
+            }}
+          >
+            <SymbolView name={{ ios: "pencil" }} tintColor={"#000"} size={20} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={confirmDelete}
+            style={{
               width: 35,
               height: 35,
               borderRadius: 30,
@@ -100,130 +141,37 @@ const DebtDetails = () => {
               alignItems: "center",
             }}
           >
-            <SymbolView
-              name={{ ios: "xmark" }}
-              tintColor={isDarkMode ? "#000" : "#fff"}
-              size={20}
-            />
+            <SymbolView name={{ ios: "trash" }} tintColor={"#000"} size={20} />
           </TouchableOpacity>
-        ),
-        headerRight: () => (
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TouchableOpacity
-              onPress={() => setEditing(true)}
-              style={{
-                width: 35,
-                height: 35,
-                borderRadius: 30,
-                justifyContent: "center",
-                alignItems: "center",
-                marginRight: 10,
-              }}
-            >
-              <SymbolView
-                name={{ ios: "pencil" }}
-                tintColor={isDarkMode ? "#000" : "#fff"}
-                size={20}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={confirmDelete}
-              style={{
-                width: 35,
-                height: 35,
-                borderRadius: 30,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <SymbolView
-                name={{ ios: "trash" }}
-                tintColor={isDarkMode ? "#000" : "#fff"}
-                size={20}
-              />
-            </TouchableOpacity>
-          </View>
-        ),
-      });
-    } else {
-      navigation.setOptions({
-        headerLeft: () => (
-          <TouchableOpacity onPress={() => setEditing(false)}>
-            <Text style={{ color: isDarkMode ? "#000" : "#fff" }}>Cancel</Text>
-          </TouchableOpacity>
-        ),
-
-        headerRight: () => (
-          <TouchableOpacity onPress={() => setEditing(false)}>
-            <SymbolView
-              name={{ ios: "checkmark" }}
-              tintColor={isDarkMode ? "#000" : "#fff"}
-              size={20}
-            />
-          </TouchableOpacity>
-        ),
-      });
-    }
+        </View>
+      ),
+    });
   }, [navigation, editing]);
 
   return (
     <ScrollView
-      style={[
-        styles.container,
-        { backgroundColor: isDarkMode ? "rgb(242, 242, 242)" : "#141414" },
-      ]}
+      style={[styles.container, { backgroundColor: "rgb(242, 242, 242)" }]}
     >
       <View style={{ height: 90 }} />
 
-      <Text style={[styles.name, { color: isDarkMode ? "#000" : "#fff" }]}>
-        {name}
-      </Text>
+      <Text style={[styles.name, { color: "#000" }]}>{name}</Text>
 
-      <View
-        style={[
-          styles.balanceCard,
-          { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-        ]}
-      >
+      <View style={[styles.balanceCard, { backgroundColor: "#fff" }]}>
         <Text style={styles.labelBalance}>Balance:</Text>
-        <Text
-          style={[styles.balanceText, { color: isDarkMode ? "#000" : "#fff" }]}
-        >
-          ${balance}
-        </Text>
+        <Text style={[styles.balanceText, { color: "#000" }]}>${balance}</Text>
       </View>
       <View style={styles.content}>
-        <View
-          style={[
-            styles.squares,
-            { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-          ]}
-        >
+        <View style={[styles.squares, { backgroundColor: "#fff" }]}>
           <Text style={styles.label}>Limit:</Text>
-          <Text style={[styles.text, { color: isDarkMode ? "#000" : "#fff" }]}>
-            ${limit}
-          </Text>
+          <Text style={[styles.text, { color: "#000" }]}>${limit}</Text>
         </View>
-        <View
-          style={[
-            styles.squares,
-            { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-          ]}
-        >
+        <View style={[styles.squares, { backgroundColor: "#fff" }]}>
           <Text style={styles.label}>APR:</Text>
-          <Text style={[styles.text, { color: isDarkMode ? "#000" : "#fff" }]}>
-            {apr}%
-          </Text>
+          <Text style={[styles.text, { color: "#000" }]}>{apr}%</Text>
         </View>
       </View>
 
-      <View
-        style={[
-          styles.rectangle,
-          { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-        ]}
-      >
+      <View style={[styles.rectangle, { backgroundColor: "#fff" }]}>
         <Text style={styles.label}>Utilization:</Text>
         <AnimatedCircularProgress
           size={80}
@@ -231,7 +179,7 @@ const DebtDetails = () => {
           backgroundWidth={5}
           fill={percentage}
           tintColor={getUtilizationColor(percentage)}
-          backgroundColor={isDarkMode ? "#e5e7eb" : "#000"}
+          backgroundColor={"#e5e7eb"}
           arcSweepAngle={240}
           rotation={240}
           lineCap="round"
@@ -242,7 +190,7 @@ const DebtDetails = () => {
               style={{
                 fontWeight: "bold",
                 fontSize: 20,
-                color: isDarkMode ? "#000" : "#fff",
+                color: "#000",
               }}
             >
               {Math.round(fill)}%
@@ -252,39 +200,22 @@ const DebtDetails = () => {
       </View>
 
       <View style={styles.content}>
-        <View
-          style={[
-            styles.squares,
-            { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-          ]}
-        >
+        <View style={[styles.squares, { backgroundColor: "#fff" }]}>
           <Text style={styles.label}>Min Payment:</Text>
-          <Text style={[styles.text, { color: isDarkMode ? "#000" : "#fff" }]}>
-            ${minimum}
-          </Text>
+          <Text style={[styles.text, { color: "#000" }]}>${minimum}</Text>
         </View>
-        <View
-          style={[
-            styles.squares,
-            { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-          ]}
-        >
+        <View style={[styles.squares, { backgroundColor: "#fff" }]}>
           <Text style={styles.label}>Due Date:</Text>
-          <Text style={[styles.text, { color: isDarkMode ? "#000" : "#fff" }]}>
+          <Text style={[styles.text, { color: "#000" }]}>
             {validateDate(date)}
           </Text>
         </View>
       </View>
 
-      <View
-        style={[
-          styles.input,
-          { backgroundColor: isDarkMode ? "#fff" : "#1c1c1c" },
-        ]}
-      >
+      <View style={[styles.input, { backgroundColor: "#fff" }]}>
         <Text style={styles.labelBalance}>Monthly Payment</Text>
         <TextInput
-          style={[styles.inputText, { color: isDarkMode ? "#000" : "#fff" }]}
+          style={[styles.inputText, { color: "#000" }]}
           onChangeText={(val) => {
             setPayment(val);
           }}
@@ -292,6 +223,7 @@ const DebtDetails = () => {
           onSubmitEditing={Keyboard.dismiss}
           value={payment}
           placeholder="$0.00"
+          placeholderTextColor={"lightgrey"}
           keyboardType="numeric"
           onEndEditing={() => {
             if (payment.trim().length === 0) {
@@ -314,15 +246,13 @@ const DebtDetails = () => {
                 style={[
                   styles.squares2,
                   {
-                    backgroundColor: isDarkMode ? "#fff" : "#1c1c1c",
-                    shadowColor: isDarkMode ? "#000" : "#838383",
+                    backgroundColor: "#fff",
+                    shadowColor: "#000",
                   },
                 ]}
               >
                 <Text style={styles.label}>Interest Payed:</Text>
-                <Text
-                  style={[styles.text, { color: isDarkMode ? "#000" : "#fff" }]}
-                >
+                <Text style={[styles.text, { color: "#000" }]}>
                   ${interestMonths.interest}
                 </Text>
               </View>
@@ -330,15 +260,13 @@ const DebtDetails = () => {
                 style={[
                   styles.squares2,
                   {
-                    backgroundColor: isDarkMode ? "#fff" : "#1c1c1c",
-                    shadowColor: isDarkMode ? "#000" : "#838383",
+                    backgroundColor: "#fff",
+                    shadowColor: "#000",
                   },
                 ]}
               >
                 <Text style={styles.label}>Total Months:</Text>
-                <Text
-                  style={[styles.text, { color: isDarkMode ? "#000" : "#fff" }]}
-                >
+                <Text style={[styles.text, { color: "#000" }]}>
                   {interestMonths.months}
                 </Text>
               </View>

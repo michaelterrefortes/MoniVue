@@ -4,6 +4,7 @@ import { useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
@@ -41,6 +42,10 @@ const SpendingTab = () => {
     setLocalSpending,
     localTotalSpending,
     setLocalTotalSpending,
+    weekly,
+    setWeekly,
+    yearSummary,
+    setYearSpending,
   } = useContext(DebtContext);
 
   const year = new Date().getFullYear();
@@ -50,14 +55,20 @@ const SpendingTab = () => {
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [selected, setSelected] = useState(0);
 
-  const [weekly, setWeekly] = useState([]);
   const [weeklyTotal, setLocalWeeklyTotalSpending] = useState(0);
 
-  const [yearSummary, setYearSpending] = useState([]);
   const [yearTotal, setYearTotalSpending] = useState(0);
 
   const start = startOfWeek(currentWeek, { weekStartsOn: 1 });
   const end = endOfWeek(currentWeek, { weekStartsOn: 1 });
+
+  const [loadingMonthly, setLoadingMonthly] = useState(false);
+  const [loadingWeekly, setLoadingWeekly] = useState(false);
+  const [loadingYearly, setLoadingYearly] = useState(false);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   function usePrevious(value) {
     const ref = useRef();
@@ -77,9 +88,11 @@ const SpendingTab = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoadingMonthly(true);
       try {
         //console.log(date);
         console.log("\nFetch Month Data", date);
+        await sleep(1000);
         if (
           date.getMonth() === new Date().getMonth() &&
           date.getFullYear() === new Date().getFullYear()
@@ -99,6 +112,8 @@ const SpendingTab = () => {
         //console.log(date);
       } catch (error) {
         console.error("Fetch error:", error);
+      } finally {
+        setLoadingMonthly(false);
       }
     };
 
@@ -106,8 +121,10 @@ const SpendingTab = () => {
   }, [date]);
 
   useEffect(() => {
+    setLoadingWeekly(true);
     const fetchData = async () => {
       console.log("Fetch Week Data", currentWeek);
+      await sleep(1000);
       try {
         const result = await fetchSpendingWeek(
           format(start, "yyyy-M-d"),
@@ -119,6 +136,8 @@ const SpendingTab = () => {
         //console.log("data week", result);
       } catch (error) {
         console.error("Fetch error:", error);
+      } finally {
+        setLoadingWeekly(false);
       }
     };
     //if (selected === 1) {
@@ -129,10 +148,15 @@ const SpendingTab = () => {
   }, [currentWeek]);
 
   useEffect(() => {
+    setLoadingYearly(true);
+
     const fetchData = async () => {
       console.log("Fetch Year Data", selectedYear);
+      await sleep(1000);
       try {
         const result = await fetchSpendingYear(selectedYear);
+
+        //console.log(result);
 
         //console.log(result);
 
@@ -141,6 +165,8 @@ const SpendingTab = () => {
         //console.log(yearSummary);
       } catch (error) {
         console.error("Fetch error:", error);
+      } finally {
+        setLoadingYearly(false);
       }
     };
     //if (selected === 1) {
@@ -199,6 +225,10 @@ const SpendingTab = () => {
                   params: {
                     selectedMonth: date.getMonth() + 1,
                     selectedYear: date.getFullYear(),
+                    //selectedWeek: currentWeek,
+                    startWeek: start,
+                    endWeek: end,
+                    year: selectedYear,
                   },
                 })
               }
@@ -217,21 +247,72 @@ const SpendingTab = () => {
 
   //formatPlotData(localSpending, date);
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+
+    await sleep(1000);
+
+    if (selected === 0) {
+      try {
+        //console.log(date);
+        console.log("\nFetch Month Data", date);
+        await sleep(1000);
+        if (
+          date.getMonth() === new Date().getMonth() &&
+          date.getFullYear() === new Date().getFullYear()
+        ) {
+          const result = await fetchSpending(date);
+
+          setSpending(result);
+          setLocalSpending(result);
+        } else {
+          const result = await fetchSpending(date);
+
+          //setSpending(result);
+          setLocalSpending(result);
+        }
+
+        //console.log(spending);
+        //console.log(date);
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    } else if (selected === 1) {
+      try {
+        const result = await fetchSpendingWeek(
+          format(start, "yyyy-M-d"),
+          format(end, "yyyy-M-d"),
+        );
+
+        setWeekly(result);
+
+        //console.log("data week", result);
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    } else {
+      try {
+        const result = await fetchSpendingYear(selectedYear);
+
+        //console.log(result);
+
+        setYearSpending(result);
+        //console.log("\ndata week", yearSummary);
+        //console.log(yearSummary);
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    }
+
+    setRefreshing(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      {/*<Text
-        style={{
-          fontWeight: "bold",
-          fontSize: 28,
-          paddingTop: 10,
-          paddingLeft: 15,
-        }}
-      >
-        Spending List
-      </Text>*/}
-
       {selected === 0 ? (
         <FlatList
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
           data={localSpending}
           renderItem={({ item }) => {
             //console.log(categories[item.type].icon);
@@ -248,6 +329,11 @@ const SpendingTab = () => {
                     date: item.date_spending,
                     selectedMonth: date.getMonth() + 1,
                     selectedYear: date.getFullYear(),
+
+                    //selectedWeek: currentWeek,
+                    startWeek: start,
+                    endWeek: end,
+                    year: selectedYear,
                   },
                 }}
               />
@@ -259,53 +345,41 @@ const SpendingTab = () => {
           ListHeaderComponent={() => {
             return (
               <>
-                <SegmentedControl
-                  values={TABS}
-                  style={{
-                    width: "80%",
-                    alignSelf: "center",
-                    margin: 20,
-                  }}
-                  selectedIndex={selected}
-                  onChange={(event) => {
-                    setSelected(event.nativeEvent.selectedSegmentIndex);
-                  }}
-                />
-                <View style={styles.datePickerCard}>
-                  <TouchableOpacity
-                    style={{ paddingHorizontal: 10 }}
-                    onPress={() => changeMonth(-1)}
-                  >
-                    <SymbolView
-                      name={{ ios: "chevron.left" }}
-                      tintColor="gray"
-                      size={20}
-                    />
-                  </TouchableOpacity>
-
-                  <Text
-                    style={{
-                      fontSize: 28,
-                      textAlign: "center",
-                      justifyContent: "center",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {formatMonth(date)}
-                  </Text>
-
-                  <TouchableOpacity
-                    style={{ paddingHorizontal: 10 }}
-                    onPress={() => changeMonth(1)}
-                  >
-                    <SymbolView
-                      name={{ ios: "chevron.right" }}
-                      tintColor="gray"
-                      size={20}
-                    />
-                  </TouchableOpacity>
-                </View>
                 <View style={styles.spendingBalance}>
+                  <View style={styles.datePickerCard}>
+                    <TouchableOpacity
+                      style={styles.buttonLeft}
+                      onPress={() => changeMonth(-1)}
+                    >
+                      <SymbolView
+                        name={{ ios: "chevron.left" }}
+                        tintColor="gray"
+                        size={20}
+                      />
+                    </TouchableOpacity>
+
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        textAlign: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {formatMonth(date)}
+                    </Text>
+
+                    <TouchableOpacity
+                      style={styles.buttonRight}
+                      onPress={() => changeMonth(1)}
+                    >
+                      <SymbolView
+                        name={{ ios: "chevron.right" }}
+                        tintColor="gray"
+                        size={20}
+                      />
+                    </TouchableOpacity>
+                  </View>
                   <Text style={styles.text}>Total:</Text>
                   <Text style={styles.textSpendingNumber}>
                     ${localTotalSpending.toFixed(2)}
@@ -313,7 +387,7 @@ const SpendingTab = () => {
 
                   <BarChart
                     data={formatPlotData(localSpending, date)}
-                    height={200}
+                    height={100}
                     //width={220}
                     //barWidth={20}
                     //minHeight={3}
@@ -330,7 +404,30 @@ const SpendingTab = () => {
                     frontColor={"#d3ff00"} // Default bottom color
                     //showGradient
                   />
+
+                  <SegmentedControl
+                    values={TABS}
+                    style={{
+                      width: "80%",
+                      alignSelf: "center",
+                      marginTop: 20,
+                    }}
+                    selectedIndex={selected}
+                    onChange={(event) => {
+                      setSelected(event.nativeEvent.selectedSegmentIndex);
+                    }}
+                  />
                 </View>
+                {loadingMonthly && (
+                  <View style={{ alignItems: "center", marginTop: 20 }}>
+                    <ActivityIndicator size="large" />
+                  </View>
+                )}
+                {localSpending.length === 0 && !loadingMonthly ? (
+                  <Text style={{ textAlign: "center", marginTop: 20 }}>
+                    No Spending
+                  </Text>
+                ) : null}
               </>
             );
           }}
@@ -338,6 +435,8 @@ const SpendingTab = () => {
       ) : selected === 1 ? (
         <FlatList
           data={weekly}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
           renderItem={({ item }) => {
             //console.log(categories[item.type].icon);
             return (
@@ -353,6 +452,11 @@ const SpendingTab = () => {
                     date: item.date_spending,
                     selectedMonth: date.getMonth() + 1,
                     selectedYear: date.getFullYear(),
+
+                    //selectedWeek: currentWeek,
+                    startWeek: start,
+                    endWeek: end,
+                    year: selectedYear,
                   },
                 }}
               />
@@ -364,64 +468,41 @@ const SpendingTab = () => {
           ListHeaderComponent={() => {
             return (
               <>
-                <SegmentedControl
-                  values={TABS}
-                  style={{
-                    width: "80%",
-                    alignSelf: "center",
-                    margin: 20,
-                  }}
-                  selectedIndex={selected}
-                  onChange={(event) => {
-                    setSelected(event.nativeEvent.selectedSegmentIndex);
-                  }}
-                />
-                <View
-                  style={[
-                    styles.datePickerCard,
-                    {
-                      width: "90%",
-                      alignSelf: "center",
-                      alignContent: "center",
-                      justifyContent: "center",
-                    },
-                  ]}
-                >
-                  <TouchableOpacity
-                    style={{ paddingHorizontal: 10 }}
-                    onPress={() => setCurrentWeek(subWeeks(currentWeek, 1))}
-                  >
-                    <SymbolView
-                      name={{ ios: "chevron.left" }}
-                      tintColor="gray"
-                      size={20}
-                    />
-                  </TouchableOpacity>
-
-                  <Text
-                    style={{
-                      fontSize: 20,
-                      textAlign: "center",
-                      justifyContent: "center",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {format(start, "MMM d")} - {format(end, "MMM d, yyyy")}
-                  </Text>
-
-                  <TouchableOpacity
-                    style={{ paddingHorizontal: 10 }}
-                    onPress={() => setCurrentWeek(addWeeks(currentWeek, 1))}
-                  >
-                    <SymbolView
-                      name={{ ios: "chevron.right" }}
-                      tintColor="gray"
-                      size={20}
-                    />
-                  </TouchableOpacity>
-                </View>
-
                 <View style={styles.spendingBalance}>
+                  <View style={[styles.datePickerCard]}>
+                    <TouchableOpacity
+                      style={styles.buttonLeft}
+                      onPress={() => setCurrentWeek(subWeeks(currentWeek, 1))}
+                    >
+                      <SymbolView
+                        name={{ ios: "chevron.left" }}
+                        tintColor="gray"
+                        size={20}
+                      />
+                    </TouchableOpacity>
+
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        textAlign: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {format(start, "MMM d")} - {format(end, "MMM d, yyyy")}
+                    </Text>
+
+                    <TouchableOpacity
+                      style={styles.buttonRight}
+                      onPress={() => setCurrentWeek(addWeeks(currentWeek, 1))}
+                    >
+                      <SymbolView
+                        name={{ ios: "chevron.right" }}
+                        tintColor="gray"
+                        size={20}
+                      />
+                    </TouchableOpacity>
+                  </View>
                   <Text style={styles.text}>Total:</Text>
                   <Text style={styles.textSpendingNumber}>
                     ${weeklyTotal.toFixed(2)}
@@ -429,7 +510,7 @@ const SpendingTab = () => {
 
                   <BarChart
                     data={formatWeeklyData(weekly)}
-                    height={200}
+                    height={100}
                     //width={220}
                     //barWidth={20}
                     //minHeight={3}
@@ -446,7 +527,32 @@ const SpendingTab = () => {
                     frontColor={"#d3ff00"} // Default bottom color
                     //showGradient
                   />
+
+                  <SegmentedControl
+                    values={TABS}
+                    style={{
+                      width: "80%",
+                      alignSelf: "center",
+                      marginTop: 20,
+                    }}
+                    selectedIndex={selected}
+                    onChange={(event) => {
+                      setSelected(event.nativeEvent.selectedSegmentIndex);
+                    }}
+                  />
                 </View>
+
+                {loadingWeekly && (
+                  <View style={{ alignItems: "center", marginTop: 20 }}>
+                    <ActivityIndicator size="large" />
+                  </View>
+                )}
+
+                {weekly.length === 0 && !loadingWeekly ? (
+                  <Text style={{ textAlign: "center", marginTop: 20 }}>
+                    No spending
+                  </Text>
+                ) : null}
               </>
             );
           }}
@@ -455,110 +561,92 @@ const SpendingTab = () => {
         <>
           <FlatList
             data={[]}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
             ListHeaderComponent={
               <>
-                <SegmentedControl
-                  values={TABS}
-                  style={{
-                    width: "80%",
-                    alignSelf: "center",
-                    margin: 20,
-                  }}
-                  selectedIndex={selected}
-                  onChange={(event) => {
-                    setSelected(event.nativeEvent.selectedSegmentIndex);
-                  }}
-                />
-                <View
-                  style={[
-                    styles.datePickerCard,
-                    { paddingHorizontal: 16, paddingBottom: 16 },
-                  ]}
-                >
-                  <TouchableOpacity
-                    style={{ paddingHorizontal: 10 }}
-                    onPress={() => {
-                      setSelectedYear((prev) => prev - 1);
-                    }}
-                  >
-                    <SymbolView
-                      name={{ ios: "chevron.left" }}
-                      tintColor="gray"
-                      size={20}
-                    />
-                  </TouchableOpacity>
-
-                  <Text
-                    style={{
-                      fontSize: 28,
-                      textAlign: "center",
-                      justifyContent: "center",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {selectedYear}
-                  </Text>
-
-                  <TouchableOpacity
-                    style={{ paddingHorizontal: 10 }}
-                    onPress={() => {
-                      setSelectedYear((prev) => prev + 1);
-                    }}
-                  >
-                    <SymbolView
-                      name={{ ios: "chevron.right" }}
-                      tintColor="gray"
-                      size={20}
-                    />
-                  </TouchableOpacity>
-                </View>
                 <View style={[styles.spendingBalance]}>
+                  <View style={[styles.datePickerCard]}>
+                    <TouchableOpacity
+                      style={styles.buttonLeft}
+                      onPress={() => {
+                        setSelectedYear((prev) => prev - 1);
+                      }}
+                    >
+                      <SymbolView
+                        name={{ ios: "chevron.left" }}
+                        tintColor="gray"
+                        size={20}
+                      />
+                    </TouchableOpacity>
+
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        textAlign: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {selectedYear}
+                    </Text>
+
+                    <TouchableOpacity
+                      style={styles.buttonRight}
+                      onPress={() => {
+                        setSelectedYear((prev) => prev + 1);
+                      }}
+                    >
+                      <SymbolView
+                        name={{ ios: "chevron.right" }}
+                        tintColor="gray"
+                        size={20}
+                      />
+                    </TouchableOpacity>
+                  </View>
                   <Text style={styles.text}>Total:</Text>
                   <Text style={styles.textSpendingNumber}>
                     ${yearTotal.toFixed(2)}
                   </Text>
-                  {yearSummary.length !== 0 ? (
-                    <BarChart
-                      data={formatYearly(yearSummary)}
-                      height={200}
-                      //width={220}
-                      barWidth={20}
-                      //horizontal
-                      //minHeight={3}
-                      barBorderRadius={3}
-                      spacing={5}
-                      noOfSections={4}
-                      yAxisThickness={0}
-                      xAxisThickness={0}
-                      xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-                      yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-                      isAnimated
-                      animationDuration={300}
-                      gradientColor={"#12ff00"} // Default top color
-                      frontColor={"#d3ff00"} // Default bottom color
-                      //showGradient
-                    />
-                  ) : (
-                    <BarChart
-                      data={[]}
-                      height={200}
-                      //width={220}
-                      barWidth={20}
-                      //horizontal
-                      //minHeight={3}
-                      barBorderRadius={3}
-                      spacing={5}
-                      noOfSections={4}
-                      yAxisThickness={0}
-                      xAxisThickness={0}
-                      xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-                      yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-                      isAnimated
-                      animationDuration={300}
-                      gradientColor={"#12ff00"} // Default top color
-                      frontColor={"#d3ff00"} // Default bottom color
-                      //showGradient
-                    />
+
+                  <BarChart
+                    data={formatYearly(yearSummary)}
+                    height={100}
+                    //width={220}
+                    barWidth={20}
+                    //horizontal
+                    //minHeight={3}
+                    barBorderRadius={3}
+                    spacing={5}
+                    noOfSections={4}
+                    yAxisThickness={0}
+                    xAxisThickness={0}
+                    xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
+                    yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+                    isAnimated
+                    animationDuration={300}
+                    gradientColor={"#12ff00"} // Default top color
+                    frontColor={"#d3ff00"} // Default bottom color
+                    //showGradient
+                  />
+
+                  <SegmentedControl
+                    values={TABS}
+                    style={{
+                      width: "80%",
+                      alignSelf: "center",
+                      marginTop: 20,
+                    }}
+                    selectedIndex={selected}
+                    onChange={(event) => {
+                      setSelected(event.nativeEvent.selectedSegmentIndex);
+                    }}
+                  />
+
+                  {loadingYearly && (
+                    <View style={{ alignItems: "center", marginTop: 20 }}>
+                      <ActivityIndicator size="large" />
+                    </View>
                   )}
                 </View>
               </>
@@ -632,19 +720,21 @@ const styles = StyleSheet.create({
   },
 
   datePickerCard: {
-    //marginTop: 15,
     flexDirection: "row",
-    //justifyContent: "space-between",
-    //backgroundColor: "#fff",
     alignItems: "center",
-    width: "50%",
-    //paddingVertical: 10,
-    //alignSelf: "center",
-    //marginLeft: 10,
+    justifyContent: "space-between",
+    paddingBottom: 10,
+  },
+
+  buttonRight: {
+    //paddingRight: 5,
+    padding: 5,
+    backgroundColor: "#f2f2f2",
     borderRadius: 50,
-    //shadowColor: "#000",
-    //shadowOpacity: 0.2,
-    //shadowRadius: 10,
-    //shadowOffset: { width: 0, height: 4 },
+  },
+  buttonLeft: {
+    padding: 5,
+    backgroundColor: "#f2f2f2",
+    borderRadius: 50,
   },
 });

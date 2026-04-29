@@ -3,22 +3,28 @@ import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { DebtContext } from "../../../context/DebtContext";
-import { addSpending } from "../../../services/api";
+import { editSpending } from "../../../services/api";
 
 const EditSpending = () => {
-  const { spending, setSpending, localSpending, setLocalSpending } =
-    useContext(DebtContext);
+  const {
+    spending,
+    setSpending,
+    localSpending,
+    setLocalSpending,
+    setWeekly,
+    setYearSpending,
+  } = useContext(DebtContext);
   const router = useRouter();
   const params = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
@@ -27,6 +33,8 @@ const EditSpending = () => {
   const [amount, setAmount] = useState(Number(params.amount));
   const [type, setType] = useState(params.type);
   const [date, setDate] = useState(new Date(params.date));
+
+  const [oldAmount, setOldAmount] = useState(Number(params.amount));
 
   const [nameWarning, setNameWarning] = useState(false);
   const [priceWarning, setPriceWarning] = useState(false);
@@ -85,11 +93,11 @@ const EditSpending = () => {
 
     setLoading(true);
 
-    const result = await addSpending(name, amount, type, date);
+    const result = await editSpending(params.id, name, amount, type, date);
 
     setLoading(false);
 
-    if (result?.message) {
+    if (result?.success) {
       //console.log(result);
       //router.setParams(result.data);
       const selectedMonth = Number(params?.selectedMonth);
@@ -110,31 +118,85 @@ const EditSpending = () => {
       const isViewMonth =
         selectedMonth === viewMonth && selectedYear === viewYear;
 
-      const sortByDateDesc = (a, b) => {
-        const dateA = a?.date_spending
-          ? new Date(a.date_spending)
-          : new Date(0);
-        const dateB = b?.date_spending
-          ? new Date(b.date_spending)
-          : new Date(0);
-        return dateB - dateA;
-      };
-
-      const updateList = (prev) => [...prev, result.data].sort(sortByDateDesc);
-
       // ✅ Update global (current real month)
-      if (isCurrentMonth) {
-        setSpending(updateList);
+      if (!isCurrentMonth) {
+        setSpending((prevItem) =>
+          prevItem.map((spending) =>
+            spending.id === result.data.id ? result.data : spending,
+          ),
+        );
+      } else {
+        setSpending((prevItems) =>
+          prevItems.filter((item) => Number(item.id) !== Number(params.id)),
+        );
       }
 
       // ✅ Update local (currently viewed month)
-      if (isViewMonth) {
-        setLocalSpending(updateList);
+      if (!isViewMonth) {
+        setLocalSpending((prevItem) =>
+          prevItem.map((spending) =>
+            spending.id === result.data.id ? result.data : spending,
+          ),
+        );
+      } else {
+        setLocalSpending((prevItems) =>
+          prevItems.filter((item) => Number(item.id) !== Number(params.id)),
+        );
+      }
+
+      const start = new Date(params.startWeek);
+      const end = new Date(params.endWeek);
+
+      if (!(new Date(params.date) >= start && new Date(params.date) <= end)) {
+        setWeekly((prevItem) =>
+          prevItem.map((spending) =>
+            spending.id === result.data.id ? result.data : spending,
+          ),
+        );
+      } else {
+        setWeekly((prevItems) =>
+          prevItems.filter((item) => Number(item.id) !== Number(params.id)),
+        );
+      }
+
+      if (!(Number(params.year) === new Date(params.date).getFullYear())) {
+        setYearSpending((prevItems) => {
+          return prevItems.map((item) => {
+            if (
+              new Date(item.month_start).getMonth() ===
+              new Date(params.date).getMonth()
+            ) {
+              return {
+                ...item,
+                total_sum:
+                  Number(item.total_sum) -
+                  Number(oldAmount) +
+                  Number(params.amount),
+              };
+            }
+            return item; // IMPORTANT: always return something
+          });
+        });
+      } else {
+        setYearSpending((prevItems) => {
+          return prevItems.map((item) => {
+            if (
+              new Date(item.month_start).getMonth() ===
+              new Date(params.date).getMonth()
+            ) {
+              return {
+                ...item,
+                total_sum: Number(item.total_sum) - Number(oldAmount),
+              };
+            }
+            return item; // IMPORTANT: always return something
+          });
+        });
       }
 
       //router.setParams({ refreshed: "true" });
       //console.log("spending:", spending);
-      router.back();
+      router.dismissAll();
     } else {
       Alert.alert("Problem", result.wrong);
     }

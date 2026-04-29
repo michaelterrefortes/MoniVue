@@ -1,19 +1,19 @@
 export const categories = {
-  1: { name: "Mortgage", icon: "house", color: "#FF9EB5" },
-  2: { name: "Rent", icon: "key", color: "#FFD54F" },
-  3: { name: "Auto Loan", icon: "car", color: "#81C784" },
-  4: { name: "Utilities", icon: "hammer", color: "#64B5F6" },
-  5: { name: "Auto Insurance", icon: "car.badge.gearshape", color: "#B39DDB" },
+  1: { name: "Mortgage", icon: "house.fill", color: "#FF9EB5" },
+  2: { name: "Rent", icon: "key.fill", color: "#FFD54F" },
+  3: { name: "Auto Loan", icon: "car.fill", color: "#81C784" },
+  4: { name: "Utilities", icon: "bolt.fill", color: "#64B5F6" },
+  5: { name: "Auto Insurance", icon: "car.circle.fill", color: "#B39DDB" },
   6: { name: "Cable & Internet", icon: "wifi", color: "#FFB74D" },
   7: {
     name: "Health Insurance",
-    icon: "heart.text.clipboard",
+    icon: "heart.fill",
     color: "#F06292",
   },
   8: { name: "Mobile", icon: "iphone", color: "#4DB6AC" },
-  9: { name: "Life Insurance", icon: "staroflife.shield", color: "#AED581" },
-  10: { name: "Alarm & Security", icon: "light.beacon.max", color: "#BA68C8" },
-  11: { name: "Others", icon: "ellipsis.circle", color: "#90A4AE" },
+  9: { name: "Life Insurance", icon: "cross.case.fill", color: "#AED581" },
+  10: { name: "Alarm & Security", icon: "lock.shield.fill", color: "#BA68C8" },
+  11: { name: "Others", icon: "ellipsis.circle.fill", color: "#90A4AE" },
 };
 
 export const categoriesSpending = {
