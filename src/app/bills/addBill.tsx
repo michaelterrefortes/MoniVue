@@ -1,18 +1,16 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation, useRouter } from "expo-router";
-import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
+import CurrencyInput from "react-native-currency-input";
+import Dropdown from "../../../components/Dropdown";
 import { DebtContext } from "../../../context/DebtContext";
 import { addBills } from "../../../services/api";
 
@@ -22,8 +20,8 @@ const AddBill = () => {
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState("");
-  const [variation, setVariation] = useState("");
-  const [price, setPrice] = useState("");
+  const [variation, setVariation] = useState(null);
+  const [price, setPrice] = useState(null);
   const [type, setType] = useState("");
   const [date, setDate] = useState(new Date());
 
@@ -35,31 +33,29 @@ const AddBill = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
+    const cond =
+      name.trim() === "" ||
+      variation === null ||
+      price === null ||
+      type.trim() === "";
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={processForm}
-          style={{
-            width: 35,
-            height: 35,
-            borderRadius: 30,
-            justifyContent: "center",
-            alignItems: "center",
-            //backgroundColor: "blue",
-            //borderColor: "blue",
-          }}
-        >
-          {loading ? (
-            <ActivityIndicator size={10} />
-          ) : (
-            <SymbolView
-              name={{ ios: "checkmark" }}
-              tintColor="black"
-              size={20}
-            />
-          )}
-        </TouchableOpacity>
-      ),
+      unstable_headerRightItems: () => [
+        {
+          type: "button",
+          label: "Add",
+          variant: "done",
+          disabled: cond,
+          //hidesSharedBackground: true,
+          icon: {
+            type: "sfSymbol",
+            name: "checkmark",
+          },
+          onPress: () => {
+            // Do something
+            processForm();
+          },
+        },
+      ],
     });
   }, [navigation, name, variation, price, type, date]);
 
@@ -70,11 +66,11 @@ const AddBill = () => {
       setNameWarning(true);
       hasError = true;
     }
-    if (variation.trim() === "") {
+    if (variation === null) {
       setVariationWarning(true);
       hasError = true;
     }
-    if (price.trim() === "") {
+    if (price === null) {
       setPriceWarning(true);
       hasError = true;
     }
@@ -137,6 +133,8 @@ const AddBill = () => {
       ) : null}
 
       <Text style={[styles.title, { color: "#000" }]}>Price</Text>
+
+      {/*
       <TextInput
         style={[styles.input, { backgroundColor: "#fff" }]}
         onChangeText={(val) => {
@@ -147,6 +145,23 @@ const AddBill = () => {
         value={price}
         placeholder="Price: 0.00"
         keyboardType="numeric"
+      />*/}
+
+      <CurrencyInput
+        style={[styles.input, { backgroundColor: "#fff" }]}
+        value={price}
+        onChangeValue={setPrice}
+        prefix="$"
+        delimiter=","
+        separator="."
+        precision={2}
+        minValue={0}
+        placeholder="$0.00"
+        placeholderTextColor={"grey"}
+        //showPositiveSign
+        //onChangeText={(formattedValue) => {
+        //  console.log(formattedValue);
+        //}}
       />
       {priceWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
@@ -155,7 +170,7 @@ const AddBill = () => {
       <Text style={[styles.title, { color: "#000" }]}>
         Monthly Bill Variation
       </Text>
-      <TextInput
+      {/*<TextInput
         style={[styles.input, { backgroundColor: "#fff" }]}
         onChangeText={(val) => {
           setVariation(val);
@@ -165,6 +180,22 @@ const AddBill = () => {
         value={variation}
         placeholder="Variation: 0.00"
         keyboardType="numeric"
+      />*/}
+      <CurrencyInput
+        style={[styles.input, { backgroundColor: "#fff" }]}
+        value={variation}
+        onChangeValue={setVariation}
+        prefix="$"
+        delimiter=","
+        separator="."
+        precision={2}
+        minValue={0}
+        placeholder="$0.00"
+        placeholderTextColor={"grey"}
+        //showPositiveSign
+        //onChangeText={(formattedValue) => {
+        //  console.log(formattedValue);
+        //}}
       />
       {variationWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
@@ -184,42 +215,13 @@ const AddBill = () => {
       </View>
 
       <Text style={[styles.title, { color: "#000" }]}>Bill Category</Text>
-      <DropDownPicker
-        style={[
-          styles.input,
-          {
-            borderColor: "#fff",
-            borderBottomLeftRadius: 50,
-            borderBottomRightRadius: 50,
-            borderTopLeftRadius: open ? 30 : 50,
-            borderTopRightRadius: open ? 30 : 50,
-            backgroundColor: "#fff",
-          },
-        ]}
+      <Dropdown
         open={open}
-        value={type}
+        type={type}
         items={items}
         setOpen={setOpen}
-        setValue={setType}
+        setType={setType}
         setItems={setItems}
-        placeholder={"Type"}
-        listMode="SCROLLVIEW"
-        dropDownContainerStyle={[
-          styles.dropdown,
-          {
-            backgroundColor: "#fff",
-            borderColor: "#fff",
-          },
-        ]}
-        listItemContainerStyle={{
-          borderBottomWidth: 1,
-          borderBottomColor: "#eee",
-
-          //paddingVertical: 13,
-        }}
-        placeholderStyle={{
-          color: "gray",
-        }}
       />
       {typeWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>

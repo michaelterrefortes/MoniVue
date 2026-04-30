@@ -11,11 +11,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { BarChart } from "react-native-gifted-charts";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AccountButton from "../../../../components/AccountButton";
+import BarPlot from "../../../../components/BarPlot";
 import Card from "../../../../components/Card";
 import {
+  formatMoney,
   formatPlotData,
   formatWeeklyData,
   formatYearly,
@@ -46,6 +47,9 @@ const SpendingTab = () => {
     setWeekly,
     yearSummary,
     setYearSpending,
+    updateMonth,
+    updateWeek,
+    updateYear,
   } = useContext(DebtContext);
 
   const year = new Date().getFullYear();
@@ -82,21 +86,17 @@ const SpendingTab = () => {
     return ref.current;
   }
 
-  const prevMonth = usePrevious(date);
-  const prevWeekly = usePrevious(currentWeek);
-  const prevYear = usePrevious(selectedYear);
-
   useEffect(() => {
     const fetchData = async () => {
       setLoadingMonthly(true);
       try {
         //console.log(date);
+        const cond =
+          date.getMonth() === new Date().getMonth() &&
+          date.getFullYear() === new Date().getFullYear();
         console.log("\nFetch Month Data", date);
         await sleep(1000);
-        if (
-          date.getMonth() === new Date().getMonth() &&
-          date.getFullYear() === new Date().getFullYear()
-        ) {
+        if (cond) {
           const result = await fetchSpending(date);
 
           setSpending(result);
@@ -104,12 +104,11 @@ const SpendingTab = () => {
         } else {
           const result = await fetchSpending(date);
 
-          //setSpending(result);
-          setLocalSpending(result);
-        }
+          const result2 = await fetchSpending(new Date());
 
-        //console.log(spending);
-        //console.log(date);
+          setLocalSpending(result);
+          setSpending(result2);
+        }
       } catch (error) {
         console.error("Fetch error:", error);
       } finally {
@@ -118,7 +117,7 @@ const SpendingTab = () => {
     };
 
     fetchData();
-  }, [date]);
+  }, [date, updateMonth]);
 
   useEffect(() => {
     setLoadingWeekly(true);
@@ -132,20 +131,15 @@ const SpendingTab = () => {
         );
 
         setWeekly(result);
-
-        //console.log("data week", result);
       } catch (error) {
         console.error("Fetch error:", error);
       } finally {
         setLoadingWeekly(false);
       }
     };
-    //if (selected === 1) {
-    //console.log(format(start, "yyyy-M-d"), format(end, "yyyy-M-d"));
 
     fetchData();
-    //}
-  }, [currentWeek]);
+  }, [currentWeek, updateWeek]);
 
   useEffect(() => {
     setLoadingYearly(true);
@@ -156,25 +150,16 @@ const SpendingTab = () => {
       try {
         const result = await fetchSpendingYear(selectedYear);
 
-        //console.log(result);
-
-        //console.log(result);
-
         setYearSpending(result);
-        //console.log("\ndata week", yearSummary);
-        //console.log(yearSummary);
       } catch (error) {
         console.error("Fetch error:", error);
       } finally {
         setLoadingYearly(false);
       }
     };
-    //if (selected === 1) {
-    //console.log(format(start, "yyyy-M-d"), format(end, "yyyy-M-d"));
 
     fetchData();
-    //}
-  }, [selectedYear]);
+  }, [selectedYear, updateYear]);
 
   useEffect(() => {
     setTotalSpending(spending.reduce((acc, curr) => acc + curr.amount, 0));
@@ -382,27 +367,12 @@ const SpendingTab = () => {
                   </View>
                   <Text style={styles.text}>Total:</Text>
                   <Text style={styles.textSpendingNumber}>
-                    ${localTotalSpending.toFixed(2)}
+                    {formatMoney(localTotalSpending)}
                   </Text>
 
-                  <BarChart
-                    data={formatPlotData(localSpending, date)}
+                  <BarPlot
                     height={100}
-                    //width={220}
-                    //barWidth={20}
-                    //minHeight={3}
-                    barBorderRadius={3}
-                    spacing={20}
-                    noOfSections={4}
-                    yAxisThickness={0}
-                    xAxisThickness={0}
-                    xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-                    yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-                    isAnimated
-                    animationDuration={300}
-                    gradientColor={"#12ff00"} // Default top color
-                    frontColor={"#d3ff00"} // Default bottom color
-                    //showGradient
+                    data={formatPlotData(localSpending, date)}
                   />
 
                   <SegmentedControl
@@ -505,28 +475,10 @@ const SpendingTab = () => {
                   </View>
                   <Text style={styles.text}>Total:</Text>
                   <Text style={styles.textSpendingNumber}>
-                    ${weeklyTotal.toFixed(2)}
+                    {formatMoney(weeklyTotal)}
                   </Text>
 
-                  <BarChart
-                    data={formatWeeklyData(weekly)}
-                    height={100}
-                    //width={220}
-                    //barWidth={20}
-                    //minHeight={3}
-                    barBorderRadius={3}
-                    spacing={5}
-                    noOfSections={4}
-                    yAxisThickness={0}
-                    xAxisThickness={0}
-                    xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-                    yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-                    isAnimated
-                    animationDuration={300}
-                    gradientColor={"#12ff00"} // Default top color
-                    frontColor={"#d3ff00"} // Default bottom color
-                    //showGradient
-                  />
+                  <BarPlot height={100} data={formatWeeklyData(weekly)} />
 
                   <SegmentedControl
                     values={TABS}
@@ -606,29 +558,10 @@ const SpendingTab = () => {
                   </View>
                   <Text style={styles.text}>Total:</Text>
                   <Text style={styles.textSpendingNumber}>
-                    ${yearTotal.toFixed(2)}
+                    {formatMoney(yearTotal)}
                   </Text>
 
-                  <BarChart
-                    data={formatYearly(yearSummary)}
-                    height={100}
-                    //width={220}
-                    barWidth={20}
-                    //horizontal
-                    //minHeight={3}
-                    barBorderRadius={3}
-                    spacing={5}
-                    noOfSections={4}
-                    yAxisThickness={0}
-                    xAxisThickness={0}
-                    xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-                    yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-                    isAnimated
-                    animationDuration={300}
-                    gradientColor={"#12ff00"} // Default top color
-                    frontColor={"#d3ff00"} // Default bottom color
-                    //showGradient
-                  />
+                  <BarPlot height={100} data={formatYearly(yearSummary)} />
 
                   <SegmentedControl
                     values={TABS}

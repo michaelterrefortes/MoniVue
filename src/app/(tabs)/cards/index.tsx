@@ -12,6 +12,7 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import CardDebts from "../../../../components/CardDebts";
+import { formatMoney } from "../../../../constants/functions";
 import { DebtContext } from "../../../../context/DebtContext";
 import { fetchCredit } from "../../../../services/api";
 
@@ -119,7 +120,7 @@ export default function Cards() {
                 Total Balance:
               </Text>
               <Text style={[styles.balanceNumber, { color: "#000" }]}>
-                ${totalDebts.toFixed(2)}
+                {formatMoney(totalDebts)}
               </Text>
               <Text
                 style={{ fontSize: 12, color: "gray", textAlign: "center" }}
@@ -129,7 +130,7 @@ export default function Cards() {
               <Text
                 style={{ fontSize: 12, color: "gray", textAlign: "center" }}
               >
-                ${totalCreditMinimum.toFixed(2)}
+                {formatMoney(totalCreditMinimum)}
               </Text>
             </View>
             <View style={{ height: 20 }} />

@@ -2,14 +2,15 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
+import CurrencyInput from "react-native-currency-input";
+import Dropdown from "../../../components/Dropdown";
 import { DebtContext } from "../../../context/DebtContext";
 import { editBills } from "../../../services/api";
 
@@ -33,18 +34,6 @@ const EditBill = () => {
     ),
   );
 
-  const [nameOld, setNameOld] = useState(params.name);
-  const [variationOld, setVariationOld] = useState(params.variable);
-  const [priceOld, setPriceOld] = useState(params.price);
-  const [typeOld, setTypeOld] = useState(params.type);
-  const [dateOld, setDateOld] = useState(
-    new Date(
-      new Date().getFullYear(),
-      new Date().getMonth(),
-      Number(params.date),
-    ),
-  );
-
   const [nameWarning, setNameWarning] = useState(false);
   const [priceWarning, setPriceWarning] = useState(false);
   const [variationWarning, setVariationWarning] = useState(false);
@@ -53,12 +42,19 @@ const EditBill = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
+    const cond =
+      name.trim() === "" ||
+      variation === null ||
+      price === null ||
+      type.trim() === "";
     navigation.setOptions({
       unstable_headerRightItems: () => [
         {
           type: "button",
           label: "Add",
-
+          variant: "done",
+          disabled: cond,
+          //hidesSharedBackground: true,
           icon: {
             type: "sfSymbol",
             name: "checkmark",
@@ -79,11 +75,11 @@ const EditBill = () => {
       setNameWarning(true);
       hasError = true;
     }
-    if (variation.trim() === "") {
+    if (variation === null) {
       setVariationWarning(true);
       hasError = true;
     }
-    if (price.trim() === "") {
+    if (price === null) {
       setPriceWarning(true);
       hasError = true;
     }
@@ -119,32 +115,6 @@ const EditBill = () => {
       );
 
       router.dismissAll();
-
-      //router.back();
-      //router.back();
-      /*router.setParams({
-        id: result.data.id,
-        name: result.data.bill_name,
-        price: result.data.price,
-        type: result.data.type_bill,
-        variable: result.data.variable,
-        date: result.data.payment_date,
-      });*/
-      //router.setParams({ refreshed: "true" });
-
-      //navigation.navigate("/(tabs)/cards");
-
-      /*router.dismissTo({
-        pathname: `bills/${result.data.id}`,
-        params: {
-          id: result.data.id,
-          name: result.data.bill_name,
-          price: result.data.price,
-          type: result.data.type_bill,
-          variable: result.data.variable,
-          date: result.data.payment_date,
-        },
-      });*/
     } else {
       Alert.alert("Problem", result.wrong);
     }
@@ -185,6 +155,7 @@ const EditBill = () => {
       ) : null}
 
       <Text style={[styles.title, { color: "#000" }]}>Price</Text>
+      {/*
       <TextInput
         style={[styles.input, { backgroundColor: "#fff" }]}
         onChangeText={(val) => {
@@ -195,6 +166,22 @@ const EditBill = () => {
         value={price}
         placeholder="Price: 0.00"
         keyboardType="numeric"
+      />*/}
+      <CurrencyInput
+        style={[styles.input, { backgroundColor: "#fff" }]}
+        value={price}
+        onChangeValue={setPrice}
+        prefix="$"
+        delimiter=","
+        separator="."
+        precision={2}
+        minValue={0}
+        placeholder="$0.00"
+        placeholderTextColor={"grey"}
+        //showPositiveSign
+        //onChangeText={(formattedValue) => {
+        //  console.log(formattedValue);
+        //}}
       />
       {priceWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
@@ -203,6 +190,7 @@ const EditBill = () => {
       <Text style={[styles.title, { color: "#000" }]}>
         Monthly Bill Variation
       </Text>
+      {/*
       <TextInput
         style={[styles.input, { backgroundColor: "#fff" }]}
         onChangeText={(val) => {
@@ -213,6 +201,22 @@ const EditBill = () => {
         value={variation}
         placeholder="Variation: 0.00"
         keyboardType="numeric"
+      />*/}
+      <CurrencyInput
+        style={[styles.input, { backgroundColor: "#fff" }]}
+        value={variation}
+        onChangeValue={setVariation}
+        prefix="$"
+        delimiter=","
+        separator="."
+        precision={2}
+        minValue={0}
+        placeholder="$0.00"
+        placeholderTextColor={"grey"}
+        //showPositiveSign
+        //onChangeText={(formattedValue) => {
+        //  console.log(formattedValue);
+        //}}
       />
       {variationWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
@@ -232,42 +236,13 @@ const EditBill = () => {
       </View>
 
       <Text style={[styles.title, { color: "#000" }]}>Bill Category</Text>
-      <DropDownPicker
-        style={[
-          styles.input,
-          {
-            borderColor: "#fff",
-            borderBottomLeftRadius: 50,
-            borderBottomRightRadius: 50,
-            borderTopLeftRadius: open ? 30 : 50,
-            borderTopRightRadius: open ? 30 : 50,
-            backgroundColor: "#fff",
-          },
-        ]}
+      <Dropdown
         open={open}
-        value={type}
+        type={type}
         items={items}
         setOpen={setOpen}
-        setValue={setType}
+        setType={setType}
         setItems={setItems}
-        placeholder={"Type"}
-        listMode="SCROLLVIEW"
-        dropDownContainerStyle={[
-          styles.dropdown,
-          {
-            backgroundColor: "#fff",
-            borderColor: "#fff",
-          },
-        ]}
-        listItemContainerStyle={{
-          borderBottomWidth: 1,
-          borderBottomColor: "#eee",
-
-          //paddingVertical: 13,
-        }}
-        placeholderStyle={{
-          color: "gray",
-        }}
       />
       {typeWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>

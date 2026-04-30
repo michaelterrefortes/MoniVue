@@ -1,12 +1,25 @@
 import { Stack } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import { Alert, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { DebtProvider } from "../../context/DebtContext";
 
 export default function RootLayout() {
   return (
     <DebtProvider>
       <Stack>
+        <Stack.Screen
+          name="(auth)"
+          options={{
+            headerBackTitle: "",
+
+            headerShown: false,
+            headerTitle: "",
+            //headerLargeTitle: true,
+            //headerLargeTitleEnabled: true,
+            //headerRight: () => <AccountButton />,
+          }}
+        />
+
         <Stack.Screen
           name="(tabs)"
           options={{
@@ -55,6 +68,26 @@ export default function RootLayout() {
             //sheetAllowedDetents: "all",
 
             //navigationBarHidden: false,
+
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={{
+                  //backgroundColor: "grey",
+                  width: 35,
+                  height: 35,
+                  borderRadius: 30,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <SymbolView
+                  name={{ ios: "xmark" }}
+                  tintColor={"#000"}
+                  size={20}
+                />
+              </TouchableOpacity>
+            ),
           })}
         />
 
@@ -74,6 +107,25 @@ export default function RootLayout() {
             //sheetAllowedDetents: "all",
 
             //navigationBarHidden: false,
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={{
+                  //backgroundColor: "grey",
+                  width: 35,
+                  height: 35,
+                  borderRadius: 30,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <SymbolView
+                  name={{ ios: "xmark" }}
+                  tintColor={"#000"}
+                  size={20}
+                />
+              </TouchableOpacity>
+            ),
           })}
         />
 
@@ -110,45 +162,6 @@ export default function RootLayout() {
                   size={20}
                 />
               </TouchableOpacity>
-            ),
-
-            headerRight: () => (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TouchableOpacity
-                  onPress={() => Alert.alert("EDIT", "PRESSED EDIT")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginRight: 10, // space between buttons
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "pencil" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => Alert.alert("DELETE", "PRESSED DELETE")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "trash" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-              </View>
             ),
 
             //navigationBarHidden: false,
@@ -190,51 +203,6 @@ export default function RootLayout() {
               </TouchableOpacity>
             ),
 
-            headerRight: () => (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TouchableOpacity
-                  onPress={() => Alert.alert("EDIT", "PRESSED EDIT")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginRight: 10, // space between buttons
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "pencil" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => Alert.alert("DELETE", "PRESSED DELETE")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "trash" }}
-                    tintColor="black"
-                    size={20}
-                  />
-
-                  <SymbolView
-                    name={{ ios: "xmark" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-              </View>
-            ),
-
             //navigationBarHidden: false,
           })}
         />
@@ -272,45 +240,6 @@ export default function RootLayout() {
                   size={20}
                 />
               </TouchableOpacity>
-            ),
-
-            headerRight: () => (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TouchableOpacity
-                  onPress={() => Alert.alert("EDIT", "PRESSED EDIT")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginRight: 10, // space between buttons
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "pencil" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => Alert.alert("DELETE", "PRESSED DELETE")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "trash" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-              </View>
             ),
 
             //navigationBarHidden: false,
@@ -352,45 +281,6 @@ export default function RootLayout() {
               </TouchableOpacity>
             ),
 
-            headerRight: () => (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TouchableOpacity
-                  onPress={() => Alert.alert("EDIT", "PRESSED EDIT")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginRight: 10, // space between buttons
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "pencil" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => Alert.alert("DELETE", "PRESSED DELETE")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "trash" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-              </View>
-            ),
-
             //navigationBarHidden: false,
           })}
         />
@@ -428,45 +318,6 @@ export default function RootLayout() {
                   size={20}
                 />
               </TouchableOpacity>
-            ),
-
-            headerRight: () => (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TouchableOpacity
-                  onPress={() => Alert.alert("EDIT", "PRESSED EDIT")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginRight: 10, // space between buttons
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "pencil" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => Alert.alert("DELETE", "PRESSED DELETE")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "trash" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-              </View>
             ),
 
             //navigationBarHidden: false,
@@ -507,46 +358,6 @@ export default function RootLayout() {
                 />
               </TouchableOpacity>
             ),
-
-            headerRight: () => (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TouchableOpacity
-                  onPress={() => Alert.alert("EDIT", "PRESSED EDIT")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginRight: 10, // space between buttons
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "pencil" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => Alert.alert("DELETE", "PRESSED DELETE")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "trash" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-              </View>
-            ),
-
             //navigationBarHidden: false,
           })}
         />
@@ -584,45 +395,6 @@ export default function RootLayout() {
                   size={20}
                 />
               </TouchableOpacity>
-            ),
-
-            headerRight: () => (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TouchableOpacity
-                  onPress={() => Alert.alert("EDIT", "PRESSED EDIT")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginRight: 10, // space between buttons
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "pencil" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => Alert.alert("DELETE", "PRESSED DELETE")}
-                  style={{
-                    width: 35,
-                    height: 35,
-                    borderRadius: 30,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <SymbolView
-                    name={{ ios: "trash" }}
-                    tintColor="black"
-                    size={20}
-                  />
-                </TouchableOpacity>
-              </View>
             ),
 
             //navigationBarHidden: false,

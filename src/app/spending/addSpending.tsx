@@ -1,18 +1,16 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
+import CurrencyInput from "react-native-currency-input";
+import Dropdown from "../../../components/Dropdown";
 import { DebtContext } from "../../../context/DebtContext";
 import { addSpending } from "../../../services/api";
 
@@ -34,21 +32,14 @@ const options = [
 ];
 
 const AddSpending = () => {
-  const {
-    spending,
-    setSpending,
-    localSpending,
-    setLocalSpending,
-    setWeekly,
-    setYearSpending,
-    yearSummary,
-  } = useContext(DebtContext);
+  const { setUpdateMonth, setUpdateWeek, setUpdateYear } =
+    useContext(DebtContext);
   const router = useRouter();
   const params = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(null);
   const [type, setType] = useState("");
   const [date, setDate] = useState(new Date());
 
@@ -59,33 +50,25 @@ const AddSpending = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
+    const cond = name.trim() === "" || amount === null || type.trim() === "";
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={processForm}
-          style={{
-            width: 35,
-            height: 35,
-            borderRadius: 30,
-            justifyContent: "center",
-            alignItems: "center",
-            //backgroundColor: "blue",
-            //borderColor: "blue",
-          }}
-        >
-          {loading ? (
-            <ActivityIndicator size={10} />
-          ) : (
-            //<Image source={checkmark} style={{ width: 15, height: 15 }} />
-
-            <SymbolView
-              name={{ ios: "checkmark" }}
-              tintColor="black"
-              size={20}
-            />
-          )}
-        </TouchableOpacity>
-      ),
+      unstable_headerRightItems: () => [
+        {
+          type: "button",
+          label: "Add",
+          variant: "done",
+          disabled: cond,
+          //hidesSharedBackground: true,
+          icon: {
+            type: "sfSymbol",
+            name: "checkmark",
+          },
+          onPress: () => {
+            // Do something
+            processForm();
+          },
+        },
+      ],
     });
   }, [navigation, name, amount, type, date]);
 
@@ -96,7 +79,7 @@ const AddSpending = () => {
       setNameWarning(true);
       hasError = true;
     }
-    if (amount.trim() === "") {
+    if (amount === null) {
       setPriceWarning(true);
       hasError = true;
     }
@@ -116,84 +99,10 @@ const AddSpending = () => {
     if (result?.message) {
       //console.log(result);
       //router.setParams(result.data);
-      const selectedMonth = Number(params?.selectedMonth);
-      const selectedYear = Number(params?.selectedYear);
 
-      // 📅 REAL current date (device)
-      const now = new Date();
-      const currentMonth = now.getMonth() + 1;
-      const currentYear = now.getFullYear();
-
-      // 📅 UI selected date
-      const viewMonth = date.getMonth() + 1;
-      const viewYear = date.getFullYear();
-
-      const isCurrentMonth =
-        selectedMonth === currentMonth && selectedYear === currentYear;
-
-      const isViewMonth =
-        selectedMonth === viewMonth && selectedYear === viewYear;
-
-      const sortByDateDesc = (a, b) => {
-        const dateA = a?.date_spending
-          ? new Date(a.date_spending)
-          : new Date(0);
-        const dateB = b?.date_spending
-          ? new Date(b.date_spending)
-          : new Date(0);
-        return dateB - dateA;
-      };
-
-      const updateList = (prev) => [...prev, result.data].sort(sortByDateDesc);
-
-      // ✅ Update global (current real month)
-      if (isCurrentMonth) {
-        setSpending(updateList);
-      }
-
-      // ✅ Update local (currently viewed month)
-      if (isViewMonth) {
-        setLocalSpending(updateList);
-      }
-
-      const start = new Date(params.startWeek);
-      const end = new Date(params.endWeek);
-
-      if (date >= start && date <= end) {
-        const updateList = (prev) =>
-          [...prev, result.data].sort(sortByDateDesc);
-        setWeekly(updateList);
-      }
-
-      if (Number(params.year) === date.getFullYear()) {
-        // start with your existing array (not just one item)
-        let elementsYear = [...yearSummary];
-
-        let exists = false;
-
-        for (const element of elementsYear) {
-          // use "of", not "in"
-          if (new Date(element.month_start).getMonth() === date.getMonth()) {
-            element.total_sum += Number(amount);
-            exists = true;
-            break;
-          }
-        }
-
-        if (!exists) {
-          elementsYear.push({
-            month_start: new Date(
-              date.getFullYear(),
-              date.getMonth(),
-              1,
-            ).toISOString(),
-            total_sum: Number(amount),
-          });
-        }
-
-        //console.log(elementsYear);
-        setYearSpending(elementsYear);
-      }
+      setUpdateMonth((prevItem) => !prevItem);
+      setUpdateWeek((prevItem) => !prevItem);
+      setUpdateYear((prevItem) => !prevItem);
 
       //router.setParams({ refreshed: "true" });
       //console.log("spending:", spending);
@@ -221,8 +130,6 @@ const AddSpending = () => {
     { label: "Others", value: "14" },
   ]);
 
-  const [selectedTag, setSelectedTag] = useState("");
-
   return (
     <ScrollView>
       <View style={{ height: 60, width: "100%" }} />
@@ -243,16 +150,21 @@ const AddSpending = () => {
       ) : null}
 
       <Text style={styles.title}>Amount</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(val) => {
-          setAmount(val);
-          if (val.trim() !== "") setPriceWarning(false); // Clear error while typing
-        }}
-        placeholderTextColor={"gray"}
+      <CurrencyInput
+        style={[styles.input, { backgroundColor: "#fff" }]}
         value={amount}
-        placeholder="Amount: 0.00"
-        keyboardType="numeric"
+        onChangeValue={setAmount}
+        prefix="$"
+        delimiter=","
+        separator="."
+        precision={2}
+        minValue={0}
+        placeholder="$0.00"
+        placeholderTextColor={"grey"}
+        //showPositiveSign
+        //onChangeText={(formattedValue) => {
+        //  console.log(formattedValue);
+        //}}
       />
       {priceWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
@@ -268,6 +180,7 @@ const AddSpending = () => {
             mode="date"
             display="default"
             onValueChange={(event, selectedDate) => setDate(selectedDate)}
+            //maximumDate={new Date()}
             //minimumDate={new Date(2024, 11)}
             //maximumDate={new Date(2026, 5, 3)}
           />
@@ -275,63 +188,14 @@ const AddSpending = () => {
       </View>
 
       <Text style={styles.title}>Category</Text>
-      <DropDownPicker
-        style={[
-          styles.input,
-          {
-            borderColor: "white",
-            borderBottomLeftRadius: 50,
-            borderBottomRightRadius: 50,
-            borderTopLeftRadius: open ? 30 : 50,
-            borderTopRightRadius: open ? 30 : 50,
-          },
-        ]}
+      <Dropdown
         open={open}
-        value={type}
+        type={type}
         items={items}
         setOpen={setOpen}
-        setValue={setType}
+        setType={setType}
         setItems={setItems}
-        placeholder={"Type"}
-        listMode="SCROLLVIEW"
-        dropDownContainerStyle={styles.dropdown}
-        listItemContainerStyle={{
-          borderBottomWidth: 1,
-          borderBottomColor: "#eee",
-          //paddingVertical: 13,
-        }}
-        placeholderStyle={{
-          color: "gray",
-        }}
       />
-
-      {/*
-      <View style={[styles.input2, { justifyContent: "space-between" }]}>
-        {selectedTag.length !== 0 ? (
-          <Text>{options[selectedTag]}</Text>
-        ) : (
-          <Text style={{ color: "grey" }}>Select Category</Text>
-        )}
-
-       <Host matchContents>
-          <Picker
-            modifiers={[pickerStyle("menu")]}
-            //modifiers={[pickerStyle("wheel")]}
-            //label="Select a fruit"
-            //selection={selectedTag}
-
-            onSelectionChange={(selection) => {
-              setSelectedTag(String(options.indexOf(selection)));
-            }}
-          >
-            {options.map((option) => (
-              <Text2 key={option} modifiers={[tag(option)]}>
-                {option}
-              </Text2>
-            ))}
-          </Picker>
-        </Host>
-      </View> */}
 
       {typeWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>

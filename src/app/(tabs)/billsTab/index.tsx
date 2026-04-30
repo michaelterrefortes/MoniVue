@@ -5,13 +5,14 @@ import {
   FlatList,
   StyleSheet,
   Text,
-  View
+  View,
 } from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import CardBills from "../../../../components/CardBills";
+import { formatMoney } from "../../../../constants/functions";
 import { DebtContext } from "../../../../context/DebtContext";
 import { fetchBills } from "../../../../services/api";
 
@@ -77,13 +78,13 @@ export default function BillsTab() {
             <View style={[styles.billsBalance, { backgroundColor: "#fff" }]}>
               <Text style={styles.textVaries}>Total:</Text>
               <Text style={[styles.textBills, { color: "#000" }]}>
-                ${totalBills.toFixed(2)}
+                {formatMoney(totalBills)}
               </Text>
 
               <Text style={styles.textVaries}>Variation:</Text>
               <Text style={styles.textVaries}>
-                ${(totalBills - variance).toFixed(2)} - $
-                {(totalBills + variance).toFixed(2)}
+                {formatMoney(totalBills - variance)} - $
+                {formatMoney(totalBills + variance)}
               </Text>
             </View>
 

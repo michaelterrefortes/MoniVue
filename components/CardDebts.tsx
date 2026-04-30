@@ -3,7 +3,7 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 
-import { validateDate } from "../constants/functions";
+import { formatMoney, validateDate } from "../constants/functions";
 
 const getUtilizationColor = (value) => {
   if (value <= 10) return "#22c55e"; // green
@@ -22,9 +22,11 @@ const CardDebts = ({ item, params, utilization }) => {
       <View style={styles.cardLeft}>
         <Text style={styles.cardTitle}>{item.credit_name}</Text>
 
-        <Text style={styles.cardBalance}>${item.balance.toFixed(2)}</Text>
+        <Text style={styles.cardBalance}>{formatMoney(item.balance)}</Text>
 
-        <Text style={styles.cardSub}>Limit: ${item.credit_limit}</Text>
+        <Text style={styles.cardSub}>
+          Limit: {formatMoney(item.credit_limit)}
+        </Text>
 
         <Text style={styles.cardAPR}>APR {item.apr}%</Text>
       </View>
@@ -50,7 +52,7 @@ const CardDebts = ({ item, params, utilization }) => {
           Due: {validateDate(item.statement_date)}
         </Text>
 
-        <Text style={styles.cardSub}>Minimum: ${item.minimum}</Text>
+        <Text style={styles.cardSub}>Minimum: {formatMoney(item.minimum)}</Text>
       </View>
     </TouchableOpacity>
   );

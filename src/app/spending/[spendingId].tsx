@@ -10,20 +10,15 @@ import {
   View,
 } from "react-native";
 import { categoriesSpending } from "../../../constants/categories";
-import { dateString } from "../../../constants/functions";
+import { dateString, formatMoney } from "../../../constants/functions";
 import { url } from "../../../constants/url";
 import { DebtContext } from "../../../context/DebtContext";
 
 const SpendingDetails = () => {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const {
-    setSpending,
-    setLocalSpending,
-    setYearSpending,
-    setWeekly,
-    yearSummary,
-  } = useContext(DebtContext);
+  const { setUpdateMonth, setUpdateWeek, setUpdateYear } =
+    useContext(DebtContext);
 
   const [name, setName] = useState(params.name);
   const [amount, setAmount] = useState(Number(params.amount));
@@ -66,55 +61,9 @@ const SpendingDetails = () => {
 
       if (!res.ok) throw new Error("Failed to delete");
 
-      //router.setParams(result.data);
-      const selectedMonth = Number(params?.selectedMonth);
-      const selectedYear = Number(params?.selectedYear);
-
-      // 📅 Real time date
-      const realMonth = new Date().getMonth() + 1;
-      const realYear = new Date().getFullYear();
-
-      const isCurrentMonth =
-        selectedMonth === realMonth && selectedYear === realYear;
-
-      if (isCurrentMonth) {
-        (setSpending((prevItems) =>
-          prevItems.filter((item) => Number(item.id) !== Number(params.id)),
-        ),
-          setLocalSpending((prevItems) =>
-            prevItems.filter((item) => Number(item.id) !== Number(params.id)),
-          ));
-      } else {
-        setLocalSpending((prevItems) =>
-          prevItems.filter((item) => Number(item.id) !== Number(params.id)),
-        );
-      }
-
-      const start = new Date(params.startWeek);
-      const end = new Date(params.endWeek);
-
-      if (new Date(params.date) >= start && new Date(params.date) <= end) {
-        setWeekly((prevItems) =>
-          prevItems.filter((item) => Number(item.id) !== Number(params.id)),
-        );
-      }
-
-      if (Number(params.year) === new Date(params.date).getFullYear()) {
-        setYearSpending((prevItems) => {
-          return prevItems.map((item) => {
-            if (
-              new Date(item.month_start).getMonth() ===
-              new Date(params.date).getMonth()
-            ) {
-              return {
-                ...item,
-                total_sum: Number(item.total_sum) - Number(params.amount),
-              };
-            }
-            return item; // IMPORTANT: always return something
-          });
-        });
-      }
+      setUpdateMonth((prevItem) => !prevItem);
+      setUpdateWeek((prevItem) => !prevItem);
+      setUpdateYear((prevItem) => !prevItem);
 
       router.back();
     } catch (err) {
@@ -124,13 +73,42 @@ const SpendingDetails = () => {
   };
 
   useEffect(() => {
-    if (!editing) {
-      navigation.setOptions({
-        headerLeft: () => (
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() =>
+              router.push({
+                pathname: "spending/editSpending",
+                params: {
+                  id: params.id,
+                  name: name,
+                  amount: amount,
+                  type: type,
+                  date: date,
+                  selectedMonth: params.selectedMonth,
+                  selectedYear: params.selectedYear,
+                  start: params.startWeek,
+                  end: params.endWeek,
+                  year: params.year,
+                },
+              })
+            } //setEditing(true)}
             style={{
-              //backgroundColor: "grey",
+              width: 35,
+              height: 35,
+              borderRadius: 30,
+              justifyContent: "center",
+              alignItems: "center",
+              marginRight: 10,
+            }}
+          >
+            <SymbolView name={{ ios: "pencil" }} tintColor="black" size={20} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={confirmDelete}
+            style={{
               width: 35,
               height: 35,
               borderRadius: 30,
@@ -138,79 +116,11 @@ const SpendingDetails = () => {
               alignItems: "center",
             }}
           >
-            <SymbolView name={{ ios: "xmark" }} tintColor="black" size={20} />
+            <SymbolView name={{ ios: "trash" }} tintColor="black" size={20} />
           </TouchableOpacity>
-        ),
-        headerRight: () => (
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TouchableOpacity
-              onPress={() =>
-                router.push({
-                  pathname: "spending/editSpending",
-                  params: {
-                    id: params.id,
-                    name: name,
-                    amount: amount,
-                    type: type,
-                    date: date,
-                    start: params.startWeek,
-                    end: params.endWeek,
-                    year: params.year,
-                  },
-                })
-              } //setEditing(true)}
-              style={{
-                width: 35,
-                height: 35,
-                borderRadius: 30,
-                justifyContent: "center",
-                alignItems: "center",
-                marginRight: 10,
-              }}
-            >
-              <SymbolView
-                name={{ ios: "pencil" }}
-                tintColor="black"
-                size={20}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={confirmDelete}
-              style={{
-                width: 35,
-                height: 35,
-                borderRadius: 30,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <SymbolView name={{ ios: "trash" }} tintColor="black" size={20} />
-            </TouchableOpacity>
-          </View>
-        ),
-      });
-    } else {
-      navigation.setOptions({
-        //presentation: "modal",
-
-        headerLeft: () => (
-          <TouchableOpacity onPress={() => setEditing(false)}>
-            <Text>Cancel</Text>
-          </TouchableOpacity>
-        ),
-
-        headerRight: () => (
-          <TouchableOpacity onPress={() => setEditing(false)}>
-            <SymbolView
-              name={{ ios: "checkmark" }}
-              tintColor="black"
-              size={20}
-            />
-          </TouchableOpacity>
-        ),
-      });
-    }
+        </View>
+      ),
+    });
   }, [navigation, editing]);
 
   //console.log(params);
@@ -229,7 +139,7 @@ const SpendingDetails = () => {
       </Text>
 
       <View style={styles.spendingBalance}>
-        <Text style={styles.textAmount}>${amount.toFixed(2)}</Text>
+        <Text style={styles.textAmount}>{formatMoney(amount)}</Text>
       </View>
       <View style={styles.content}>
         <View style={styles.squares}>

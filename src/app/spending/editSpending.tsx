@@ -1,30 +1,22 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
+import CurrencyInput from "react-native-currency-input";
+import Dropdown from "../../../components/Dropdown";
 import { DebtContext } from "../../../context/DebtContext";
 import { editSpending } from "../../../services/api";
 
 const EditSpending = () => {
-  const {
-    spending,
-    setSpending,
-    localSpending,
-    setLocalSpending,
-    setWeekly,
-    setYearSpending,
-  } = useContext(DebtContext);
+  const { setUpdateMonth, setUpdateWeek, setUpdateYear } =
+    useContext(DebtContext);
   const router = useRouter();
   const params = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
@@ -43,33 +35,25 @@ const EditSpending = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
+    const cond = name.trim() === "" || amount === null || type.trim() === "";
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={processForm}
-          style={{
-            width: 35,
-            height: 35,
-            borderRadius: 30,
-            justifyContent: "center",
-            alignItems: "center",
-            //backgroundColor: "blue",
-            //borderColor: "blue",
-          }}
-        >
-          {loading ? (
-            <ActivityIndicator size={10} />
-          ) : (
-            //<Image source={checkmark} style={{ width: 15, height: 15 }} />
-
-            <SymbolView
-              name={{ ios: "checkmark" }}
-              tintColor="black"
-              size={20}
-            />
-          )}
-        </TouchableOpacity>
-      ),
+      unstable_headerRightItems: () => [
+        {
+          type: "button",
+          label: "Add",
+          variant: "done",
+          disabled: cond,
+          //hidesSharedBackground: true,
+          icon: {
+            type: "sfSymbol",
+            name: "checkmark",
+          },
+          onPress: () => {
+            // Do something
+            processForm();
+          },
+        },
+      ],
     });
   }, [navigation, name, amount, type, date]);
 
@@ -80,7 +64,7 @@ const EditSpending = () => {
       setNameWarning(true);
       hasError = true;
     }
-    if (amount.trim() === "") {
+    if (amount === null) {
       setPriceWarning(true);
       hasError = true;
     }
@@ -100,102 +84,11 @@ const EditSpending = () => {
     if (result?.success) {
       //console.log(result);
       //router.setParams(result.data);
-      const selectedMonth = Number(params?.selectedMonth);
-      const selectedYear = Number(params?.selectedYear);
 
-      // 📅 REAL current date (device)
-      const now = new Date();
-      const currentMonth = now.getMonth() + 1;
-      const currentYear = now.getFullYear();
+      setUpdateMonth((prevItem) => !prevItem);
+      setUpdateWeek((prevItem) => !prevItem);
+      setUpdateYear((prevItem) => !prevItem);
 
-      // 📅 UI selected date
-      const viewMonth = date.getMonth() + 1;
-      const viewYear = date.getFullYear();
-
-      const isCurrentMonth =
-        selectedMonth === currentMonth && selectedYear === currentYear;
-
-      const isViewMonth =
-        selectedMonth === viewMonth && selectedYear === viewYear;
-
-      // ✅ Update global (current real month)
-      if (!isCurrentMonth) {
-        setSpending((prevItem) =>
-          prevItem.map((spending) =>
-            spending.id === result.data.id ? result.data : spending,
-          ),
-        );
-      } else {
-        setSpending((prevItems) =>
-          prevItems.filter((item) => Number(item.id) !== Number(params.id)),
-        );
-      }
-
-      // ✅ Update local (currently viewed month)
-      if (!isViewMonth) {
-        setLocalSpending((prevItem) =>
-          prevItem.map((spending) =>
-            spending.id === result.data.id ? result.data : spending,
-          ),
-        );
-      } else {
-        setLocalSpending((prevItems) =>
-          prevItems.filter((item) => Number(item.id) !== Number(params.id)),
-        );
-      }
-
-      const start = new Date(params.startWeek);
-      const end = new Date(params.endWeek);
-
-      if (!(new Date(params.date) >= start && new Date(params.date) <= end)) {
-        setWeekly((prevItem) =>
-          prevItem.map((spending) =>
-            spending.id === result.data.id ? result.data : spending,
-          ),
-        );
-      } else {
-        setWeekly((prevItems) =>
-          prevItems.filter((item) => Number(item.id) !== Number(params.id)),
-        );
-      }
-
-      if (!(Number(params.year) === new Date(params.date).getFullYear())) {
-        setYearSpending((prevItems) => {
-          return prevItems.map((item) => {
-            if (
-              new Date(item.month_start).getMonth() ===
-              new Date(params.date).getMonth()
-            ) {
-              return {
-                ...item,
-                total_sum:
-                  Number(item.total_sum) -
-                  Number(oldAmount) +
-                  Number(params.amount),
-              };
-            }
-            return item; // IMPORTANT: always return something
-          });
-        });
-      } else {
-        setYearSpending((prevItems) => {
-          return prevItems.map((item) => {
-            if (
-              new Date(item.month_start).getMonth() ===
-              new Date(params.date).getMonth()
-            ) {
-              return {
-                ...item,
-                total_sum: Number(item.total_sum) - Number(oldAmount),
-              };
-            }
-            return item; // IMPORTANT: always return something
-          });
-        });
-      }
-
-      //router.setParams({ refreshed: "true" });
-      //console.log("spending:", spending);
       router.dismissAll();
     } else {
       Alert.alert("Problem", result.wrong);
@@ -240,16 +133,21 @@ const EditSpending = () => {
       ) : null}
 
       <Text style={styles.title}>Amount</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(val) => {
-          setAmount(val);
-          if (val.trim() !== "") setPriceWarning(false); // Clear error while typing
-        }}
-        placeholderTextColor={"gray"}
-        value={amount.toString()}
-        placeholder="Amount: 0.00"
-        keyboardType="numeric"
+      <CurrencyInput
+        style={[styles.input, { backgroundColor: "#fff" }]}
+        value={amount}
+        onChangeValue={setAmount}
+        prefix="$"
+        delimiter=","
+        separator="."
+        precision={2}
+        minValue={0}
+        placeholder="$0.00"
+        placeholderTextColor={"grey"}
+        //showPositiveSign
+        //onChangeText={(formattedValue) => {
+        //  console.log(formattedValue);
+        //}}
       />
       {priceWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
@@ -272,34 +170,13 @@ const EditSpending = () => {
       </View>
 
       <Text style={styles.title}>Category</Text>
-      <DropDownPicker
-        style={[
-          styles.input,
-          {
-            borderColor: "white",
-            borderBottomLeftRadius: 50,
-            borderBottomRightRadius: 50,
-            borderTopLeftRadius: open ? 30 : 50,
-            borderTopRightRadius: open ? 30 : 50,
-          },
-        ]}
+      <Dropdown
         open={open}
-        value={type}
+        type={type}
         items={items}
         setOpen={setOpen}
-        setValue={setType}
+        setType={setType}
         setItems={setItems}
-        placeholder={"Type"}
-        listMode="SCROLLVIEW"
-        dropDownContainerStyle={styles.dropdown}
-        listItemContainerStyle={{
-          borderBottomWidth: 1,
-          borderBottomColor: "#eee",
-          //paddingVertical: 13,
-        }}
-        placeholderStyle={{
-          color: "gray",
-        }}
       />
       {typeWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>

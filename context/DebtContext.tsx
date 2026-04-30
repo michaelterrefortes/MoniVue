@@ -18,6 +18,10 @@ export function DebtProvider({ children }) {
   const [weekly, setWeekly] = useState([]);
   const [yearSummary, setYearSpending] = useState([]);
 
+  const [updateMonth, setUpdateMonth] = useState(false);
+  const [updateWeek, setUpdateWeek] = useState(false);
+  const [updateYear, setUpdateYear] = useState(false);
+
   return (
     <DebtContext.Provider
       value={{
@@ -43,6 +47,12 @@ export function DebtProvider({ children }) {
         setWeekly,
         yearSummary,
         setYearSpending,
+        updateMonth,
+        setUpdateMonth,
+        updateWeek,
+        setUpdateWeek,
+        updateYear,
+        setUpdateYear,
       }}
     >
       {children}

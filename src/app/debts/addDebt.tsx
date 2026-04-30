@@ -1,18 +1,17 @@
 import { router, useNavigation } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { SymbolView } from "expo-symbols";
+import CurrencyInput from "react-native-currency-input";
+import { formatMoney } from "../../../constants/functions";
 import { DebtContext } from "../../../context/DebtContext";
 import { addCreditCard } from "../../../services/api";
 
@@ -22,10 +21,10 @@ const DebtInfo = () => {
   const { debts, setDebts } = useContext(DebtContext);
 
   const [name, setName] = useState("");
-  const [balance, setBalance] = useState("");
-  const [limit, setLimit] = useState("");
-  const [apr, setApr] = useState("");
-  const [minimum, setMinimum] = useState("");
+  const [balance, setBalance] = useState(null);
+  const [limit, setLimit] = useState(null);
+  const [apr, setApr] = useState(null);
+  const [minimum, setMinimum] = useState(null);
   const [date, setDate] = useState(new Date());
 
   const [aprWarning, setAprWarning] = useState(false);
@@ -39,47 +38,30 @@ const DebtInfo = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
+    const cond =
+      name.trim() === "" ||
+      balance === null ||
+      limit === null ||
+      apr === null ||
+      minimum === null;
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={processForm}
-          style={{
-            width: 35,
-            height: 35,
-            borderRadius: 30,
-            justifyContent: "center",
-            alignItems: "center",
-
-            //borderColor: "blue",
-          }}
-        >
-          {loading ? (
-            <ActivityIndicator size={10} />
-          ) : (
-            <SymbolView
-              name={{ ios: "checkmark" }}
-              tintColor={"#000"}
-              size={20}
-            />
-          )}
-        </TouchableOpacity>
-      ),
-
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{
-            //backgroundColor: "grey",
-            width: 35,
-            height: 35,
-            borderRadius: 30,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <SymbolView name={{ ios: "xmark" }} tintColor={"#000"} size={20} />
-        </TouchableOpacity>
-      ),
+      unstable_headerRightItems: () => [
+        {
+          type: "button",
+          label: "Add",
+          variant: "done",
+          disabled: cond,
+          //hidesSharedBackground: true,
+          icon: {
+            type: "sfSymbol",
+            name: "checkmark",
+          },
+          onPress: () => {
+            // Do something
+            processForm();
+          },
+        },
+      ],
     });
   }, [navigation, name, balance, limit, apr, date, minimum]);
 
@@ -90,20 +72,20 @@ const DebtInfo = () => {
       setNameWarning(true);
       hasError = true;
     }
-    if (balance.trim() === "") {
+    if (balance === null) {
       setBalanceWarning(true);
       hasError = true;
     }
-    if (limit.trim() === "") {
+    if (limit === null) {
       setLimitWarning(true);
       hasError = true;
     }
-    if (apr.trim() === "") {
+    if (apr === null) {
       setAprWarning(true);
       hasError = true;
     }
 
-    if (minimum.trim() === "") {
+    if (minimum === null) {
       setMinimumWarning(true);
       hasError = true;
     }
@@ -137,7 +119,7 @@ const DebtInfo = () => {
   return (
     <ScrollView style={{ backgroundColor: "rgb(242, 242, 242)" }}>
       <View style={{ height: 100, width: "100%" }} />
-      {balance === null || balance.trim() === "" ? (
+      {balance === null || balance === null ? (
         <Text
           style={[
             styles.numberBalance,
@@ -147,7 +129,7 @@ const DebtInfo = () => {
             },
           ]}
         >
-          ${0}
+          {formatMoney(0)}
         </Text>
       ) : (
         <Text
@@ -159,7 +141,7 @@ const DebtInfo = () => {
             },
           ]}
         >
-          ${balance}
+          {formatMoney(balance)}
         </Text>
       )}
 
@@ -180,64 +162,85 @@ const DebtInfo = () => {
       ) : null}
 
       <Text style={[styles.title, { color: "#000" }]}>Credit Balance</Text>
-      <TextInput
+      <CurrencyInput
         style={[styles.input, { backgroundColor: "#fff" }]}
-        onChangeText={(val) => {
-          setBalance(val);
-          if (val.trim() !== "") setBalanceWarning(false); // Clear error while typing
-        }}
-        placeholderTextColor={"gray"}
         value={balance}
-        placeholder="Balance: 0.00"
-        keyboardType="numeric"
+        onChangeValue={setBalance}
+        prefix="$"
+        delimiter=","
+        separator="."
+        precision={2}
+        minValue={0}
+        placeholder="$0.00"
+        placeholderTextColor={"grey"}
+        //showPositiveSign
+        //onChangeText={(formattedValue) => {
+        //  console.log(formattedValue);
+        //}}
       />
       {balanceWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
       ) : null}
 
       <Text style={[styles.title, { color: "#000" }]}>Credit Limit</Text>
-      <TextInput
+      <CurrencyInput
         style={[styles.input, { backgroundColor: "#fff" }]}
-        onChangeText={(val) => {
-          setLimit(val);
-          if (val.trim() !== "") setLimitWarning(false); // Clear error while typing
-        }}
-        placeholderTextColor={"gray"}
         value={limit}
-        placeholder="Limit: 0.00"
-        keyboardType="numeric"
+        onChangeValue={setLimit}
+        prefix="$"
+        delimiter=","
+        separator="."
+        precision={2}
+        minValue={0}
+        placeholder="$0.00"
+        placeholderTextColor={"grey"}
+        //showPositiveSign
+        //onChangeText={(formattedValue) => {
+        //  console.log(formattedValue);
+        //}}
       />
       {limitWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
       ) : null}
 
       <Text style={[styles.title, { color: "#000" }]}>APR</Text>
-      <TextInput
+      <CurrencyInput
         style={[styles.input, { backgroundColor: "#fff" }]}
-        onChangeText={(val) => {
-          setApr(val);
-          if (val.trim() !== "") setAprWarning(false); // Clear error while typing
-        }}
-        placeholderTextColor={"gray"}
         value={apr}
-        placeholder="APR: 28.99"
-        keyboardType="numeric"
+        onChangeValue={setApr}
+        prefix=""
+        delimiter=","
+        separator="."
+        precision={2}
+        minValue={0}
+        //maxValue={40}
+        placeholder="21.99"
+        placeholderTextColor={"grey"}
+        //showPositiveSign
+        //onChangeText={(formattedValue) => {
+        //  console.log(formattedValue);
+        //}}
       />
       {aprWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
       ) : null}
 
       <Text style={[styles.title, { color: "#000" }]}>Minimum Payment</Text>
-      <TextInput
+      <CurrencyInput
         style={[styles.input, { backgroundColor: "#fff" }]}
-        onChangeText={(val) => {
-          setMinimum(val);
-          if (val.trim() !== "") setMinimumWarning(false); // Clear error while typing
-        }}
         value={minimum}
-        placeholderTextColor={"gray"}
-        placeholder="Minimum: 30"
-        keyboardType="numeric"
+        onChangeValue={setMinimum}
+        prefix="$"
+        delimiter=","
+        separator="."
+        precision={2}
+        minValue={0}
+        placeholder="$0.00"
+        placeholderTextColor={"grey"}
+        //showPositiveSign
+        //onChangeText={(formattedValue) => {
+        //  console.log(formattedValue);
+        //}}
       />
       {minimumWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>

@@ -10,9 +10,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { BarChart, PieChart } from "react-native-gifted-charts";
+import { PieChart } from "react-native-gifted-charts";
+import BarPlot from "../../../../components/BarPlot";
 import { categoriesSpending } from "../../../../constants/categories";
-import { formatPlotData, getMonthStats } from "../../../../constants/functions";
+import {
+  formatMoney,
+  formatPlotData,
+  getMonthStats,
+} from "../../../../constants/functions";
 import { DebtContext } from "../../../../context/DebtContext";
 import { fetchSpending, fetchTotals } from "../../../../services/api";
 
@@ -143,13 +148,13 @@ const Index = () => {
                   style={{
                     paddingHorizontal: 2,
                     flexDirection: "row",
-                    justifyContent: "center",
+                    //justifyContent: "center",
 
                     alignItems: "center",
                   }}
                   onPress={() => console.log("pressed")}
                 >
-                  <Text style={[styles.label]}>Income</Text>
+                  <Text style={[styles.labelTitle]}>Income</Text>
                   <SymbolView
                     name={{ ios: "chevron.right" }}
                     tintColor="gray"
@@ -157,7 +162,9 @@ const Index = () => {
                   />
                 </TouchableOpacity>
 
-                <Text style={[styles.value, styles.income]}>${income}</Text>
+                <Text style={[styles.value, styles.income]}>
+                  {formatMoney(income)}
+                </Text>
               </View>
 
               <View>
@@ -171,7 +178,7 @@ const Index = () => {
                   }}
                   onPress={() => router.push("/(tabs)/billsTab")}
                 >
-                  <Text style={[styles.label]}>Bills</Text>
+                  <Text style={styles.labelTitle}>Bills</Text>
                   <SymbolView
                     name={{ ios: "chevron.right" }}
                     tintColor="gray"
@@ -179,7 +186,7 @@ const Index = () => {
                   />
                 </TouchableOpacity>
                 <Text style={[styles.value, styles.expense]}>
-                  ${totalBills.toFixed(2)}
+                  {formatMoney(totalBills)}
                 </Text>
               </View>
             </View>
@@ -188,16 +195,52 @@ const Index = () => {
 
             <View style={styles.row}>
               <View>
-                <Text style={styles.label}>Credit Card</Text>
-                <Text style={[styles.value, styles.expense]}>
-                  ${totalCreditMinimum.toFixed(2)}
-                </Text>
+                <View>
+                  <TouchableOpacity
+                    style={{
+                      paddingHorizontal: 2,
+                      flexDirection: "row",
+                      //justifyContent: "center",
+
+                      alignItems: "center",
+                    }}
+                    onPress={() => router.push("/(tabs)/cards")}
+                  >
+                    <Text style={styles.labelTitle}>Credit Card</Text>
+                    <SymbolView
+                      name={{ ios: "chevron.right" }}
+                      tintColor="gray"
+                      size={12}
+                    />
+                  </TouchableOpacity>
+                  <Text style={[styles.value, styles.expense]}>
+                    {formatMoney(totalCreditMinimum)}
+                  </Text>
+                </View>
               </View>
               <View>
-                <Text style={styles.label}>Spending</Text>
-                <Text style={[styles.value, styles.expense]}>
-                  ${totalSpending.toFixed(2)}
-                </Text>
+                <View>
+                  <TouchableOpacity
+                    style={{
+                      paddingHorizontal: 2,
+                      flexDirection: "row",
+                      //justifyContent: "center",
+
+                      alignItems: "center",
+                    }}
+                    onPress={() => router.push("/(tabs)/spendingTab")}
+                  >
+                    <Text style={styles.labelTitle}>Spending</Text>
+                    <SymbolView
+                      name={{ ios: "chevron.right" }}
+                      tintColor="gray"
+                      size={12}
+                    />
+                  </TouchableOpacity>
+                  <Text style={[styles.value, styles.expense]}>
+                    {formatMoney(totalSpending)}
+                  </Text>
+                </View>
               </View>
             </View>
 
@@ -222,13 +265,9 @@ const Index = () => {
                   : styles.expense,
               ]}
             >
-              $
-              {(
-                income -
-                totalBills -
-                totalCreditMinimum -
-                totalSpending
-              ).toFixed(2)}
+              {formatMoney(
+                income - totalBills - totalCreditMinimum - totalSpending,
+              )}
             </Text>
           </View>
           <View
@@ -257,11 +296,10 @@ const Index = () => {
                   : styles.expense,
               ]}
             >
-              $
-              {(
+              {formatMoney(
                 (income - totalBills - totalCreditMinimum - totalSpending) /
-                getMonthStats().totalDays
-              ).toFixed(2)}
+                  getMonthStats().totalDays,
+              )}
               /day
             </Text>
           </View>
@@ -277,47 +315,12 @@ const Index = () => {
               style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}
             >
               {spending.length !== 0 ? (
-                <BarChart
-                  data={formatPlotData(spending, new Date())}
+                <BarPlot
                   height={200}
-                  //width={220}
-                  //barWidth={20}
-                  //minHeight={3}
-                  barBorderRadius={3}
-                  spacing={20}
-                  noOfSections={4}
-                  yAxisThickness={0}
-                  xAxisThickness={0}
-                  xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-                  yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-                  isAnimated
-                  animationDuration={300}
-                  //showGradient
-                  gradientColor={"#12ff00"} // Default top color
-                  frontColor={"#d3ff00"} // Default bottom color
-                  //frontColor={"#drgb(0, 162, 255)"}
+                  data={formatPlotData(spending, new Date())}
                 />
               ) : (
-                <BarChart
-                  data={[]}
-                  height={200}
-                  //width={220}
-                  //barWidth={20}
-                  //minHeight={3}
-                  barBorderRadius={3}
-                  spacing={20}
-                  noOfSections={4}
-                  yAxisThickness={0}
-                  xAxisThickness={0}
-                  xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
-                  yAxisTextStyle={{ color: "gray", fontSize: 10 }}
-                  isAnimated
-                  animationDuration={300}
-                  showGradient
-                  gradientColor={"#12ff00"} // Default top color
-                  frontColor={"#d3ff00"} // Default bottom color
-                  //frontColor={"#drgb(0, 162, 255)"}
-                />
+                <BarPlot height={200} data={[]} />
               )}
             </View>
           </View>
@@ -413,6 +416,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#888",
     marginBottom: 4,
+  },
+  labelTitle: {
+    fontSize: 14,
+    color: "#888",
+    //marginBottom: 4,
   },
   value: {
     fontSize: 20,

@@ -3,7 +3,7 @@ import { SymbolView } from "expo-symbols";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { categories } from "../constants/categories";
-import { validateDate } from "../constants/functions";
+import { formatMoney, validateDate } from "../constants/functions";
 
 const CardBills = ({ item, params }) => {
   const router = useRouter();
@@ -35,11 +35,13 @@ const CardBills = ({ item, params }) => {
       </View>
 
       <View style={styles.cardRight}>
-        <Text style={styles.cardPrice}>${item.price.toFixed(2)}</Text>
+        <Text style={styles.cardPrice}>{formatMoney(item.price)}</Text>
         <Text style={styles.cardDate}>
           Due: {validateDate(Number(item.payment_date))}
         </Text>
-        <Text style={styles.cardDate}>Variation: ${item.variable}</Text>
+        <Text style={styles.cardDate}>
+          Variation: {formatMoney(item.variable)}
+        </Text>
       </View>
 
       <SymbolView

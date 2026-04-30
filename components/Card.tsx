@@ -3,6 +3,7 @@ import { SymbolView } from "expo-symbols";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { categoriesSpending } from "../constants/categories";
+import { formatMoney } from "../constants/functions";
 
 const Card = ({ item, params }) => {
   const router = useRouter();
@@ -41,7 +42,7 @@ const Card = ({ item, params }) => {
       </View>
 
       <View style={styles.cardRight}>
-        <Text style={styles.cardPrice}>${item.amount.toFixed(2)}</Text>
+        <Text style={styles.cardPrice}>{formatMoney(item.amount)}</Text>
         <Text style={styles.cardDate}>
           {new Intl.DateTimeFormat("en-US", {
             month: "short",

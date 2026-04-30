@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { categories } from "../../../constants/categories";
-import { validateDate } from "../../../constants/functions";
+import { formatMoney, validateDate } from "../../../constants/functions";
 import { url } from "../../../constants/url";
 import { DebtContext } from "../../../context/DebtContext";
 
@@ -68,21 +68,6 @@ const BillDetails = () => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{
-            //backgroundColor: "grey",
-            width: 35,
-            height: 35,
-            borderRadius: 30,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <SymbolView name={{ ios: "xmark" }} tintColor={"#000"} size={20} />
-        </TouchableOpacity>
-      ),
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity
@@ -156,14 +141,13 @@ const BillDetails = () => {
       <View style={[styles.billsBalance, { backgroundColor: "#fff" }]}>
         <Text style={styles.label}>Due Date: {validateDate(Number(date))}</Text>
         <Text style={[styles.textBills, { color: "#000" }]}>
-          ${price.toFixed(2)}
+          {formatMoney(price)}
         </Text>
         {variable !== 0 ? (
           <>
             <Text style={styles.textVaries}>Variation:</Text>
             <Text style={styles.textVaries}>
-              ${(price - variable).toFixed(2)} - $
-              {(price + variable).toFixed(2)}
+              {formatMoney(price - variable)} -{formatMoney(price + variable)}
             </Text>
           </>
         ) : null}
@@ -196,7 +180,7 @@ const BillDetails = () => {
         <View style={[styles.squares, { backgroundColor: "#fff" }]}>
           <Text style={styles.label}>Variation:</Text>
           <Text style={[styles.text, { color: "#000" }]}>
-            ${Number(variable).toFixed(2)}
+            {formatMoney(variable)}
           </Text>
         </View>
       </View>

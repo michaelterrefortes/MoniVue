@@ -6,7 +6,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -14,7 +13,8 @@ import {
 import { useNavigation } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
-import { validateDate } from "../../../constants/functions";
+import CurrencyInput from "react-native-currency-input";
+import { formatMoney, validateDate } from "../../../constants/functions";
 import { url } from "../../../constants/url";
 import { DebtContext } from "../../../context/DebtContext";
 import { calculateInterest } from "../../../services/calculate";
@@ -87,21 +87,6 @@ const DebtDetails = () => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{
-            //backgroundColor: "grey",
-            width: 35,
-            height: 35,
-            borderRadius: 30,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <SymbolView name={{ ios: "xmark" }} tintColor={"#000"} size={20} />
-        </TouchableOpacity>
-      ),
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity
@@ -158,12 +143,16 @@ const DebtDetails = () => {
 
       <View style={[styles.balanceCard, { backgroundColor: "#fff" }]}>
         <Text style={styles.labelBalance}>Balance:</Text>
-        <Text style={[styles.balanceText, { color: "#000" }]}>${balance}</Text>
+        <Text style={[styles.balanceText, { color: "#000" }]}>
+          {formatMoney(balance)}
+        </Text>
       </View>
       <View style={styles.content}>
         <View style={[styles.squares, { backgroundColor: "#fff" }]}>
           <Text style={styles.label}>Limit:</Text>
-          <Text style={[styles.text, { color: "#000" }]}>${limit}</Text>
+          <Text style={[styles.text, { color: "#000" }]}>
+            {formatMoney(limit)}
+          </Text>
         </View>
         <View style={[styles.squares, { backgroundColor: "#fff" }]}>
           <Text style={styles.label}>APR:</Text>
@@ -202,7 +191,9 @@ const DebtDetails = () => {
       <View style={styles.content}>
         <View style={[styles.squares, { backgroundColor: "#fff" }]}>
           <Text style={styles.label}>Min Payment:</Text>
-          <Text style={[styles.text, { color: "#000" }]}>${minimum}</Text>
+          <Text style={[styles.text, { color: "#000" }]}>
+            {formatMoney(minimum)}
+          </Text>
         </View>
         <View style={[styles.squares, { backgroundColor: "#fff" }]}>
           <Text style={styles.label}>Due Date:</Text>
@@ -214,7 +205,7 @@ const DebtDetails = () => {
 
       <View style={[styles.input, { backgroundColor: "#fff" }]}>
         <Text style={styles.labelBalance}>Monthly Payment</Text>
-        <TextInput
+        {/*<TextInput
           style={[styles.inputText, { color: "#000" }]}
           onChangeText={(val) => {
             setPayment(val);
@@ -238,6 +229,37 @@ const DebtDetails = () => {
               );
             }
           }}
+        />*/}
+        <CurrencyInput
+          style={[styles.inputText, { color: "#000" }]}
+          value={payment}
+          onChangeValue={setPayment}
+          prefix="$"
+          delimiter=","
+          separator="."
+          precision={2}
+          minValue={0}
+          placeholder="$0.00"
+          placeholderTextColor={"lightgrey"}
+          returnKeyType="done"
+          onSubmitEditing={Keyboard.dismiss}
+          onEndEditing={() => {
+            if (payment === null) {
+              setInterestMonths({});
+            } else {
+              setInterestMonths(
+                calculateInterest(
+                  Number(balance),
+                  Number(apr),
+                  Number(payment),
+                ),
+              );
+            }
+          }}
+          //showPositiveSign
+          //onChangeText={(formattedValue) => {
+          //  console.log(formattedValue);
+          //}}
         />
         {Object.keys(interestMonths).length !== 0 ? (
           <>
@@ -253,7 +275,7 @@ const DebtDetails = () => {
               >
                 <Text style={styles.label}>Interest Payed:</Text>
                 <Text style={[styles.text, { color: "#000" }]}>
-                  ${interestMonths.interest}
+                  {formatMoney(interestMonths.interest)}
                 </Text>
               </View>
               <View
