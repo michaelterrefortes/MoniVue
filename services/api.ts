@@ -273,3 +273,56 @@ export const fetchTotals = async () => {
     minimum: totalMinimum,
   };
 };
+
+export const loginProcess = async (email, password) => {
+  const response = await fetch(`${url}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    }),
+  });
+
+  if (!response.ok) {
+    // @ts-ignore
+    throw new Error("Failed to login", response.statusText);
+  }
+
+  const result = await response.json();
+
+  return result;
+};
+
+export const signupProcess = async (
+  name,
+  lastname,
+  income,
+  email,
+  password,
+) => {
+  const response = await fetch(`${url}/signup`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: name,
+      lastname: lastname,
+      income: income,
+      email: email,
+      password: password,
+    }),
+  });
+
+  if (!response.ok) {
+    // @ts-ignore
+    throw new Error("Failed to login", response.statusText);
+  }
+
+  const result = await response.json();
+
+  return result;
+};

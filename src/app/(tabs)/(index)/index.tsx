@@ -320,7 +320,7 @@ const Index = () => {
                   data={formatPlotData(spending, new Date())}
                 />
               ) : (
-                <BarPlot height={200} data={[]} />
+                <BarPlot height={200} barWidth={25} data={[]} />
               )}
             </View>
           </View>

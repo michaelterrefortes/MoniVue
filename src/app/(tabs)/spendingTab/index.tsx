@@ -372,6 +372,8 @@ const SpendingTab = () => {
 
                   <BarPlot
                     height={100}
+                    //spacing={10}
+                    barWidth={25}
                     data={formatPlotData(localSpending, date)}
                   />
 
@@ -478,7 +480,11 @@ const SpendingTab = () => {
                     {formatMoney(weeklyTotal)}
                   </Text>
 
-                  <BarPlot height={100} data={formatWeeklyData(weekly)} />
+                  <BarPlot
+                    height={100}
+                    spacing={10}
+                    data={formatWeeklyData(weekly)}
+                  />
 
                   <SegmentedControl
                     values={TABS}
@@ -561,7 +567,21 @@ const SpendingTab = () => {
                     {formatMoney(yearTotal)}
                   </Text>
 
-                  <BarPlot height={100} data={formatYearly(yearSummary)} />
+                  {yearSummary.length === 0 ? (
+                    <BarPlot
+                      height={100}
+                      data={[]}
+                      spacing={15}
+                      barWidth={10}
+                    />
+                  ) : (
+                    <BarPlot
+                      height={100}
+                      data={formatYearly(yearSummary)}
+                      spacing={15}
+                      barWidth={10}
+                    />
+                  )}
 
                   <SegmentedControl
                     values={TABS}
