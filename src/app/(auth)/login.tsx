@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { validateEmail } from "../../../constants/functions";
-import { loginProcess } from "../../../services/api";
+import { supabase } from "../../../services/auth";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -41,15 +41,14 @@ const LoginScreen = () => {
 
     if (warning) return;
 
-    const result = await loginProcess(email, password);
+    //const result = await loginProcess(email, password);
 
-    if (result?.sucess) {
-      console.log(result);
-
-      router.replace("/(tabs)/(index)");
-    } else {
-      Alert.alert("Error", "Problem with login");
-    }
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+    if (error) Alert.alert(error.message);
+    else router.replace("/(tabs)/(index)");
   };
 
   return (

@@ -1,10 +1,20 @@
 import { url } from "../constants/url";
+import { getAccessToken } from "./auth";
 
 export const fetchBills = async () => {
-  const response = await fetch(`${url}/bills`);
+  const token = await getAccessToken();
+
+  const response = await fetch(`${url}/bills`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
   const result = await response.json();
   if (!response.ok) {
     // @ts-ignore
+    console.log(response);
     throw new Error("Failed to fetch bills", response.statusText);
   }
   //console.log(result);
@@ -27,7 +37,15 @@ export const fetchSpending = async (date = null) => {
 
   //console.log(month, year);
 
-  const response = await fetch(`${url}/spending/${month}_${year}`);
+  const token = await getAccessToken();
+
+  const response = await fetch(`${url}/spending/${month}_${year}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
   //console.log(date);
   const result = await response.json();
 
@@ -43,8 +61,14 @@ export const fetchSpending = async (date = null) => {
 
 export const fetchSpendingWeek = async (start, end) => {
   //console.log(month, year);
-
-  const response = await fetch(`${url}/spending/week/${start}_${end}`);
+  const token = await getAccessToken();
+  const response = await fetch(`${url}/spending/week/${start}_${end}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
   //console.log(date);
   const result = await response.json();
 
@@ -60,8 +84,14 @@ export const fetchSpendingWeek = async (start, end) => {
 
 export const fetchSpendingYear = async (year) => {
   //console.log(month, year);
-
-  const response = await fetch(`${url}/spending/year/${year}`);
+  const token = await getAccessToken();
+  const response = await fetch(`${url}/spending/year/${year}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
   //console.log(date);
   const result = await response.json();
 
@@ -78,7 +108,14 @@ export const fetchSpendingYear = async (year) => {
 };
 
 export const fetchCredit = async () => {
-  const response = await fetch(`${url}/credit`);
+  const token = await getAccessToken();
+  const response = await fetch(`${url}/credit`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
   const result = await response.json();
   if (!response.ok) {
     // @ts-ignore
@@ -96,10 +133,12 @@ export const addCreditCard = async (
   minimum,
   date,
 ) => {
+  const token = await getAccessToken();
   const response = await fetch(`${url}/credit`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       credit_name: name,
@@ -130,10 +169,12 @@ export const editCreditCard = async (
   minimum,
   date,
 ) => {
+  const token = await getAccessToken();
   const response = await fetch(`${url}/credit`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       id: id,
@@ -157,10 +198,12 @@ export const editCreditCard = async (
 };
 
 export const addBills = async (name, variation, price, type, date) => {
+  const token = await getAccessToken();
   const response = await fetch(`${url}/bills`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       bill_name: name,
@@ -182,10 +225,12 @@ export const addBills = async (name, variation, price, type, date) => {
 };
 
 export const editBills = async (id, name, variation, price, type, date) => {
+  const token = await getAccessToken();
   const response = await fetch(`${url}/bills`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       id: id,
@@ -208,10 +253,12 @@ export const editBills = async (id, name, variation, price, type, date) => {
 };
 
 export const addSpending = async (name, amount, type, date) => {
+  const token = await getAccessToken();
   const response = await fetch(`${url}/spending`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       spending_name: name,
@@ -232,10 +279,12 @@ export const addSpending = async (name, amount, type, date) => {
 };
 
 export const editSpending = async (id, name, amount, type, date) => {
+  const token = await getAccessToken();
   const response = await fetch(`${url}/spending`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       id: id,
@@ -274,36 +323,8 @@ export const fetchTotals = async () => {
   };
 };
 
-export const loginProcess = async (email, password) => {
-  const response = await fetch(`${url}/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email: email,
-      password: password,
-    }),
-  });
-
-  if (!response.ok) {
-    // @ts-ignore
-    throw new Error("Failed to login", response.statusText);
-  }
-
-  const result = await response.json();
-
-  return result;
-};
-
-export const signupProcess = async (
-  name,
-  lastname,
-  income,
-  email,
-  password,
-) => {
-  const response = await fetch(`${url}/signup`, {
+export const profileProcess = async (name, lastname, income, uuid) => {
+  const response = await fetch(`${url}/profile`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -312,8 +333,7 @@ export const signupProcess = async (
       name: name,
       lastname: lastname,
       income: income,
-      email: email,
-      password: password,
+      uuid: uuid,
     }),
   });
 

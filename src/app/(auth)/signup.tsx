@@ -12,7 +12,8 @@ import {
 } from "react-native";
 import CurrencyInput from "react-native-currency-input";
 import { validateEmail, validatePassword } from "../../../constants/functions";
-import { signupProcess } from "../../../services/api";
+import { profileProcess } from "../../../services/api";
+import { getUUID, supabase } from "../../../services/auth";
 
 const SignupScreen = () => {
   const [email, setEmail] = useState("");
@@ -67,14 +68,20 @@ const SignupScreen = () => {
 
     if (warning) return;
 
-    const result = await signupProcess(name, lastname, income, email, password);
+    //const result = await signupProcess(name, lastname, income, email, password);
 
-    if (result?.sucess) {
-      console.log(result);
+    const { error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    });
+    if (error) Alert.alert(error.message);
+    else {
+      const uuid = await getUUID();
 
-      router.replace("/(tabs)/(index)");
-    } else {
-      Alert.alert("Error", "Problem with login");
+      const response = await profileProcess(name, lastname, income, uuid);
+
+      if (response?.success) router.replace("/(tabs)/(index)");
+      else Alert.alert("Error", "Error signing up");
     }
   };
 
@@ -91,7 +98,7 @@ const SignupScreen = () => {
           if (val.trim() !== "") setNameWarning(false);
         }}
         keyboardType="default"
-        autoCapitalize="none"
+        //autoCapitalize="none"
       />
       {nameWarning && <Text style={styles.warning}>* Field Missing Value</Text>}
 
@@ -105,7 +112,7 @@ const SignupScreen = () => {
           if (val.trim() !== "") setLastnameWarning(false);
         }}
         keyboardType="default"
-        autoCapitalize="none"
+        //autoCapitalize="none"
       />
       {lastnameWarning && (
         <Text style={styles.warning}>* Field Missing Value</Text>
