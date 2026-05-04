@@ -1,5 +1,4 @@
 import { useRouter } from "expo-router";
-import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,11 +6,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { PieChart } from "react-native-gifted-charts";
 import BarPlot from "../../../../components/BarPlot";
+import CardHome from "../../../../components/CardHome";
 import { categoriesSpending } from "../../../../constants/categories";
 import {
   formatMoney,
@@ -19,7 +18,11 @@ import {
   getMonthStats,
 } from "../../../../constants/functions";
 import { DebtContext } from "../../../../context/DebtContext";
-import { fetchSpending, fetchTotals } from "../../../../services/api";
+import {
+  fetchProfile,
+  fetchSpending,
+  fetchTotals,
+} from "../../../../services/api";
 
 const formatDataType = (monthlyData, total) => {
   let dataPlot = [];
@@ -59,7 +62,6 @@ const formatDataType = (monthlyData, total) => {
 const Index = () => {
   const router = useRouter();
 
-  const [income, setIncome] = useState(2300);
   const {
     totalDebts,
     setTotalDebts,
@@ -71,6 +73,8 @@ const Index = () => {
     setTotalCreditMinimum,
     spending,
     setSpending,
+    income,
+    setIncome,
   } = useContext(DebtContext);
 
   const [loading, setLoading] = useState(false);
@@ -83,6 +87,8 @@ const Index = () => {
       setLoading(true);
       await sleep(1000);
       try {
+        const result1 = await fetchProfile();
+        setIncome(result1.data.income);
         const result = await fetchTotals();
         setTotalBills(result.bills);
         setTotalDebts(result.debts);
@@ -136,7 +142,163 @@ const Index = () => {
         </View>
       ) : (
         <>
-          <View style={[styles.card, , { backgroundColor: "#fff" }]}>
+          <Text style={{ marginBottom: 10 }}>Track your monthly finances</Text>
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginBottom: 10,
+            }}
+          >
+            <CardHome
+              data={income}
+              label={"Income"}
+              color={"green"}
+              route={() => router.push("/settings/change-income")}
+            />
+
+            <CardHome
+              data={totalBills + totalCreditMinimum + totalDebts}
+              label={"Total Expenses"}
+              color={"red"}
+              pressable={false}
+              route={() => null}
+            />
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginBottom: 10,
+            }}
+          >
+            <CardHome
+              data={totalBills}
+              label={"Bills"}
+              color={"red"}
+              route={() => router.navigate("/(tabs)/billsTab")}
+            />
+
+            <CardHome
+              data={totalSpending}
+              label={"Spending"}
+              color={"red"}
+              route={() => router.navigate("/(tabs)/spendingTab")}
+            />
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginBottom: 10,
+            }}
+          >
+            <CardHome
+              data={totalCreditMinimum}
+              label={"Credit Card"}
+              color={"red"}
+              route={() => router.navigate("/(tabs)/cards")}
+            />
+
+            <CardHome
+              data={income - totalBills - totalCreditMinimum - totalSpending}
+              label={"Left This Month"}
+              color={"green"}
+              pressable={false}
+              route={() => null}
+            />
+          </View>
+
+          <View
+            style={[
+              styles.cardBudget,
+              {
+                flexDirection: "row",
+                justifyContent: "space-between",
+                backgroundColor: "#fff",
+              },
+            ]}
+          >
+            <View style={{ flexDirection: "column" }}>
+              <Text style={styles.label}>Daily Amount to Spend:</Text>
+              <Text style={styles.label}>
+                Remaining Days in Month: {getMonthStats().remainingDays}
+              </Text>
+            </View>
+            <Text style={[styles.value]}>
+              {formatMoney(
+                (income - totalBills - totalCreditMinimum - totalSpending) /
+                  getMonthStats().totalDays,
+              )}
+              /day
+            </Text>
+          </View>
+          <View style={[styles.card, { marginTop: 10 }]}>
+            <Text style={[styles.label, { textAlign: "left" }]}>
+              Monthly Spending:
+            </Text>
+            <Text style={{ fontWeight: "bold" }}>
+              {new Date().toLocaleDateString("en-US", { month: "short" })}{" "}
+              {new Date().getFullYear()}
+            </Text>
+            <View
+              style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}
+            >
+              {spending.length !== 0 ? (
+                <BarPlot
+                  height={200}
+                  data={formatPlotData(spending, new Date())}
+                />
+              ) : (
+                <BarPlot height={200} barWidth={25} data={[]} />
+              )}
+            </View>
+          </View>
+          <View style={[styles.card, { marginTop: 10, marginBottom: 15 }]}>
+            <Text style={[styles.label, { textAlign: "left" }]}>
+              Spending Categories:
+            </Text>
+            <View
+              style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}
+            >
+              {spending.length !== 0 ? (
+                <PieChart
+                  radius={90}
+                  innerRadius={60}
+                  data={formatDataType(spending, totalSpending)}
+                  donut
+                />
+              ) : (
+                <PieChart radius={90} innerRadius={60} data={[]} donut />
+              )}
+            </View>
+            {formatDataType(spending, totalSpending)?.map((item, index) => {
+              return (
+                <View
+                  key={`${item.key}-${index}`}
+                  style={{ flexDirection: "row", alignSelf: "center" }}
+                >
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      borderRadius: 5,
+                      backgroundColor: item.color,
+                      marginRight: 10,
+                    }}
+                  />
+                  <Text style={styles.label}>
+                    {item.label}: {item.value.toFixed(0)}%
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+
+          {/*<View style={[styles.card, , { backgroundColor: "#fff" }]}>
             <Text style={{ paddingBottom: 10 }}>
               Budget for{" "}
               {new Date().toLocaleString("default", { month: "long" })}{" "}
@@ -363,7 +525,7 @@ const Index = () => {
                 </View>
               );
             })}
-          </View>
+          </View> */}
         </>
       )}
     </ScrollView>
@@ -373,6 +535,79 @@ const Index = () => {
 export default Index;
 
 const styles = StyleSheet.create({
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
+  },
+  cardSmall: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 20,
+    width: "48%",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F7FA",
+    //paddingTop: 80,
+    paddingHorizontal: 20,
+    //marginHorizontal: 20,
+  },
+  cardBudget: {
+    //marginTop: 10,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
+  },
+  value: {
+    fontSize: 20,
+    fontWeight: "500",
+  },
+  label: {
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 4,
+  },
+  income: {
+    color: "#2ECC71",
+  },
+  expense: {
+    color: "#E74C3C",
+  },
+});
+
+const styles2 = StyleSheet.create({
+  containerCard: {
+    borderRadius: 24, // rounded-3xl
+    padding: 6, // space for border effect
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 10, // Android shadow
+  },
+  inner: {
+    borderRadius: 24,
+    padding: 24, // p-6
+    backgroundColor: "rgba(255,255,255,0.05)", // subtle glass effect
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)", // border-white/20
+  },
   container: {
     flex: 1,
     backgroundColor: "#F5F7FA",

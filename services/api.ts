@@ -323,23 +323,65 @@ export const fetchTotals = async () => {
   };
 };
 
-export const profileProcess = async (name, lastname, income, uuid) => {
+export const profileProcess = async (income) => {
+  const token = await getAccessToken();
   const response = await fetch(`${url}/profile`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      name: name,
-      lastname: lastname,
       income: income,
-      uuid: uuid,
     }),
   });
 
   if (!response.ok) {
     // @ts-ignore
     throw new Error("Failed to login", response.statusText);
+  }
+
+  const result = await response.json();
+
+  return result;
+};
+
+export const updateProfile = async (income) => {
+  const token = await getAccessToken();
+  const response = await fetch(`${url}/profile`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      income: income,
+    }),
+  });
+
+  if (!response.ok) {
+    // @ts-ignore
+    throw new Error("Failed to login", response.statusText);
+  }
+
+  const result = await response.json();
+
+  return result;
+};
+
+export const fetchProfile = async () => {
+  const token = await getAccessToken();
+  const response = await fetch(`${url}/profile`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    // @ts-ignore
+    throw new Error("Failed to fetch profile", response.statusText);
   }
 
   const result = await response.json();

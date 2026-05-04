@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 35,
     height: 35,
-    borderRadius: 50,
+    borderRadius: 10,
     backgroundColor: "gray", // replace with your dynamic color
     alignItems: "center",
     justifyContent: "center",
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
 
   cardTitle: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "500",
   },
 
   cardCategory: {
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
 
   cardPrice: {
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: "500",
     //textAlign: "center",
   },
 

@@ -39,9 +39,71 @@ export default function RootLayout() {
             headerBackTitle: "",
             headerShown: true,
             headerTransparent: true,
-            headerTitle: "Settings",
+            headerTitle: "Account",
             headerShadowVisible: false,
             headerBlurEffect: "none",
+            headerLargeTitleEnabled: true,
+
+            //presentation: "modal",
+
+            //sheetGrabberVisible: true,
+            //sheetAllowedDetents: "all",
+
+            //navigationBarHidden: false,
+          })}
+        />
+
+        <Stack.Screen
+          name="settings/change-income"
+          options={({ navigation }) => ({
+            headerBackTitle: "",
+
+            headerShown: true,
+            headerTransparent: true,
+            headerTitle: "Change Income",
+            headerShadowVisible: false,
+            headerBlurEffect: "none",
+            headerLargeTitleEnabled: true,
+
+            //presentation: "modal",
+
+            //sheetGrabberVisible: true,
+            //sheetAllowedDetents: "all",
+
+            //navigationBarHidden: false,
+          })}
+        />
+
+        <Stack.Screen
+          name="settings/change-email"
+          options={({ navigation }) => ({
+            headerBackTitle: "",
+            headerShown: true,
+            headerTransparent: true,
+            headerTitle: "Change Email",
+            headerShadowVisible: false,
+            headerBlurEffect: "none",
+            headerLargeTitleEnabled: true,
+
+            //presentation: "modal",
+
+            //sheetGrabberVisible: true,
+            //sheetAllowedDetents: "all",
+
+            //navigationBarHidden: false,
+          })}
+        />
+
+        <Stack.Screen
+          name="settings/change-password"
+          options={({ navigation }) => ({
+            headerBackTitle: "",
+            headerShown: true,
+            headerTransparent: true,
+            headerTitle: "Change Password",
+            headerShadowVisible: false,
+            headerBlurEffect: "none",
+            headerLargeTitleEnabled: true,
 
             //presentation: "modal",
 

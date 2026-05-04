@@ -13,18 +13,15 @@ import {
 import CurrencyInput from "react-native-currency-input";
 import { validateEmail, validatePassword } from "../../../constants/functions";
 import { profileProcess } from "../../../services/api";
-import { getUUID, supabase } from "../../../services/auth";
+import { supabase } from "../../../services/auth";
 
 const SignupScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [lastname, setLastname] = useState("");
+
   const [income, setIncome] = useState(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const [nameWarning, setNameWarning] = useState(false);
-  const [lastnameWarning, setLastnameWarning] = useState(false);
   const [emailWarning, setEmailWarning] = useState(false);
   const [incomeWarning, setIncomeWarning] = useState(false);
   const [passwordWarning, setPasswordWarning] = useState(false);
@@ -38,14 +35,6 @@ const SignupScreen = () => {
   const processButton = async () => {
     let warning = false;
 
-    if (name.trim() === "") {
-      setNameWarning(true);
-      warning = true;
-    }
-    if (lastname.trim() === "") {
-      setLastnameWarning(true);
-      warning = true;
-    }
     if (income === null) {
       setIncomeWarning(true);
       warning = true;
@@ -76,9 +65,7 @@ const SignupScreen = () => {
     });
     if (error) Alert.alert(error.message);
     else {
-      const uuid = await getUUID();
-
-      const response = await profileProcess(name, lastname, income, uuid);
+      const response = await profileProcess(income);
 
       if (response?.success) router.replace("/(tabs)/(index)");
       else Alert.alert("Error", "Error signing up");
@@ -88,35 +75,6 @@ const SignupScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={{ height: 100 }} />
-      <Text style={styles.title}>First Name</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="First Name"
-        value={name}
-        onChangeText={(val) => {
-          setName(val);
-          if (val.trim() !== "") setNameWarning(false);
-        }}
-        keyboardType="default"
-        //autoCapitalize="none"
-      />
-      {nameWarning && <Text style={styles.warning}>* Field Missing Value</Text>}
-
-      <Text style={styles.title}>Last Name</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Last Name"
-        value={lastname}
-        onChangeText={(val) => {
-          setLastname(val);
-          if (val.trim() !== "") setLastnameWarning(false);
-        }}
-        keyboardType="default"
-        //autoCapitalize="none"
-      />
-      {lastnameWarning && (
-        <Text style={styles.warning}>* Field Missing Value</Text>
-      )}
 
       <Text style={styles.title}>Monthly Income</Text>
       <CurrencyInput

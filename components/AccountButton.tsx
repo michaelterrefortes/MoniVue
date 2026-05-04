@@ -20,21 +20,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  fab: {
-    position: "absolute",
-    top: 6, // adjust if your tab bar is different
-    right: 20,
-    backgroundColor: "#0080FF",
-    width: 50,
-    height: 50,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-  },
 });

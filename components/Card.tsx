@@ -17,7 +17,7 @@ const Card = ({ item, params }) => {
               width: 35,
               height: 35,
               backgroundColor: categoriesSpending[item.type_spending].color,
-              borderRadius: 50,
+              borderRadius: 10,
               alignItems: "center",
               justifyContent: "center",
             }}
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
 
   cardTitle: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "500",
   },
 
   cardCategory: {
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
 
   cardPrice: {
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: "500",
     //textAlign: "center",
   },
 

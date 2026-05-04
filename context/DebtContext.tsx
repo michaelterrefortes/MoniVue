@@ -22,6 +22,8 @@ export function DebtProvider({ children }) {
   const [updateWeek, setUpdateWeek] = useState(false);
   const [updateYear, setUpdateYear] = useState(false);
 
+  const [income, setIncome] = useState(0);
+
   return (
     <DebtContext.Provider
       value={{
@@ -53,6 +55,8 @@ export function DebtProvider({ children }) {
         setUpdateWeek,
         updateYear,
         setUpdateYear,
+        income,
+        setIncome,
       }}
     >
       {children}

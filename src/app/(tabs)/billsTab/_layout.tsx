@@ -17,7 +17,7 @@ const Layout = () => {
 
           //headerLargeTitle: true,
           headerLargeTitleEnabled: true,
-          headerTitle: "Bills & Utilities",
+          headerTitle: "Bills",
           //headerRight: () => <AccountButton />,
 
           unstable_headerRightItems: () => [

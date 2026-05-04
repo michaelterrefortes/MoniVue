@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const StartScreen = () => {
+const AuthScreen = () => {
   const router = useRouter();
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -37,7 +37,7 @@ const StartScreen = () => {
   );
 };
 
-export default StartScreen;
+export default AuthScreen;
 
 const styles = StyleSheet.create({
   button: {

@@ -16,6 +16,12 @@ import { formatMoney } from "../../../../constants/functions";
 import { DebtContext } from "../../../../context/DebtContext";
 import { fetchCredit } from "../../../../services/api";
 
+const getUtilizationColor = (value) => {
+  if (value <= 10) return "#22c55e"; // green
+  if (value <= 30) return "#f59e0b"; // yellow
+  return "#ef4444"; // red
+};
+
 export default function Cards() {
   const router = useRouter();
 
@@ -32,6 +38,10 @@ export default function Cards() {
   //const [debt, setDebt] = useState(0);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  const [totalLimit, setTotalLimit] = useState(0);
+
+  const [globalUtilization, setGlobalUtilization] = useState(0);
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -58,6 +68,7 @@ export default function Cards() {
   useEffect(() => {
     setTotalDebts(debts.reduce((acc, curr) => acc + curr.balance, 0));
     setTotalCreditMinimum(debts.reduce((acc, curr) => acc + curr.minimum, 0));
+    setTotalLimit(debts.reduce((acc, curr) => acc + curr.credit_limit, 0));
   }, [debts]);
 
   const { top } = useSafeAreaInsets();
@@ -76,6 +87,11 @@ export default function Cards() {
       setRefreshing(false);
     }
   };
+
+  useEffect(() => {
+    if (totalLimit === 0) setGlobalUtilization(0);
+    else setGlobalUtilization((totalDebts / totalLimit) * 100);
+  }, [totalDebts, totalLimit]);
 
   return (
     <SafeAreaView
@@ -113,25 +129,63 @@ export default function Cards() {
 
         ListHeaderComponent={
           <>
+            <Text style={{ marginLeft: 30, paddingBottom: 25 }}>
+              Monitor your credit usage
+            </Text>
             <View style={[styles.viewBalance, { backgroundColor: "#fff" }]}>
-              <Text
-                style={{ fontSize: 12, color: "gray", textAlign: "center" }}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
               >
-                Total Balance:
-              </Text>
-              <Text style={[styles.balanceNumber, { color: "#000" }]}>
-                {formatMoney(totalDebts)}
-              </Text>
-              <Text
-                style={{ fontSize: 12, color: "gray", textAlign: "center" }}
-              >
+                <View>
+                  <Text style={{ fontSize: 12, color: "gray" }}>
+                    Total Balance
+                  </Text>
+                  <Text style={[styles.balanceNumber, { color: "#000" }]}>
+                    {formatMoney(totalDebts)}
+                  </Text>
+                </View>
+                <View>
+                  <Text style={{ fontSize: 12, color: "gray" }}>Available</Text>
+                  <Text
+                    style={[
+                      styles.balanceNumber,
+                      { color: "#000", fontSize: 20 },
+                    ]}
+                  >
+                    {formatMoney(totalLimit - totalDebts)}
+                  </Text>
+                </View>
+              </View>
+              <Text style={{ fontSize: 12, color: "gray" }}>
                 Total Min Payment:
               </Text>
-              <Text
-                style={{ fontSize: 12, color: "gray", textAlign: "center" }}
-              >
+              <Text style={{ fontSize: 12, color: "gray" }}>
                 {formatMoney(totalCreditMinimum)}
               </Text>
+
+              <View style={styles.container2}>
+                <View style={styles.headerRow}>
+                  <Text style={styles.dateText}>Credit Utilization</Text>
+                  <Text style={styles.percentText}>
+                    {globalUtilization.toFixed(2)}% used
+                  </Text>
+                </View>
+
+                <View style={[styles.progressBarBackground]}>
+                  <View
+                    style={[
+                      styles.progressBarFill,
+                      {
+                        width: `${globalUtilization}%`,
+                        backgroundColor: getUtilizationColor(globalUtilization),
+                      },
+                    ]}
+                  />
+                </View>
+              </View>
             </View>
             <View style={{ height: 20 }} />
 
@@ -167,16 +221,16 @@ const styles = StyleSheet.create({
 
   viewBalance: {
     backgroundColor: "#fff",
-    paddingHorizontal: 15,
+    paddingHorizontal: 30,
     paddingVertical: 30,
-    borderRadius: 50,
+    borderRadius: 20,
     //marginBottom: 30,
 
     marginTop: 10,
 
-    width: "80%",
-    justifyContent: "center",
-    alignItems: "center",
+    width: "90%",
+    //justifyContent: "center",
+    //alignItems: "center",
     alignSelf: "center",
 
     shadowColor: "#000",
@@ -186,33 +240,38 @@ const styles = StyleSheet.create({
   },
 
   balanceNumber: {
-    fontWeight: "bold",
-    fontSize: 38,
-    textAlign: "center",
-  },
-
-  fab: {
-    position: "absolute",
-    bottom: 20, // adjust if your tab bar is different
-    right: 20,
-    backgroundColor: "#0080FF",
-    width: 50,
-    height: 50,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-  },
-
-  buttonText: {
-    color: "#fff",
+    fontWeight: "500",
     fontSize: 30,
+    //textAlign: "center",
+  },
 
-    //fontWeight: "bold",
+  container2: {
+    //backgroundColor: "#e3e3e3",
+    padding: 16,
+    borderRadius: 12,
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  dateText: {
+    //color: "#FFFFFF",
+    fontSize: 14,
+  },
+  percentText: {
+    //color: "#FFFFFF",
+    fontSize: 14,
+  },
+  progressBarBackground: {
+    height: 6,
+    backgroundColor: "rgba(146, 146, 146, 0.3)",
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  progressBarFill: {
+    height: "100%",
+    //backgroundColor: "#d3ff00",
+    borderRadius: 3,
   },
 });

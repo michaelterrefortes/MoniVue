@@ -13,6 +13,7 @@ import { categoriesSpending } from "../../../constants/categories";
 import { dateString, formatMoney } from "../../../constants/functions";
 import { url } from "../../../constants/url";
 import { DebtContext } from "../../../context/DebtContext";
+import { getAccessToken } from "../../../services/auth";
 
 const SpendingDetails = () => {
   const params = useLocalSearchParams();
@@ -55,8 +56,13 @@ const SpendingDetails = () => {
 
   const handleDelete = async () => {
     try {
+      const token = await getAccessToken();
       const res = await fetch(`${url}/spending/${params.id}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) throw new Error("Failed to delete");
@@ -129,10 +135,10 @@ const SpendingDetails = () => {
       <View style={{ height: 70 }} />
       <Text
         style={{
-          fontWeight: "bold",
+          fontWeight: "500",
           fontSize: 28,
           paddingTop: 10,
-          paddingLeft: 15,
+          paddingLeft: 50,
         }}
       >
         {name}
@@ -150,7 +156,7 @@ const SpendingDetails = () => {
               width: 35,
               height: 35,
               backgroundColor: itemColor,
-              borderRadius: 50,
+              borderRadius: 10,
               alignItems: "center",
               justifyContent: "center",
               alignSelf: "center",
@@ -198,7 +204,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
   },
   textAmount: {
-    fontWeight: "bold",
+    fontWeight: "500",
     fontSize: 38,
     textAlign: "center",
   },
@@ -234,7 +240,7 @@ const styles = StyleSheet.create({
   text: {
     textAlign: "center",
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: "500",
   },
   label: {
     color: "gray",

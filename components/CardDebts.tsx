@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { AnimatedCircularProgress } from "react-native-circular-progress";
 
 import { formatMoney, validateDate } from "../constants/functions";
 
@@ -19,40 +18,43 @@ const CardDebts = ({ item, params, utilization }) => {
       style={[styles.card, styles.shadow]}
       onPress={() => router.push(params)}
     >
-      <View style={styles.cardLeft}>
-        <Text style={styles.cardTitle}>{item.credit_name}</Text>
+      <Text style={styles.cardTitle}>{item.credit_name}</Text>
 
-        <Text style={styles.cardBalance}>{formatMoney(item.balance)}</Text>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View>
+          <Text>Balance</Text>
+          <Text style={styles.cardBalance}>{formatMoney(item.balance)}</Text>
+        </View>
 
-        <Text style={styles.cardSub}>
-          Limit: {formatMoney(item.credit_limit)}
-        </Text>
-
-        <Text style={styles.cardAPR}>APR {item.apr}%</Text>
+        <View>
+          <Text style={{ textAlign: "right" }}>Limit</Text>
+          <Text style={styles.cardBalance}>
+            {formatMoney(item.credit_limit)}
+          </Text>
+        </View>
       </View>
 
-      <View style={styles.cardRight}>
-        <AnimatedCircularProgress
-          size={65}
-          width={7}
-          backgroundWidth={3}
-          fill={utilization}
-          tintColor={getUtilizationColor(utilization)}
-          backgroundColor="#e5e7eb"
-          arcSweepAngle={240}
-          rotation={240}
-          lineCap="round"
-        >
-          {(fill) => (
-            <Text style={styles.progressText}>{Math.round(fill)}%</Text>
-          )}
-        </AnimatedCircularProgress>
+      <Text style={styles.cardSub}>Minimum: {formatMoney(item.minimum)}</Text>
 
-        <Text style={styles.cardSub}>
-          Due: {validateDate(item.statement_date)}
-        </Text>
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <Text style={styles.dateText}>
+            Due {validateDate(item.statement_date)}
+          </Text>
+          <Text style={styles.percentText}>{utilization.toFixed(2)}% used</Text>
+        </View>
 
-        <Text style={styles.cardSub}>Minimum: {formatMoney(item.minimum)}</Text>
+        <View style={[styles.progressBarBackground]}>
+          <View
+            style={[
+              styles.progressBarFill,
+              {
+                width: `${utilization}%`,
+                backgroundColor: getUtilizationColor(utilization),
+              },
+            ]}
+          />
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -63,14 +65,15 @@ export default CardDebts;
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
-    padding: 16,
+    paddingHorizontal: 30,
+    paddingVertical: 30,
     borderRadius: 20,
     marginTop: 12,
     width: "92%",
     alignSelf: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    //flexDirection: "row",
+    //justifyContent: "space-between",
+    //alignItems: "center",
   },
 
   shadow: {
@@ -91,15 +94,16 @@ const styles = StyleSheet.create({
   },
 
   cardTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 4,
+    fontSize: 20,
+    fontWeight: "500",
+    marginBottom: 15,
     color: "#000",
   },
 
   cardBalance: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: "500",
+    marginTop: 5,
     marginBottom: 4,
     color: "#000",
   },
@@ -117,7 +121,37 @@ const styles = StyleSheet.create({
 
   progressText: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "500",
     color: "#000",
+  },
+
+  container: {
+    //backgroundColor: "#e3e3e3",
+    padding: 16,
+    borderRadius: 12,
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  dateText: {
+    //color: "#FFFFFF",
+    fontSize: 14,
+  },
+  percentText: {
+    //color: "#FFFFFF",
+    fontSize: 14,
+  },
+  progressBarBackground: {
+    height: 6,
+    backgroundColor: "rgba(146, 146, 146, 0.3)",
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  progressBarFill: {
+    height: "100%",
+    //backgroundColor: "#d3ff00",
+    borderRadius: 3,
   },
 });

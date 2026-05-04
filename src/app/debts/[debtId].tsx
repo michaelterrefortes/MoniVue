@@ -17,6 +17,7 @@ import CurrencyInput from "react-native-currency-input";
 import { formatMoney, validateDate } from "../../../constants/functions";
 import { url } from "../../../constants/url";
 import { DebtContext } from "../../../context/DebtContext";
+import { getAccessToken } from "../../../services/auth";
 import { calculateInterest } from "../../../services/calculate";
 
 const DebtDetails = () => {
@@ -39,7 +40,7 @@ const DebtDetails = () => {
 
   //console.log(percentage);
 
-  const [payment, setPayment] = useState(0);
+  const [payment, setPayment] = useState(null);
 
   const getUtilizationColor = (value) => {
     if (value <= 10) return "#22c55e"; // green
@@ -67,8 +68,13 @@ const DebtDetails = () => {
 
   const handleDelete = async () => {
     try {
+      const token = await getAccessToken();
       const res = await fetch(`${url}/credit/${params.id}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) throw new Error("Failed to delete");
@@ -177,7 +183,7 @@ const DebtDetails = () => {
           {(fill) => (
             <Text
               style={{
-                fontWeight: "bold",
+                fontWeight: "500",
                 fontSize: 20,
                 color: "#000",
               }}
@@ -204,7 +210,7 @@ const DebtDetails = () => {
       </View>
 
       <View style={[styles.input, { backgroundColor: "#fff" }]}>
-        <Text style={styles.labelBalance}>Monthly Payment</Text>
+        <Text style={styles.labelBalance}>Monthly Payment Calculator</Text>
         {/*<TextInput
           style={[styles.inputText, { color: "#000" }]}
           onChangeText={(val) => {
@@ -309,9 +315,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   name: {
-    fontWeight: "bold",
+    fontWeight: "500",
     fontSize: 28,
-    paddingLeft: 26,
+    paddingLeft: 40,
   },
 
   content: {
@@ -326,7 +332,7 @@ const styles = StyleSheet.create({
     //paddingVertical: 30,
     paddingBottom: 30,
     paddingTop: 15,
-    borderRadius: 50,
+    borderRadius: 30,
     //marginBottom: 30,
 
     marginTop: 10,
@@ -347,7 +353,7 @@ const styles = StyleSheet.create({
     //paddingVertical: 30,
     paddingBottom: 30,
     paddingTop: 15,
-    borderRadius: 50,
+    borderRadius: 30,
     //marginBottom: 30,
 
     marginTop: 10,
@@ -366,13 +372,13 @@ const styles = StyleSheet.create({
   balanceText: {
     fontSize: 38,
     textAlign: "center",
-    fontWeight: "bold",
+    fontWeight: "500",
   },
 
   inputText: {
     fontSize: 38,
     textAlign: "center",
-    fontWeight: "bold",
+    fontWeight: "500",
   },
 
   squares: {
@@ -424,7 +430,7 @@ const styles = StyleSheet.create({
   text: {
     textAlign: "center",
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: "500",
   },
   label: {
     color: "gray",

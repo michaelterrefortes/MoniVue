@@ -75,6 +75,7 @@ export default function BillsTab() {
         keyExtractor={(item) => item.id.toString()}
         ListHeaderComponent={
           <>
+            <Text style={{ marginLeft: 20 }}>Manage your monthly payments</Text>
             <View style={[styles.billsBalance, { backgroundColor: "#fff" }]}>
               <Text style={styles.textVaries}>Total:</Text>
               <Text style={[styles.textBills, { color: "#000" }]}>
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
   billsBalance: {
     paddingHorizontal: 15,
     paddingVertical: 30,
-    borderRadius: 50,
+    borderRadius: 30,
     marginTop: 10,
     width: "80%",
     alignSelf: "center",
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
   },
 
   textBills: {
-    fontWeight: "bold",
+    fontWeight: "500",
     fontSize: 38,
   },
 

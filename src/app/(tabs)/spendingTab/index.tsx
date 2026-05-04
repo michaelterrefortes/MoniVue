@@ -330,6 +330,7 @@ const SpendingTab = () => {
           ListHeaderComponent={() => {
             return (
               <>
+                <Text style={{ marginLeft: 20 }}>Track your expenses</Text>
                 <View style={styles.spendingBalance}>
                   <View style={styles.datePickerCard}>
                     <TouchableOpacity
@@ -348,7 +349,7 @@ const SpendingTab = () => {
                         fontSize: 20,
                         textAlign: "center",
                         justifyContent: "center",
-                        fontWeight: "bold",
+                        fontWeight: "500",
                       }}
                     >
                       {formatMonth(date)}
@@ -440,6 +441,7 @@ const SpendingTab = () => {
           ListHeaderComponent={() => {
             return (
               <>
+                <Text style={{ marginLeft: 20 }}>Track your expenses</Text>
                 <View style={styles.spendingBalance}>
                   <View style={[styles.datePickerCard]}>
                     <TouchableOpacity
@@ -458,7 +460,7 @@ const SpendingTab = () => {
                         fontSize: 20,
                         textAlign: "center",
                         justifyContent: "center",
-                        fontWeight: "bold",
+                        fontWeight: "500",
                       }}
                     >
                       {format(start, "MMM d")} - {format(end, "MMM d, yyyy")}
@@ -523,6 +525,7 @@ const SpendingTab = () => {
             onRefresh={handleRefresh}
             ListHeaderComponent={
               <>
+                <Text style={{ marginLeft: 20 }}>Track your expenses</Text>
                 <View style={[styles.spendingBalance]}>
                   <View style={[styles.datePickerCard]}>
                     <TouchableOpacity
@@ -543,7 +546,7 @@ const SpendingTab = () => {
                         fontSize: 20,
                         textAlign: "center",
                         justifyContent: "center",
-                        fontWeight: "bold",
+                        fontWeight: "500",
                       }}
                     >
                       {selectedYear}
@@ -640,9 +643,9 @@ const styles = StyleSheet.create({
 
   spendingBalance: {
     backgroundColor: "#fff",
-    paddingHorizontal: 15,
+    paddingHorizontal: 16,
     paddingVertical: 30,
-    borderRadius: 50,
+    borderRadius: 30,
     //marginBottom: 30,
     marginTop: 10,
 
@@ -658,7 +661,7 @@ const styles = StyleSheet.create({
   },
 
   textSpendingNumber: {
-    fontWeight: "bold",
+    fontWeight: "500",
     fontSize: 20,
     paddingLeft: 10,
     paddingBottom: 5,
