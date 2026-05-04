@@ -85,7 +85,7 @@ const Index = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await sleep(1000);
+      //await sleep(1000);
       try {
         const result1 = await fetchProfile();
         setIncome(result1.data.income);
@@ -110,7 +110,7 @@ const Index = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await sleep(1000);
+    //await sleep(1000);
     try {
       const result = await fetchTotals();
       setTotalBills(result.bills);

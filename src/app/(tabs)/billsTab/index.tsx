@@ -32,7 +32,7 @@ export default function BillsTab() {
   useEffect(() => {
     const loadBills = async () => {
       setLoading(true);
-      await sleep(1000);
+      //await sleep(1000);
       try {
         const result = await fetchBills();
         setBills(result);
@@ -54,7 +54,7 @@ export default function BillsTab() {
   const handleRefresh = async () => {
     setRefreshing(true);
 
-    await sleep(1000);
+    //await sleep(1000);
 
     try {
       const result = await fetchBills();

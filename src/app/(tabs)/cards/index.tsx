@@ -48,7 +48,7 @@ export default function Cards() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await sleep(1000);
+      //await sleep(1000);
       try {
         const result = await fetchCredit();
 
@@ -76,7 +76,7 @@ export default function Cards() {
   const handleRefresh = async () => {
     setRefreshing(true);
 
-    await sleep(1000);
+    //await sleep(1000);
 
     try {
       const result = await fetchCredit();
