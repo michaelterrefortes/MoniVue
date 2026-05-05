@@ -51,9 +51,10 @@ const Account = () => {
         },
       });
 
-      if (!res.ok) throw new Error("Failed to delete");
+      const result = await res.json();
 
-      handleSignOut();
+      if (!res.ok) Alert.alert("Error", result.error);
+      else handleSignOut();
     } catch (err) {
       Alert.alert("Error", "Could not delete account");
       console.error(err);

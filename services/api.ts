@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import { url } from "../constants/url";
 import { getAccessToken } from "./auth";
 
@@ -15,7 +16,9 @@ export const fetchBills = async () => {
   if (!response.ok) {
     // @ts-ignore
     console.log(response);
-    throw new Error("Failed to fetch bills", response.statusText);
+    //throw new Error("Failed to fetch bills", response.statusText);
+    Alert.alert("Error", result.error);
+    return [];
   }
   //console.log(result);
   return result;
@@ -53,7 +56,9 @@ export const fetchSpending = async (date = null) => {
 
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to fetch spending", response.statusText);
+    //throw new Error("Failed to fetch spending", response.statusText);
+    Alert.alert("Error", result.error);
+    return [];
   }
   //console.log(result);
   return result;
@@ -76,7 +81,9 @@ export const fetchSpendingWeek = async (start, end) => {
 
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to fetch spending", response.statusText);
+    //throw new Error("Failed to fetch spending", response.statusText);
+    Alert.alert("Error", result.error);
+    return [];
   }
   //console.log(result);
   return result;
@@ -101,7 +108,9 @@ export const fetchSpendingYear = async (year) => {
 
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to fetch spending", response.statusText);
+    //throw new Error("Failed to fetch spending", response.statusText);
+    Alert.alert("Error", result.error);
+    return [];
   }
   //console.log(result);
   return result;
@@ -119,7 +128,9 @@ export const fetchCredit = async () => {
   const result = await response.json();
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to fetch credit cards", response.statusText);
+    //throw new Error("Failed to fetch credit cards", response.statusText);
+    Alert.alert("Error", result.error);
+    return [];
   }
   //console.log(result);
   return result;
@@ -150,12 +161,14 @@ export const addCreditCard = async (
     }),
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to save credit cards", response.statusText);
+    //throw new Error("Failed to save credit cards", response.statusText);
+    //Alert.alert("Error", result.error);
+    return { success: false, error: result.error };
   }
-
-  const result = await response.json();
 
   return result;
 };
@@ -187,12 +200,14 @@ export const editCreditCard = async (
     }),
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to edit credit", response.statusText);
+    //throw new Error("Failed to edit credit", response.statusText);
+    //Alert.alert("Error", result.error);
+    return { success: false, error: result.error };
   }
-
-  const result = await response.json();
 
   return result;
 };
@@ -214,12 +229,14 @@ export const addBills = async (name, variation, price, type, date) => {
     }),
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to save bill", response.statusText);
+    //throw new Error("Failed to save bill", response.statusText);
+    //Alert.alert("Error", result.error);
+    return { success: false, error: result.error };
   }
-
-  const result = await response.json();
 
   return result;
 };
@@ -242,12 +259,15 @@ export const editBills = async (id, name, variation, price, type, date) => {
     }),
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to edit bill", response.statusText);
-  }
+    //throw new Error("Failed to edit bill", response.statusText);
 
-  const result = await response.json();
+    //Alert.alert("Error", result.error);
+    return { success: false, error: result.error };
+  }
 
   return result;
 };
@@ -268,12 +288,14 @@ export const addSpending = async (name, amount, type, date) => {
     }),
   });
 
+  const result = await response.json();
+
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to save spending", response.statusText);
+    //throw new Error("Failed to save spending", response.statusText);
+    //Alert.alert("Error", result.error);
+    return { success: false, error: result.error };
   }
-
-  const result = await response.json();
 
   return result;
 };
@@ -294,13 +316,14 @@ export const editSpending = async (id, name, amount, type, date) => {
       spending_date: date,
     }),
   });
-
+  const result = await response.json();
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to edit spending", response.statusText);
-  }
+    //throw new Error("Failed to edit spending", response.statusText);
 
-  const result = await response.json();
+    //Alert.alert("Error", result.error);
+    return { success: false, error: result.error };
+  }
 
   return result;
 };
@@ -335,13 +358,15 @@ export const profileProcess = async (income) => {
       income: income,
     }),
   });
+  const result = await response.json();
 
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to login", response.statusText);
-  }
+    //throw new Error("Failed to login", response.statusText);
 
-  const result = await response.json();
+    //Alert.alert("Error", result.error);
+    return { success: false, error: result.error };
+  }
 
   return result;
 };
@@ -358,13 +383,14 @@ export const updateProfile = async (income) => {
       income: income,
     }),
   });
+  const result = await response.json();
 
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to login", response.statusText);
+    //throw new Error("Failed to login", response.statusText);
+    //Alert.alert("Error", result.error);
+    return { success: false, error: result.error };
   }
-
-  const result = await response.json();
 
   return result;
 };
@@ -378,13 +404,15 @@ export const fetchProfile = async () => {
       Authorization: `Bearer ${token}`,
     },
   });
+  const result = await response.json();
 
   if (!response.ok) {
     // @ts-ignore
-    throw new Error("Failed to fetch profile", response.statusText);
-  }
+    //throw new Error("Failed to fetch profile", response.statusText);
 
-  const result = await response.json();
+    Alert.alert("Error", result.error);
+    return [];
+  }
 
   return result;
 };

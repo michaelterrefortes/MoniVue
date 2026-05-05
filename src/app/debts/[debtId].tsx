@@ -12,8 +12,8 @@ import {
 //import CircularPicker from "react-native-circular-picker";
 import { useNavigation } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import { AnimatedCircularProgress } from "react-native-circular-progress";
 import CurrencyInput from "react-native-currency-input";
+import { PieChart } from "react-native-gifted-charts";
 import { formatMoney, validateDate } from "../../../constants/functions";
 import { url } from "../../../constants/url";
 import { DebtContext } from "../../../context/DebtContext";
@@ -34,7 +34,7 @@ const DebtDetails = () => {
   const [minimum, setMinimum] = useState(params.minimum);
   const [interestMonths, setInterestMonths] = useState({});
 
-  const percentage = Math.round((Number(balance) / Number(limit)) * 100);
+  const percentage = (Number(balance) / Number(limit)) * 100;
 
   const [editing, setEditing] = useState(false);
 
@@ -77,12 +77,15 @@ const DebtDetails = () => {
         },
       });
 
-      if (!res.ok) throw new Error("Failed to delete");
+      const result = await res.json();
 
-      setDebts((prevItems) =>
-        prevItems.filter((item) => Number(item.id) !== Number(params.id)),
-      );
-      router.back();
+      if (!res.ok) Alert.alert("Error", result.error);
+      else {
+        setDebts((prevItems) =>
+          prevItems.filter((item) => Number(item.id) !== Number(params.id)),
+        );
+        router.back();
+      }
     } catch (err) {
       Alert.alert("Error", "Could not delete item");
       console.error(err);
@@ -148,27 +151,48 @@ const DebtDetails = () => {
       <Text style={[styles.name, { color: "#000" }]}>{name}</Text>
 
       <View style={[styles.balanceCard, { backgroundColor: "#fff" }]}>
-        <Text style={styles.labelBalance}>Balance:</Text>
+        <Text style={styles.labelBalance}>Balance</Text>
         <Text style={[styles.balanceText, { color: "#000" }]}>
           {formatMoney(balance)}
         </Text>
       </View>
       <View style={styles.content}>
         <View style={[styles.squares, { backgroundColor: "#fff" }]}>
-          <Text style={styles.label}>Limit:</Text>
+          <Text style={styles.label}>Limit</Text>
           <Text style={[styles.text, { color: "#000" }]}>
             {formatMoney(limit)}
           </Text>
         </View>
         <View style={[styles.squares, { backgroundColor: "#fff" }]}>
-          <Text style={styles.label}>APR:</Text>
+          <Text style={styles.label}>APR</Text>
           <Text style={[styles.text, { color: "#000" }]}>{apr}%</Text>
         </View>
       </View>
 
       <View style={[styles.rectangle, { backgroundColor: "#fff" }]}>
-        <Text style={styles.label}>Utilization:</Text>
-        <AnimatedCircularProgress
+        <Text style={styles.label}>Utilization</Text>
+
+        <View style={styles.headerRow}>
+          <Text
+            style={[styles.percentText, { color: "#000", fontWeight: "500" }]}
+          >
+            {percentage.toFixed(2)}% used
+          </Text>
+        </View>
+
+        <View style={[styles.progressBarBackground]}>
+          <View
+            style={[
+              styles.progressBarFill,
+              {
+                width: percentage > 100 ? 100 : `${percentage}%`,
+                backgroundColor: getUtilizationColor(percentage),
+                //backgroundColor: "#ffffff",
+              },
+            ]}
+          />
+        </View>
+        {/*<AnimatedCircularProgress
           size={80}
           width={9}
           backgroundWidth={5}
@@ -191,18 +215,18 @@ const DebtDetails = () => {
               {Math.round(fill)}%
             </Text>
           )}
-        </AnimatedCircularProgress>
+        </AnimatedCircularProgress>*/}
       </View>
 
       <View style={styles.content}>
         <View style={[styles.squares, { backgroundColor: "#fff" }]}>
-          <Text style={styles.label}>Min Payment:</Text>
+          <Text style={styles.label}>Min Payment</Text>
           <Text style={[styles.text, { color: "#000" }]}>
             {formatMoney(minimum)}
           </Text>
         </View>
         <View style={[styles.squares, { backgroundColor: "#fff" }]}>
-          <Text style={styles.label}>Due Date:</Text>
+          <Text style={styles.label}>Due Date</Text>
           <Text style={[styles.text, { color: "#000" }]}>
             {validateDate(date)}
           </Text>
@@ -211,31 +235,7 @@ const DebtDetails = () => {
 
       <View style={[styles.input, { backgroundColor: "#fff" }]}>
         <Text style={styles.labelBalance}>Monthly Payment Calculator</Text>
-        {/*<TextInput
-          style={[styles.inputText, { color: "#000" }]}
-          onChangeText={(val) => {
-            setPayment(val);
-          }}
-          returnKeyType="done"
-          onSubmitEditing={Keyboard.dismiss}
-          value={payment}
-          placeholder="$0.00"
-          placeholderTextColor={"lightgrey"}
-          keyboardType="numeric"
-          onEndEditing={() => {
-            if (payment.trim().length === 0) {
-              setInterestMonths({});
-            } else {
-              setInterestMonths(
-                calculateInterest(
-                  Number(balance),
-                  Number(apr),
-                  Number(payment),
-                ),
-              );
-            }
-          }}
-        />*/}
+
         <CurrencyInput
           style={[styles.inputText, { color: "#000" }]}
           value={payment}
@@ -252,6 +252,9 @@ const DebtDetails = () => {
           onEndEditing={() => {
             if (payment === null) {
               setInterestMonths({});
+            } else if (payment === 0) {
+              setInterestMonths({});
+              Alert.alert("Error", "Payment cannot be zero. Try again.");
             } else {
               setInterestMonths(
                 calculateInterest(
@@ -279,7 +282,7 @@ const DebtDetails = () => {
                   },
                 ]}
               >
-                <Text style={styles.label}>Interest Payed:</Text>
+                <Text style={styles.label}>Interest Payed</Text>
                 <Text style={[styles.text, { color: "#000" }]}>
                   {formatMoney(interestMonths.interest)}
                 </Text>
@@ -293,9 +296,84 @@ const DebtDetails = () => {
                   },
                 ]}
               >
-                <Text style={styles.label}>Total Months:</Text>
+                <Text style={styles.label}>Total Months</Text>
                 <Text style={[styles.text, { color: "#000" }]}>
                   {interestMonths.months}
+                </Text>
+              </View>
+            </View>
+
+            <View style={[styles.squares2, { width: "83%" }]}>
+              <Text style={styles.label}>Interest Plot</Text>
+              <View
+                style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}
+              >
+                <PieChart
+                  radius={90}
+                  innerRadius={60}
+                  data={[
+                    {
+                      key: 1,
+                      label: "Balance",
+                      value:
+                        (Number(balance) /
+                          (Number(balance) + Number(interestMonths.interest))) *
+                        100,
+                      color: "#66BB6A",
+                    },
+                    {
+                      key: 2,
+                      label: "Interest",
+                      value:
+                        (Number(interestMonths.interest) /
+                          (Number(balance) + Number(interestMonths.interest))) *
+                        100,
+                      color: "#F48FB1",
+                    },
+                  ]}
+                  donut
+                />
+              </View>
+
+              <View style={{ flexDirection: "row", alignSelf: "center" }}>
+                <View
+                  style={{
+                    height: 10,
+                    width: 10,
+                    borderRadius: 5,
+                    backgroundColor: "#66BB6A",
+                    marginRight: 10,
+                  }}
+                />
+                <Text style={styles.label}>
+                  Balance:{" "}
+                  {(
+                    (Number(balance) /
+                      (Number(balance) + Number(interestMonths.interest))) *
+                    100
+                  ).toFixed(0)}
+                  %
+                </Text>
+              </View>
+
+              <View style={{ flexDirection: "row", alignSelf: "center" }}>
+                <View
+                  style={{
+                    height: 10,
+                    width: 10,
+                    borderRadius: 5,
+                    backgroundColor: "#F48FB1",
+                    marginRight: 10,
+                  }}
+                />
+                <Text style={styles.label}>
+                  Interest:{" "}
+                  {(
+                    (Number(interestMonths.interest) /
+                      (Number(balance) + Number(interestMonths.interest))) *
+                    100
+                  ).toFixed(0)}
+                  %
                 </Text>
               </View>
             </View>
@@ -393,7 +471,7 @@ const styles = StyleSheet.create({
 
     marginTop: 10,
 
-    width: "40%",
+    width: "39%",
     justifyContent: "center",
     //alignItems: "center",
     alignSelf: "center",
@@ -460,5 +538,31 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
+  },
+
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginBottom: 8,
+  },
+  dateText: {
+    //color: "#FFFFFF",
+    fontSize: 14,
+  },
+  percentText: {
+    //color: "#FFFFFF",
+    fontSize: 14,
+  },
+  progressBarBackground: {
+    height: 6,
+    backgroundColor: "rgba(146, 146, 146, 0.3)",
+    //backgroundColor: "rgba(255, 255, 255, 0.3)",
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  progressBarFill: {
+    height: "100%",
+    //backgroundColor: "#d3ff00",
+    borderRadius: 3,
   },
 });

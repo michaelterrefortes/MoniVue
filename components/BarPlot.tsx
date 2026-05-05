@@ -22,12 +22,17 @@ const BarPlot = ({
       xAxisThickness={0}
       xAxisLabelTextStyle={{ color: "gray", fontSize: 10 }}
       yAxisTextStyle={{ color: "gray", fontSize: 10 }}
+      yAxisLabelPrefix="$"
       isAnimated
       animationDuration={300}
       //showGradient
-      gradientColor={"#12ff00"} // Default top color
+      //backgroundColor={"grey"}
+      //gradientColor={"#12ff00"} // Default top color
       //frontColor={"#d3ff00"} // Default bottom color
-      frontColor={"#0095ff"}
+      //frontColor={"#0095ff"}
+
+      gradientColor={"#da108b"}
+      frontColor={"#9e1df0"}
       //frontColor={"#drgb(0, 162, 255)"}
     />
   );

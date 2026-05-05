@@ -31,6 +31,7 @@ const EditSpending = () => {
   const [nameWarning, setNameWarning] = useState(false);
   const [priceWarning, setPriceWarning] = useState(false);
   const [typeWarning, setTypeWarning] = useState(false);
+  const [priceWarningNumber, setPriceWarningNumber] = useState(false);
 
   const navigation = useNavigation();
 
@@ -73,6 +74,11 @@ const EditSpending = () => {
       hasError = true;
     }
 
+    if (amount === 0) {
+      setPriceWarningNumber(true);
+      hasError = true;
+    }
+
     if (hasError) return;
 
     setLoading(true);
@@ -91,7 +97,7 @@ const EditSpending = () => {
 
       router.dismissAll();
     } else {
-      Alert.alert("Problem", result.wrong);
+      Alert.alert("Error", result.error);
     }
   };
 
@@ -136,7 +142,10 @@ const EditSpending = () => {
       <CurrencyInput
         style={[styles.input, { backgroundColor: "#fff" }]}
         value={amount}
-        onChangeValue={setAmount}
+        onChangeValue={(val) => {
+          setPriceWarningNumber(false);
+          setAmount(val);
+        }}
         prefix="$"
         delimiter=","
         separator="."
@@ -151,6 +160,10 @@ const EditSpending = () => {
       />
       {priceWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
+      ) : null}
+
+      {priceWarningNumber ? (
+        <Text style={styles.warning}>*Amount cannot be zero. Try again</Text>
       ) : null}
 
       <Text style={styles.title}>Date</Text>

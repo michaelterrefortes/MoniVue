@@ -1,8 +1,10 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useState } from "react";
 import {
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -74,7 +76,19 @@ const SignupScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={{ height: 100 }} />
+      <View style={{ height: "20%" }} />
+
+      <Image
+        source={require("../../../assets/images/icon-zerodebt.png")}
+        style={{ width: 100, height: 100, alignSelf: "center" }}
+      />
+
+      <Text style={{ fontWeight: "700", fontSize: 32, textAlign: "center" }}>
+        Create Account
+      </Text>
+      <Text style={{ textAlign: "center", marginTop: 10 }}>
+        Start managing your budget today
+      </Text>
 
       <Text style={styles.title}>Monthly Income</Text>
       <CurrencyInput
@@ -171,13 +185,41 @@ const SignupScreen = () => {
       </View>
 
       <TouchableOpacity
-        style={styles.button}
         onPress={processButton} //router.replace("/(tabs)/(index)")}
       >
-        <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
-          Sign up
-        </Text>
+        <LinearGradient
+          colors={["#00a440", "#007e53"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.button}
+        >
+          <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
+            Sign up
+          </Text>
+        </LinearGradient>
       </TouchableOpacity>
+
+      <View style={{ flexDirection: "row", alignSelf: "center" }}>
+        <Text style={{ marginTop: 20, textAlign: "center", fontSize: 15 }}>
+          Already have an account?{"   "}
+        </Text>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={{ flexDirection: "row", alignSelf: "center" }}
+        >
+          <Text
+            style={{
+              marginTop: 20,
+              textAlign: "center",
+              fontSize: 15,
+              color: "green",
+              fontWeight: "600",
+            }}
+          >
+            Sign in
+          </Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };
@@ -187,7 +229,7 @@ export default SignupScreen;
 const styles = StyleSheet.create({
   title: {
     fontWeight: "bold",
-    paddingLeft: 70,
+    paddingLeft: 45,
     paddingBottom: 10,
     marginTop: 20,
   },
@@ -207,7 +249,7 @@ const styles = StyleSheet.create({
 
     //marginBottom: 30,
 
-    width: "70%",
+    width: "80%",
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
@@ -231,10 +273,10 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 30,
     alignSelf: "center",
-    padding: 20,
+    padding: 15,
     borderRadius: 50,
     backgroundColor: "#0095ff",
 
-    width: "50%",
+    width: "80%",
   },
 });

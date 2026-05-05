@@ -65,13 +65,16 @@ const SpendingDetails = () => {
         },
       });
 
-      if (!res.ok) throw new Error("Failed to delete");
+      const result = await res.json();
 
-      setUpdateMonth((prevItem) => !prevItem);
-      setUpdateWeek((prevItem) => !prevItem);
-      setUpdateYear((prevItem) => !prevItem);
+      if (!res.ok) Alert.alert("Error", result.error);
+      else {
+        setUpdateMonth((prevItem) => !prevItem);
+        setUpdateWeek((prevItem) => !prevItem);
+        setUpdateYear((prevItem) => !prevItem);
 
-      router.back();
+        router.back();
+      }
     } catch (err) {
       Alert.alert("Error", "Could not delete item");
       console.error(err);
@@ -130,8 +133,19 @@ const SpendingDetails = () => {
   }, [navigation, editing]);
 
   //console.log(params);
+
+  const [layout, setLayout] = useState({ width: 0, height: 0 });
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={[
+        styles.container,
+        { backgroundColor: layout.height > 600 ? "#f2f2f2" : "" },
+      ]}
+      onLayout={(event) => {
+        const { width, height } = event.nativeEvent.layout;
+        setLayout({ width, height });
+      }}
+    >
       <View style={{ height: 70 }} />
       <Text
         style={{
@@ -145,11 +159,12 @@ const SpendingDetails = () => {
       </Text>
 
       <View style={styles.spendingBalance}>
+        <Text style={styles.label}>Amount</Text>
         <Text style={styles.textAmount}>{formatMoney(amount)}</Text>
       </View>
       <View style={styles.content}>
         <View style={styles.squares}>
-          <Text style={styles.label}>Type:</Text>
+          <Text style={styles.label}>Type</Text>
 
           <View
             style={{
@@ -169,7 +184,7 @@ const SpendingDetails = () => {
           </Text>
         </View>
         <View style={styles.squares}>
-          <Text style={styles.label}>Date:</Text>
+          <Text style={styles.label}>Date</Text>
           <Text style={styles.text}>{dateString(date)}</Text>
         </View>
       </View>
@@ -189,7 +204,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingHorizontal: 15,
     paddingVertical: 30,
-    borderRadius: 50,
+    borderRadius: 30,
     //marginBottom: 30,
     marginTop: 10,
 

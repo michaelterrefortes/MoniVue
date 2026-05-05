@@ -136,14 +136,14 @@ export default function TabLayout() {
             }),
         }}
       />
+
+      {/*
       <Tabs.Screen
         name="savingsTab"
         options={{
           title: "Savings",
           //tabBarActiveTintColor: "#2f95dc",
-          /*tabBarIcon: ({ focused }) => (
-            <Icons focused={focused} title={"dollarsign.bank.building"} />
-          ),*/
+         
 
           tabBarIcon: ({ focused }) =>
             Platform.select({
@@ -155,7 +155,7 @@ export default function TabLayout() {
               },
             }),
         }}
-      />
+      />*/}
     </Tabs>
   );
 }

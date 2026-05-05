@@ -1,3 +1,4 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import {
@@ -67,27 +68,37 @@ export default function BillsTab() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["left", "right"]}>
       <FlatList
         data={bills}
         refreshing={refreshing}
         onRefresh={handleRefresh}
         keyExtractor={(item) => item.id.toString()}
+        ListFooterComponent={<View style={{ height: 15 }} />}
         ListHeaderComponent={
           <>
             <Text style={{ marginLeft: 20 }}>Manage your monthly payments</Text>
-            <View style={[styles.billsBalance, { backgroundColor: "#fff" }]}>
-              <Text style={styles.textVaries}>Total:</Text>
-              <Text style={[styles.textBills, { color: "#000" }]}>
+            <LinearGradient
+              colors={["#ff6400", "#eb1102"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.billsBalance, { backgroundColor: "#fff" }]}
+            >
+              <Text style={[styles.textVaries, { color: "lightgray" }]}>
+                Total:
+              </Text>
+              <Text style={[styles.textBills, { color: "#fff" }]}>
                 {formatMoney(totalBills)}
               </Text>
 
-              <Text style={styles.textVaries}>Variation:</Text>
-              <Text style={styles.textVaries}>
+              <Text style={[styles.textVaries, { color: "lightgray" }]}>
+                Variation:
+              </Text>
+              <Text style={[styles.textVaries, { color: "lightgray" }]}>
                 {formatMoney(totalBills - variance)} - $
                 {formatMoney(totalBills + variance)}
               </Text>
-            </View>
+            </LinearGradient>
 
             <View style={{ height: 20 }} />
 
@@ -135,7 +146,7 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     borderRadius: 30,
     marginTop: 10,
-    width: "80%",
+    width: "90%",
     alignSelf: "center",
     alignItems: "center",
 

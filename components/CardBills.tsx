@@ -59,7 +59,7 @@ export default CardBills;
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
-    padding: 16,
+    padding: 12,
     borderRadius: 20,
     marginTop: 12,
     width: "92%",

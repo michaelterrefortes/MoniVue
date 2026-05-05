@@ -38,6 +38,7 @@ const EditBill = () => {
   const [priceWarning, setPriceWarning] = useState(false);
   const [variationWarning, setVariationWarning] = useState(false);
   const [typeWarning, setTypeWarning] = useState(false);
+  const [priceWarningNumber, setPriceWarningNumber] = useState(false);
 
   const navigation = useNavigation();
 
@@ -88,6 +89,11 @@ const EditBill = () => {
       hasError = true;
     }
 
+    if (price === 0) {
+      setPriceWarningNumber(true);
+      hasError = true;
+    }
+
     if (hasError) return;
 
     setLoading(true);
@@ -116,7 +122,7 @@ const EditBill = () => {
 
       router.dismissAll();
     } else {
-      Alert.alert("Problem", result.wrong);
+      Alert.alert("Error", result.error);
     }
   };
 
@@ -170,7 +176,10 @@ const EditBill = () => {
       <CurrencyInput
         style={[styles.input, { backgroundColor: "#fff" }]}
         value={price}
-        onChangeValue={setPrice}
+        onChangeValue={(val) => {
+          setPriceWarningNumber(false);
+          setPrice(val);
+        }}
         prefix="$"
         delimiter=","
         separator="."
@@ -185,6 +194,10 @@ const EditBill = () => {
       />
       {priceWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
+      ) : null}
+
+      {priceWarningNumber ? (
+        <Text style={styles.warning}>*Price cannot be zero. Try again</Text>
       ) : null}
 
       <Text style={[styles.title, { color: "#000" }]}>

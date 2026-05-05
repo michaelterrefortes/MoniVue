@@ -1,8 +1,10 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useState } from "react";
 import {
   Alert,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -52,7 +54,14 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
+      <View style={{ height: "50%" }} />
+      <Text style={{ fontWeight: "700", fontSize: 32, textAlign: "center" }}>
+        Welcome Back
+      </Text>
+      <Text style={{ textAlign: "center", marginTop: 10 }}>
+        Sign in to manage your budget
+      </Text>
       {/* Email Input */}
       <Text style={styles.title}>Email</Text>
       <TextInput
@@ -118,14 +127,20 @@ const LoginScreen = () => {
       </View>
 
       <TouchableOpacity
-        style={styles.button}
         onPress={processButton} //router.replace("/(tabs)/(index)")}
       >
-        <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
-          Log in
-        </Text>
+        <LinearGradient
+          colors={["#2b5bfc", "#921ffa"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.button}
+        >
+          <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
+            Sign in
+          </Text>
+        </LinearGradient>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -134,7 +149,7 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   title: {
     fontWeight: "bold",
-    paddingLeft: 70,
+    paddingLeft: 45,
     paddingBottom: 10,
     marginTop: 30,
   },
@@ -153,7 +168,7 @@ const styles = StyleSheet.create({
 
     //marginBottom: 30,
 
-    width: "70%",
+    width: "80%",
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
@@ -164,7 +179,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     flex: 1,
-    justifyContent: "center",
+    //justifyContent: "center",
     //alignItems: "center",
   },
   passwordContainer: {
@@ -176,10 +191,10 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 30,
     alignSelf: "center",
-    padding: 20,
+    padding: 15,
     borderRadius: 50,
     backgroundColor: "#0095ff",
 
-    width: "50%",
+    width: "80%",
   },
 });

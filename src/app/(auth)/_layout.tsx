@@ -20,7 +20,7 @@ const Layout = () => {
           headerBackTitle: "",
           headerShown: true,
           headerTransparent: true,
-          headerTitle: "Login",
+          headerTitle: "",
           headerShadowVisible: false,
           headerBlurEffect: "none",
         })}
@@ -32,7 +32,7 @@ const Layout = () => {
           headerBackTitle: "",
           headerShown: true,
           headerTransparent: true,
-          headerTitle: "Signup",
+          headerTitle: "",
           headerShadowVisible: false,
           headerBlurEffect: "none",
         })}

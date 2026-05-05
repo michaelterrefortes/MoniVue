@@ -60,12 +60,15 @@ const BillDetails = () => {
         },
       });
 
-      if (!res.ok) throw new Error("Failed to delete");
+      const result = await res.json();
 
-      setBills((prevItems) =>
-        prevItems.filter((item) => Number(item.id) !== Number(params.id)),
-      );
-      router.back();
+      if (!res.ok) Alert.alert("Error", result.error);
+      else {
+        setBills((prevItems) =>
+          prevItems.filter((item) => Number(item.id) !== Number(params.id)),
+        );
+        router.back();
+      }
     } catch (err) {
       Alert.alert("Error", "Could not delete item");
       console.error(err);
@@ -123,7 +126,7 @@ const BillDetails = () => {
     <ScrollView
       style={[
         styles.container,
-        { backgroundColor: layout.height > 500 ? "#f2f2f2" : "" },
+        { backgroundColor: layout.height > 600 ? "#f2f2f2" : "" },
       ]}
       onLayout={(event) => {
         const { width, height } = event.nativeEvent.layout;
@@ -160,7 +163,7 @@ const BillDetails = () => {
       </View>
       <View style={styles.content}>
         <View style={[styles.squares, { backgroundColor: "#fff" }]}>
-          <Text style={styles.label}>Type:</Text>
+          <Text style={styles.label}>Type</Text>
 
           <View
             style={{
@@ -184,7 +187,7 @@ const BillDetails = () => {
           </Text>
         </View>
         <View style={[styles.squares, { backgroundColor: "#fff" }]}>
-          <Text style={styles.label}>Variation:</Text>
+          <Text style={styles.label}>Variation</Text>
           <Text style={[styles.text, { color: "#000" }]}>
             {formatMoney(variable)}
           </Text>
@@ -206,7 +209,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingHorizontal: 15,
     paddingVertical: 30,
-    borderRadius: 50,
+    borderRadius: 30,
     //marginBottom: 30,
     marginTop: 10,
 

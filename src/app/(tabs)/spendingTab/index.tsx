@@ -1,5 +1,6 @@
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { addWeeks, endOfWeek, format, startOfWeek, subWeeks } from "date-fns";
+import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useContext, useEffect, useRef, useState } from "react";
@@ -27,7 +28,6 @@ import {
   fetchSpendingWeek,
   fetchSpendingYear,
 } from "../../../../services/api";
-
 const TABS = ["Month", "Week", "Year"];
 
 const SpendingTab = () => {
@@ -293,7 +293,7 @@ const SpendingTab = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["left", "right"]}>
       {selected === 0 ? (
         <FlatList
           refreshing={refreshing}
@@ -327,10 +327,29 @@ const SpendingTab = () => {
           //contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
           keyExtractor={(item) => item.id.toString()}
           //scrollEnabled={false}
+          ListFooterComponent={<View style={{ height: 15 }} />}
           ListHeaderComponent={() => {
             return (
               <>
                 <Text style={{ marginLeft: 20 }}>Track your expenses</Text>
+                <LinearGradient
+                  colors={["#9e1df0", "#da108b"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.spendingBalance}
+                >
+                  <Text style={[styles.text, { color: "lightgray" }]}>
+                    Total:
+                  </Text>
+                  <Text
+                    style={[
+                      styles.textSpendingNumber,
+                      { fontSize: 28, color: "#fff" },
+                    ]}
+                  >
+                    {formatMoney(localTotalSpending)}
+                  </Text>
+                </LinearGradient>
                 <View style={styles.spendingBalance}>
                   <View style={styles.datePickerCard}>
                     <TouchableOpacity
@@ -366,10 +385,6 @@ const SpendingTab = () => {
                       />
                     </TouchableOpacity>
                   </View>
-                  <Text style={styles.text}>Total:</Text>
-                  <Text style={styles.textSpendingNumber}>
-                    {formatMoney(localTotalSpending)}
-                  </Text>
 
                   <BarPlot
                     height={100}
@@ -438,10 +453,29 @@ const SpendingTab = () => {
           //contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
           keyExtractor={(item) => item.id.toString()}
           //scrollEnabled={false}
+          ListFooterComponent={<View style={{ height: 15 }} />}
           ListHeaderComponent={() => {
             return (
               <>
                 <Text style={{ marginLeft: 20 }}>Track your expenses</Text>
+                <LinearGradient
+                  colors={["#9e1df0", "#da108b"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.spendingBalance}
+                >
+                  <Text style={[styles.text, { color: "lightgray" }]}>
+                    Total:
+                  </Text>
+                  <Text
+                    style={[
+                      styles.textSpendingNumber,
+                      { fontSize: 28, color: "#fff" },
+                    ]}
+                  >
+                    {formatMoney(weeklyTotal)}
+                  </Text>
+                </LinearGradient>
                 <View style={styles.spendingBalance}>
                   <View style={[styles.datePickerCard]}>
                     <TouchableOpacity
@@ -477,10 +511,6 @@ const SpendingTab = () => {
                       />
                     </TouchableOpacity>
                   </View>
-                  <Text style={styles.text}>Total:</Text>
-                  <Text style={styles.textSpendingNumber}>
-                    {formatMoney(weeklyTotal)}
-                  </Text>
 
                   <BarPlot
                     height={100}
@@ -526,6 +556,24 @@ const SpendingTab = () => {
             ListHeaderComponent={
               <>
                 <Text style={{ marginLeft: 20 }}>Track your expenses</Text>
+                <LinearGradient
+                  colors={["#9e1df0", "#da108b"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.spendingBalance}
+                >
+                  <Text style={[styles.text, { color: "lightgray" }]}>
+                    Total:
+                  </Text>
+                  <Text
+                    style={[
+                      styles.textSpendingNumber,
+                      { fontSize: 28, color: "#fff" },
+                    ]}
+                  >
+                    {formatMoney(yearTotal)}
+                  </Text>
+                </LinearGradient>
                 <View style={[styles.spendingBalance]}>
                   <View style={[styles.datePickerCard]}>
                     <TouchableOpacity
@@ -565,10 +613,6 @@ const SpendingTab = () => {
                       />
                     </TouchableOpacity>
                   </View>
-                  <Text style={styles.text}>Total:</Text>
-                  <Text style={styles.textSpendingNumber}>
-                    {formatMoney(yearTotal)}
-                  </Text>
 
                   {yearSummary.length === 0 ? (
                     <BarPlot

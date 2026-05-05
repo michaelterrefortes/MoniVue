@@ -39,6 +39,8 @@ const EditDebt = () => {
   const [balanceWarning, setBalanceWarning] = useState(false);
   const [limitWarning, setLimitWarning] = useState(false);
   const [minimumWarning, setMinimumWarning] = useState(false);
+  const [limitWarningNumber, setLimitWarningNumber] = useState(false);
+
   //const [dateWarning, setDateWarning] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -97,6 +99,11 @@ const EditDebt = () => {
       hasError = true;
     }
 
+    if (limit === 0) {
+      setLimitWarningNumber(true);
+      hasError = true;
+    }
+
     if (hasError) return;
 
     setLoading(true);
@@ -122,7 +129,7 @@ const EditDebt = () => {
 
       router.dismissAll();
     } else {
-      Alert.alert("Problem", result.wrong);
+      Alert.alert("Error", result.error);
     }
   };
 
@@ -196,7 +203,10 @@ const EditDebt = () => {
       <CurrencyInput
         style={[styles.input, { backgroundColor: "#fff" }]}
         value={limit}
-        onChangeValue={setLimit}
+        onChangeValue={(val) => {
+          setLimitWarningNumber(false);
+          setLimit(val);
+        }}
         prefix="$"
         delimiter=","
         separator="."
@@ -211,6 +221,10 @@ const EditDebt = () => {
       />
       {limitWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
+      ) : null}
+
+      {limitWarningNumber ? (
+        <Text style={styles.warning}>*Limit cannot be zero. Try again</Text>
       ) : null}
 
       <Text style={[styles.title, { color: "#000" }]}>APR</Text>

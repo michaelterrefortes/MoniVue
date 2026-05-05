@@ -1,3 +1,4 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import {
@@ -96,12 +97,13 @@ export default function Cards() {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: "rgb(242, 242, 242)" }]}
+      edges={["left", "right"]}
     >
       <FlatList
         data={debts}
         refreshing={refreshing}
         onRefresh={handleRefresh}
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           const utilization = (item.balance / item.credit_limit) * 100 || 0;
 
           return (
@@ -119,6 +121,7 @@ export default function Cards() {
                   date: item.statement_date,
                 },
               }}
+              index={index}
               utilization={utilization}
             />
           );
@@ -127,12 +130,16 @@ export default function Cards() {
         keyExtractor={(item) => item.id.toString()}
         //scrollEnabled={false}
 
+        ListFooterComponent={<View style={{ height: 15 }} />}
         ListHeaderComponent={
           <>
-            <Text style={{ marginLeft: 30, paddingBottom: 25 }}>
-              Monitor your credit usage
-            </Text>
-            <View style={[styles.viewBalance, { backgroundColor: "#fff" }]}>
+            <Text style={{ marginLeft: 20 }}>Monitor your credit usage</Text>
+            <LinearGradient
+              colors={["#5536f4", "#7f07dd"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.viewBalance, { backgroundColor: "#fff" }]}
+            >
               <View
                 style={{
                   flexDirection: "row",
@@ -140,36 +147,40 @@ export default function Cards() {
                 }}
               >
                 <View>
-                  <Text style={{ fontSize: 12, color: "gray" }}>
+                  <Text style={{ fontSize: 12, color: "lightgray" }}>
                     Total Balance
                   </Text>
-                  <Text style={[styles.balanceNumber, { color: "#000" }]}>
+                  <Text style={[styles.balanceNumber, { color: "#fff" }]}>
                     {formatMoney(totalDebts)}
                   </Text>
                 </View>
                 <View>
-                  <Text style={{ fontSize: 12, color: "gray" }}>Available</Text>
+                  <Text style={{ fontSize: 12, color: "lightgray" }}>
+                    Available
+                  </Text>
                   <Text
                     style={[
                       styles.balanceNumber,
-                      { color: "#000", fontSize: 20 },
+                      { color: "#fff", fontSize: 20 },
                     ]}
                   >
                     {formatMoney(totalLimit - totalDebts)}
                   </Text>
                 </View>
               </View>
-              <Text style={{ fontSize: 12, color: "gray" }}>
+              <Text style={{ fontSize: 12, color: "lightgray" }}>
                 Total Min Payment:
               </Text>
-              <Text style={{ fontSize: 12, color: "gray" }}>
+              <Text style={{ fontSize: 12, color: "lightgray" }}>
                 {formatMoney(totalCreditMinimum)}
               </Text>
 
               <View style={styles.container2}>
                 <View style={styles.headerRow}>
-                  <Text style={styles.dateText}>Credit Utilization</Text>
-                  <Text style={styles.percentText}>
+                  <Text style={[styles.dateText, { color: "white" }]}>
+                    Credit Utilization
+                  </Text>
+                  <Text style={[styles.percentText, { color: "white" }]}>
                     {globalUtilization.toFixed(2)}% used
                   </Text>
                 </View>
@@ -180,13 +191,14 @@ export default function Cards() {
                       styles.progressBarFill,
                       {
                         width: `${globalUtilization}%`,
-                        backgroundColor: getUtilizationColor(globalUtilization),
+                        //backgroundColor: getUtilizationColor(globalUtilization),
+                        backgroundColor: "#fff",
                       },
                     ]}
                   />
                 </View>
               </View>
-            </View>
+            </LinearGradient>
             <View style={{ height: 20 }} />
 
             {loading && (
@@ -246,7 +258,8 @@ const styles = StyleSheet.create({
   },
 
   container2: {
-    //backgroundColor: "#e3e3e3",
+    marginTop: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
     padding: 16,
     borderRadius: 12,
   },
@@ -265,7 +278,8 @@ const styles = StyleSheet.create({
   },
   progressBarBackground: {
     height: 6,
-    backgroundColor: "rgba(146, 146, 146, 0.3)",
+    //backgroundColor: "rgba(146, 146, 146, 0.3)",
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
     borderRadius: 3,
     overflow: "hidden",
   },

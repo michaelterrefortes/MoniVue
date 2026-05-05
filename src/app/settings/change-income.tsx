@@ -28,7 +28,7 @@ const ChangeIncome = () => {
       setIncome(result.data.income);
       router.back();
     } else {
-      Alert.alert("Problem", "Error updating income");
+      Alert.alert("Error", result.error);
     }
 
     //alert("Check your email to confirm.");

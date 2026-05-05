@@ -29,6 +29,7 @@ const AddBill = () => {
   const [priceWarning, setPriceWarning] = useState(false);
   const [variationWarning, setVariationWarning] = useState(false);
   const [typeWarning, setTypeWarning] = useState(false);
+  const [priceWarningNumber, setPriceWarningNumber] = useState(false);
 
   const navigation = useNavigation();
 
@@ -79,6 +80,11 @@ const AddBill = () => {
       hasError = true;
     }
 
+    if (price === 0) {
+      setPriceWarningNumber(true);
+      hasError = true;
+    }
+
     if (hasError) return;
 
     setLoading(true);
@@ -87,14 +93,14 @@ const AddBill = () => {
 
     setLoading(false);
 
-    if (result?.message) {
+    if (result?.success) {
       //console.log(result.message);
       //router.setParams(result.data);
       setBills((prevBills) => [...prevBills, result.data]);
       //router.setParams({ refreshed: "true" });
       router.back();
     } else {
-      Alert.alert("Problem", result.wrong);
+      Alert.alert("Error", result.error);
     }
   };
 
@@ -150,7 +156,10 @@ const AddBill = () => {
       <CurrencyInput
         style={[styles.input, { backgroundColor: "#fff" }]}
         value={price}
-        onChangeValue={setPrice}
+        onChangeValue={(val) => {
+          setPriceWarningNumber(false);
+          setPrice(val);
+        }}
         prefix="$"
         delimiter=","
         separator="."
@@ -165,6 +174,10 @@ const AddBill = () => {
       />
       {priceWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
+      ) : null}
+
+      {priceWarningNumber ? (
+        <Text style={styles.warning}>*Price cannot be zero. Try again</Text>
       ) : null}
 
       <Text style={[styles.title, { color: "#000" }]}>
