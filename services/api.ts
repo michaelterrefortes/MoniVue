@@ -15,7 +15,7 @@ export const fetchBills = async () => {
   const result = await response.json();
   if (!response.ok) {
     // @ts-ignore
-    console.log(response);
+    //console.log(response);
     //throw new Error("Failed to fetch bills", response.statusText);
     Alert.alert("Error", result.error);
     return [];

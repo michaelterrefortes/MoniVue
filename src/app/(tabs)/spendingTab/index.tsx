@@ -82,7 +82,7 @@ const SpendingTab = () => {
         const cond =
           date.getMonth() === new Date().getMonth() &&
           date.getFullYear() === new Date().getFullYear();
-        console.log("\nFetch Month Data", date);
+        //  console.log("\nFetch Month Data", date);
         //await sleep(1000);
         if (cond) {
           const result = await fetchSpending(date);
@@ -111,7 +111,7 @@ const SpendingTab = () => {
   useEffect(() => {
     setLoadingWeekly(true);
     const fetchData = async () => {
-      console.log("Fetch Week Data", currentWeek);
+      // console.log("Fetch Week Data", currentWeek);
       //await sleep(1000);
       try {
         const result = await fetchSpendingWeek(
@@ -134,7 +134,7 @@ const SpendingTab = () => {
     setLoadingYearly(true);
 
     const fetchData = async () => {
-      console.log("Fetch Year Data", selectedYear);
+      // console.log("Fetch Year Data", selectedYear);
       //await sleep(1000);
       try {
         const result = await fetchSpendingYear(selectedYear);
@@ -229,7 +229,7 @@ const SpendingTab = () => {
     if (selected === 0) {
       try {
         //console.log(date);
-        console.log("\nFetch Month Data", date);
+        // console.log("\nFetch Month Data", date);
         //await sleep(1000);
         if (
           date.getMonth() === new Date().getMonth() &&
