@@ -27,6 +27,18 @@ const Layout = () => {
       />
 
       <Stack.Screen
+        name="forgotPassword"
+        options={({ navigation }) => ({
+          headerBackTitle: "",
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "",
+          headerShadowVisible: false,
+          headerBlurEffect: "none",
+        })}
+      />
+
+      <Stack.Screen
         name="signup"
         options={({ navigation }) => ({
           headerBackTitle: "",

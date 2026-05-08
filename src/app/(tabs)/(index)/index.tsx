@@ -159,7 +159,7 @@ const Index = () => {
             />
 
             <CardHome
-              data={totalBills + totalCreditMinimum + totalDebts}
+              data={totalBills + totalCreditMinimum + totalSpending}
               label={"Total Expenses"}
               color={"red"}
               pressable={false}

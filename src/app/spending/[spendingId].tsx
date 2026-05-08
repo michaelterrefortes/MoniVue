@@ -1,7 +1,8 @@
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useLayoutEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -34,6 +35,8 @@ const SpendingDetails = () => {
 
   const [editing, setEditing] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   const navigation = useNavigation();
 
   const confirmDelete = () => {
@@ -55,6 +58,7 @@ const SpendingDetails = () => {
   };
 
   const handleDelete = async () => {
+    setLoading(true);
     try {
       const token = await getAccessToken();
       const res = await fetch(`${url}/spending/${params.id}`, {
@@ -78,10 +82,12 @@ const SpendingDetails = () => {
     } catch (err) {
       Alert.alert("Error", "Could not delete item");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -147,6 +153,20 @@ const SpendingDetails = () => {
       }}
     >
       <View style={{ height: 70 }} />
+
+      {loading ? (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 10,
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ marginRight: 5 }}>Processing deletion ...</Text>
+          <ActivityIndicator size={20} color="gray" />
+        </View>
+      ) : null}
       <Text
         style={{
           fontWeight: "500",

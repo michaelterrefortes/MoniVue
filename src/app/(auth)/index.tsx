@@ -1,275 +1,225 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { SymbolView } from "expo-symbols";
 import React, { useState } from "react";
 import {
-  Alert,
+  Dimensions,
   Image,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 
-import { validateEmail } from "../../../constants/functions";
-import { supabase } from "../../../services/auth";
+const { width } = Dimensions.get("window");
 
-const LoginScreen = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+const slides = [
+  {
+    title: "Track Expenses",
+    description:
+      "Monitor your daily spending, categorize expenses, and stay on top of your monthly budget with ease.",
+  },
+  {
+    title: "Credit Card Analysis",
+    description:
+      "Analyze your credit card usage, and gain insights into balances and interest payments.",
+  },
+  {
+    title: "Bills",
+    description:
+      "Keep track of upcoming bills, payment due dates, and recurring expenses so you never miss a payment.",
+  },
+];
+
+const Index = () => {
   const router = useRouter();
-
-  const [emailWarning, setEmailWarning] = useState(false);
-
-  const [passwordWarning, setPasswordWarning] = useState(false);
-  const [emailIncorrectWarning, setEmailIncorrectWarning] = useState(false);
-
-  const processButton = async () => {
-    let warning = false;
-
-    if (email.trim() === "") {
-      setEmailWarning(true);
-      warning = true;
-    } else if (!validateEmail(email)) {
-      setEmailIncorrectWarning(true);
-      warning = true;
-    }
-
-    if (password.trim() === "") {
-      setPasswordWarning(true);
-      warning = true;
-    }
-
-    if (warning) return;
-
-    //const result = await loginProcess(email, password);
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
-    if (error) Alert.alert(error.message);
-    else router.replace("/(tabs)/(index)");
-  };
+  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={{ height: "30%" }} />
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={{ height: 80 }} />
 
+      {/* Logo */}
       <Image
-        source={require("../../../assets/images/icon-zerodebt.png")}
-        style={{ width: 100, height: 100, alignSelf: "center" }}
+        source={require("../../../assets/images/icon-monivue.png")}
+        style={styles.logo}
       />
 
-      <Text style={{ fontWeight: "700", fontSize: 32, textAlign: "center" }}>
-        Welcome Back
-      </Text>
-      <Text style={{ textAlign: "center", marginTop: 10 }}>
-        Sign in to manage your budget
-      </Text>
-      {/* Email Input */}
-      <Text style={styles.title}>Email</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={(val) => {
-          setEmail(val);
-          if (val.trim() !== "") {
-            (setEmailWarning(false), setEmailIncorrectWarning(false));
-          }
+      {/* App Title */}
+      <Text style={styles.appTitle}>MoniVue</Text>
+
+      <Text style={styles.subtitle}>A Budget Manager App</Text>
+
+      {/* Carousel / Slideshow */}
+      <ScrollView
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onScroll={(event) => {
+          const slideSize = width - 40;
+          const index = Math.round(
+            event.nativeEvent.contentOffset.x / slideSize,
+          );
+          setActiveIndex(index);
         }}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      {emailWarning && (
-        <Text style={styles.warning}>* Field Missing Value</Text>
-      )}
-      {emailIncorrectWarning && (
-        <Text style={styles.warning}>* Incorrect Email. Try again.</Text>
-      )}
+        scrollEventThrottle={16}
+        style={{ marginTop: 40 }}
+      >
+        {slides.map((item, index) => (
+          <View key={index} style={styles.card}>
+            <Text style={styles.cardTitle}>{item.title}</Text>
 
-      {/* Password Input with Toggle */}
+            <Text style={styles.cardDescription}>{item.description}</Text>
+          </View>
+        ))}
+      </ScrollView>
 
-      <View>
-        <Text style={styles.title}>Password</Text>
-        <View
-          style={[
-            styles.input,
-            { flexDirection: "row", justifyContent: "space-between" },
-          ]}
-        >
-          <TextInput
-            //style={styles.input}
-            style={{ width: "90%" }}
-            placeholder="Password"
-            value={password}
-            onChangeText={(val) => {
-              setPassword(val);
-              if (val.trim() !== "") {
-                setPasswordWarning(false);
-              }
-            }}
-            secureTextEntry={!isPasswordVisible} // Toggles visibility
+      {/* Dots Indicator */}
+      <View style={styles.dotsContainer}>
+        {slides.map((_, index) => (
+          <View
+            key={index}
+            style={[styles.dot, activeIndex === index && styles.activeDot]}
           />
-          <TouchableOpacity
-            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-          >
-            {isPasswordVisible ? (
-              <SymbolView
-                name={{ ios: "eye.slash" }}
-                tintColor={"#000"}
-                size={20}
-              />
-            ) : (
-              <SymbolView name={{ ios: "eye" }} tintColor={"#000"} size={20} />
-            )}
-          </TouchableOpacity>
-        </View>
-        {passwordWarning && (
-          <Text style={styles.warning}>* Field Missing Value</Text>
-        )}
+        ))}
       </View>
 
-      <TouchableOpacity
-        onPress={processButton} //router.replace("/(tabs)/(index)")}
-      >
+      {/* Sign In Button */}
+      <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
         <LinearGradient
           colors={["#2b5bfc", "#921ffa"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.button}
         >
-          <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
-            Sign in
-          </Text>
+          <Text style={styles.buttonText}>Sign in</Text>
         </LinearGradient>
       </TouchableOpacity>
 
-      <View style={{ flexDirection: "row", alignSelf: "center" }}>
-        <Text style={{ marginTop: 20, textAlign: "center", fontSize: 15 }}>
-          Don't have an account?{"   "}
-        </Text>
-        <TouchableOpacity
-          onPress={() => router.push("/(auth)/signup")}
-          style={{ flexDirection: "row", alignSelf: "center" }}
-        >
-          <Text
-            style={{
-              marginTop: 20,
-              textAlign: "center",
-              fontSize: 15,
-              color: "blue",
-              fontWeight: "600",
-            }}
-          >
-            Sign up
-          </Text>
+      {/* Sign Up */}
+      <View style={styles.signupContainer}>
+        <Text style={styles.signupText}>Don't have an account? </Text>
+
+        <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
+          <Text style={styles.signupButton}>Sign up</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 };
 
-export default LoginScreen;
+export default Index;
 
 const styles = StyleSheet.create({
-  title: {
-    fontWeight: "bold",
-    paddingLeft: 45,
-    paddingBottom: 10,
-    marginTop: 30,
-  },
-  warning: {
-    color: "red",
-    paddingLeft: 70,
-    //paddingBottom: 10,
-    marginTop: 5,
-  },
-  input: {
+  container: {
+    flex: 1,
+    padding: 20,
     backgroundColor: "#fff",
-    paddingHorizontal: 15,
-    paddingVertical: 15,
-    borderRadius: 50,
-    //color: "gray",
+  },
 
-    //marginBottom: 30,
-
-    width: "80%",
-    justifyContent: "center",
-    alignItems: "center",
+  logo: {
+    width: 100,
+    height: 100,
     alignSelf: "center",
   },
 
-  toggleButton: { padding: 8 },
-
-  container: {
-    padding: 20,
-    flex: 1,
-    //justifyContent: "center",
-    //alignItems: "center",
+  appTitle: {
+    fontWeight: "700",
+    fontSize: 32,
+    textAlign: "center",
+    marginTop: 15,
   },
-  passwordContainer: {
-    flexDirection: "row",
-    //borderBottomWidth: 1,
+
+  subtitle: {
+    textAlign: "center",
+    marginTop: 10,
+    color: "#666",
+    fontSize: 16,
+  },
+
+  card: {
+    width: width - 40,
+    backgroundColor: "#f5f7ff",
+    borderRadius: 25,
+    padding: 25,
+    marginRight: 10,
     alignItems: "center",
+    justifyContent: "center",
+  },
+
+  cardTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#2b5bfc",
+    marginBottom: 12,
+  },
+
+  cardDescription: {
+    textAlign: "center",
+    color: "#555",
+    fontSize: 16,
+    lineHeight: 24,
+  },
+
+  dotsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#ccc",
+    marginHorizontal: 5,
+  },
+
+  activeDot: {
+    backgroundColor: "#2b5bfc",
+    width: 22,
   },
 
   button: {
-    marginTop: 30,
+    marginTop: 40,
     alignSelf: "center",
     padding: 15,
     borderRadius: 50,
-    backgroundColor: "#0095ff",
-
     width: "80%",
   },
-});
 
-/*import { useRouter } from "expo-router";
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+  buttonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "600",
+  },
 
-const AuthScreen = () => {
-  const router = useRouter();
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <TouchableOpacity
-        onPress={() => router.push("/(auth)/login")}
-        style={styles.button}
-      >
-        <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
-          Log in
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => router.push("/(auth)/signup")}
-        style={{ flexDirection: "row" }}
-      >
-        <Text style={{ marginTop: 20, textAlign: "center", fontSize: 15 }}>
-          Don't have an account? Sign up
-        </Text>
-       
-      </TouchableOpacity>
-    </View>
-  );
-};
-
-export default AuthScreen;
-
-const styles = StyleSheet.create({
-  button: {
-    marginTop: 30,
+  signupContainer: {
+    flexDirection: "row",
     alignSelf: "center",
-    padding: 20,
-    borderRadius: 50,
-    backgroundColor: "#0095ff",
+    marginTop: 20,
+  },
 
-    width: "50%",
+  signupText: {
+    fontSize: 15,
+    color: "#333",
+  },
+
+  signupButton: {
+    fontSize: 15,
+    color: "#2b5bfc",
+    fontWeight: "700",
+  },
+
+  footer: {
+    marginTop: 50,
+    marginBottom: 30,
+    alignItems: "center",
+  },
+
+  footerText: {
+    color: "#777",
+    fontSize: 14,
   },
 });
-*/

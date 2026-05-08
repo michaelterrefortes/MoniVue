@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useLayoutEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -46,7 +47,7 @@ const EditDebt = () => {
 
   const navigation = useNavigation();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const cond =
       name.trim() === "" ||
       balance === null ||
@@ -136,6 +137,20 @@ const EditDebt = () => {
   return (
     <ScrollView style={{ backgroundColor: "rgb(242, 242, 242)" }}>
       <View style={{ height: 100, width: "100%" }} />
+      {loading ? (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            //marginTop: 10,
+            marginBottom: 10,
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ marginRight: 5 }}>Processing editing ...</Text>
+          <ActivityIndicator size={20} color="gray" />
+        </View>
+      ) : null}
       {balance === null || balance === null ? (
         <Text
           style={[

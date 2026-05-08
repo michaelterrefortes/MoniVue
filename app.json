@@ -1,16 +1,18 @@
 {
   "expo": {
-    "name": "debtzero",
-    "slug": "debtzero",
+    "name": "MoniVue",
+    "slug": "monivue",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon-zerodebt.png",
-    "scheme": "debtzero",
+    "icon": "./assets/images/icon-monivue.png",
+    "scheme": "monivue",
     "userInterfaceStyle": "automatic",
+
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.mterrefortes.debtzero"
+      "bundleIdentifier": "com.mterrefortes.monivue"
     },
+
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -19,25 +21,31 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.mterrefortes.debtzero"
+      "package": "com.mterrefortes.monivue"
     },
+
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+
     "plugins": [
       "expo-router",
+
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "android": {
-            "image": "./assets/images/splash-icon.png",
-            "imageWidth": 76
-          }
+          "backgroundColor": "#f4f4f4",
+
+          "image": "./assets/images/splash-icon.png",
+
+          "imageWidth": 120,
+
+          "resizeMode": "contain"
         }
       ]
     ],
+
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true

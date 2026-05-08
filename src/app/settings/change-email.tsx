@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   StyleSheet,
   Text,
   TextInput,
@@ -16,6 +17,7 @@ const ChangeEmail = () => {
   const [emailWarning, setEmailWarning] = useState(false);
 
   const [emailIncorrectWarning, setEmailIncorrectWarning] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleUpdate = async () => {
     let warning = false;
@@ -28,7 +30,11 @@ const ChangeEmail = () => {
     }
     if (warning) return;
 
+    setLoading(true);
+
     const { error } = await supabase.auth.updateUser({ email });
+
+    setLoading(false);
 
     if (error) {
       alert(error.message);
@@ -67,6 +73,21 @@ const ChangeEmail = () => {
       <TouchableOpacity style={styles.button} onPress={handleUpdate}>
         <Text style={styles.buttonTextRegular}>Update Email</Text>
       </TouchableOpacity>
+
+      {loading ? (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            //marginTop: 10,
+            marginBottom: 10,
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ marginRight: 5 }}>Processing request ...</Text>
+          <ActivityIndicator size={20} color="gray" />
+        </View>
+      ) : null}
     </View>
   );
 };

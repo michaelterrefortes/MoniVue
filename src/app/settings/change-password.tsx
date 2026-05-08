@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   StyleSheet,
   Text,
   TextInput,
@@ -20,6 +21,8 @@ const ChangePassword = () => {
   const [passwordIncorrectWarning, setPasswordIncorrectWarning] =
     useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   const handleUpdate = async () => {
     let warning = false;
     if (password.trim() === "") {
@@ -32,7 +35,11 @@ const ChangePassword = () => {
 
     if (warning) return;
 
+    setLoading(true);
+
     const { error } = await supabase.auth.updateUser({ password });
+
+    setLoading(false);
 
     if (error) {
       alert(error.message);
@@ -88,6 +95,21 @@ const ChangePassword = () => {
       <TouchableOpacity style={styles.button} onPress={handleUpdate}>
         <Text style={styles.buttonTextRegular}>Update Password</Text>
       </TouchableOpacity>
+
+      {loading ? (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            //marginTop: 10,
+            marginBottom: 10,
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ marginRight: 5 }}>Processing request ...</Text>
+          <ActivityIndicator size={20} color="gray" />
+        </View>
+      ) : null}
     </View>
   );
 };

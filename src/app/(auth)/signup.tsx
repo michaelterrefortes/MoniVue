@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   ScrollView,
@@ -31,6 +32,8 @@ const SignupScreen = () => {
   const [emailIncorrectWarning, setEmailIncorrectWarning] = useState(false);
   const [passwordIncorrectWarning, setPasswordIncorrectWarning] =
     useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
@@ -61,10 +64,12 @@ const SignupScreen = () => {
 
     //const result = await signupProcess(name, lastname, income, email, password);
 
+    setLoading(true);
     const { error } = await supabase.auth.signUp({
       email: email,
       password: password,
     });
+    setLoading(false);
     if (error) Alert.alert(error.message);
     else {
       const response = await profileProcess(income);
@@ -79,7 +84,7 @@ const SignupScreen = () => {
       <View style={{ height: "20%" }} />
 
       <Image
-        source={require("../../../assets/images/icon-zerodebt.png")}
+        source={require("../../../assets/images/icon-monivue.png")}
         style={{ width: 100, height: 100, alignSelf: "center" }}
       />
 
@@ -193,9 +198,13 @@ const SignupScreen = () => {
           end={{ x: 1, y: 1 }}
           style={styles.button}
         >
-          <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
-            Sign up
-          </Text>
+          {!loading ? (
+            <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
+              Sign up
+            </Text>
+          ) : (
+            <ActivityIndicator size={20} color="lightgray" />
+          )}
         </LinearGradient>
       </TouchableOpacity>
 

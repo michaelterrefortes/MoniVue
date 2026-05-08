@@ -3,7 +3,7 @@ import { addWeeks, endOfWeek, format, startOfWeek, subWeeks } from "date-fns";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -74,18 +74,6 @@ const SpendingTab = () => {
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  function usePrevious(value) {
-    const ref = useRef();
-
-    // Store current value in ref after every render
-    useEffect(() => {
-      ref.current = value;
-    }, [value]);
-
-    // Return the value from the previous render (which was stored in the last effect run)
-    return ref.current;
-  }
-
   useEffect(() => {
     const fetchData = async () => {
       setLoadingMonthly(true);
@@ -100,6 +88,7 @@ const SpendingTab = () => {
           const result = await fetchSpending(date);
 
           setSpending(result);
+          //console.log(result);
           setLocalSpending(result);
         } else {
           const result = await fetchSpending(date);
@@ -196,7 +185,7 @@ const SpendingTab = () => {
     });
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({
       unstable_headerRightItems: () => [
         {

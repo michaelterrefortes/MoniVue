@@ -1,6 +1,13 @@
 import { useRouter } from "expo-router";
 import React, { useContext, useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import CurrencyInput from "react-native-currency-input";
 import { DebtContext } from "../../../context/DebtContext";
 import { updateProfile } from "../../../services/api";
@@ -10,6 +17,7 @@ const ChangeIncome = () => {
   const { income, setIncome } = useContext(DebtContext);
   const [localIncome, setLocalIncome] = useState(null);
   const [incomeWarning, setIncomeWarning] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleUpdate = async () => {
     let warning = false;
@@ -20,7 +28,11 @@ const ChangeIncome = () => {
     }
     if (warning) return;
 
+    setLoading(true);
+
     const result = await updateProfile(localIncome);
+
+    setLoading(false);
 
     //console.log(result);
 
@@ -65,6 +77,21 @@ const ChangeIncome = () => {
       <TouchableOpacity style={styles.button} onPress={handleUpdate}>
         <Text style={styles.buttonTextRegular}>Update Income</Text>
       </TouchableOpacity>
+
+      {loading ? (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            //marginTop: 10,
+            marginBottom: 10,
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ marginRight: 5 }}>Processing update ...</Text>
+          <ActivityIndicator size={20} color="gray" />
+        </View>
+      ) : null}
     </View>
   );
 };

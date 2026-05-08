@@ -6,7 +6,7 @@ import { DebtProvider } from "../../context/DebtContext";
 export default function RootLayout() {
   return (
     <DebtProvider>
-      <Stack>
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen
           name="(auth)"
           options={{

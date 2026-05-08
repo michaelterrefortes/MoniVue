@@ -1,7 +1,8 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useLayoutEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -50,7 +51,7 @@ const AddSpending = () => {
 
   const navigation = useNavigation();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const cond = name.trim() === "" || amount === null || type.trim() === "";
     navigation.setOptions({
       unstable_headerRightItems: () => [
@@ -139,6 +140,19 @@ const AddSpending = () => {
   return (
     <ScrollView>
       <View style={{ height: 60, width: "100%" }} />
+      {loading ? (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 10,
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ marginRight: 5 }}>Processing addition ...</Text>
+          <ActivityIndicator size={20} color="gray" />
+        </View>
+      ) : null}
       <Text style={styles.title}>Name</Text>
       <TextInput
         style={styles.input}

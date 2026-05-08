@@ -1,7 +1,8 @@
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useLayoutEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -33,6 +34,8 @@ const BillDetails = () => {
   const [iconImage, setIconImage] = useState(categories[type].icon);
   const [itemColor, setItemColor] = useState(categories[type].color);
 
+  const [loading, setLoading] = useState(false);
+
   const navigation = useNavigation();
 
   const confirmDelete = () => {
@@ -50,6 +53,7 @@ const BillDetails = () => {
   };
 
   const handleDelete = async () => {
+    setLoading(true);
     try {
       const token = await getAccessToken();
       const res = await fetch(`${url}/bills/${params.id}`, {
@@ -72,10 +76,12 @@ const BillDetails = () => {
     } catch (err) {
       Alert.alert("Error", "Could not delete item");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -121,6 +127,7 @@ const BillDetails = () => {
       ),
     });
   }, [navigation]);
+
   const [layout, setLayout] = useState({ width: 0, height: 0 });
   return (
     <ScrollView
@@ -134,6 +141,20 @@ const BillDetails = () => {
       }}
     >
       <View style={{ height: 70 }} />
+
+      {loading ? (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 10,
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ marginRight: 5 }}>Processing deletion ...</Text>
+          <ActivityIndicator size={20} color="gray" />
+        </View>
+      ) : null}
 
       <Text
         style={{

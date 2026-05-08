@@ -3,7 +3,9 @@ import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { validateEmail } from "../../../constants/functions";
 import { supabase } from "../../../services/auth";
 
@@ -24,6 +27,8 @@ const LoginScreen = () => {
 
   const [passwordWarning, setPasswordWarning] = useState(false);
   const [emailIncorrectWarning, setEmailIncorrectWarning] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   const processButton = async () => {
     let warning = false;
@@ -45,17 +50,25 @@ const LoginScreen = () => {
 
     //const result = await loginProcess(email, password);
 
+    setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
+    setLoading(false);
     if (error) Alert.alert(error.message);
     else router.replace("/(tabs)/(index)");
   };
 
   return (
     <ScrollView style={styles.container}>
-      <View style={{ height: "50%" }} />
+      <View style={{ height: "30%" }} />
+
+      <Image
+        source={require("../../../assets/images/icon-monivue.png")}
+        style={{ width: 100, height: 100, alignSelf: "center" }}
+      />
+
       <Text style={{ fontWeight: "700", fontSize: 32, textAlign: "center" }}>
         Welcome Back
       </Text>
@@ -135,10 +148,53 @@ const LoginScreen = () => {
           end={{ x: 1, y: 1 }}
           style={styles.button}
         >
-          <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
-            Sign in
-          </Text>
+          {!loading ? (
+            <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
+              Sign in
+            </Text>
+          ) : (
+            <ActivityIndicator size={20} color="lightgray" />
+          )}
         </LinearGradient>
+      </TouchableOpacity>
+
+      <View style={{ flexDirection: "row", alignSelf: "center" }}>
+        <Text style={{ marginTop: 20, textAlign: "center", fontSize: 15 }}>
+          Don't have an account?{"   "}
+        </Text>
+        <TouchableOpacity
+          onPress={() => router.push("/(auth)/signup")}
+          style={{ flexDirection: "row", alignSelf: "center" }}
+        >
+          <Text
+            style={{
+              marginTop: 20,
+              textAlign: "center",
+              fontSize: 15,
+              color: "blue",
+              fontWeight: "600",
+            }}
+          >
+            Sign up
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity
+        onPress={() => router.push("/(auth)/forgotPassword")}
+        style={{ flexDirection: "row", alignSelf: "center" }}
+      >
+        <Text
+          style={{
+            marginTop: 20,
+            textAlign: "center",
+            fontSize: 15,
+            color: "blue",
+            fontWeight: "600",
+          }}
+        >
+          Forgot Password?
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -198,3 +254,48 @@ const styles = StyleSheet.create({
     width: "80%",
   },
 });
+
+/*import { useRouter } from "expo-router";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+const AuthScreen = () => {
+  const router = useRouter();
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <TouchableOpacity
+        onPress={() => router.push("/(auth)/login")}
+        style={styles.button}
+      >
+        <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
+          Log in
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => router.push("/(auth)/signup")}
+        style={{ flexDirection: "row" }}
+      >
+        <Text style={{ marginTop: 20, textAlign: "center", fontSize: 15 }}>
+          Don't have an account? Sign up
+        </Text>
+       
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+export default AuthScreen;
+
+const styles = StyleSheet.create({
+  button: {
+    marginTop: 30,
+    alignSelf: "center",
+    padding: 20,
+    borderRadius: 50,
+    backgroundColor: "#0095ff",
+
+    width: "50%",
+  },
+});
+*/

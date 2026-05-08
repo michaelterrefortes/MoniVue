@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router/build/hooks";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useLayoutEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Keyboard,
   ScrollView,
@@ -42,6 +43,8 @@ const DebtDetails = () => {
 
   const [payment, setPayment] = useState(null);
 
+  const [loading, setLoading] = useState(false);
+
   const getUtilizationColor = (value) => {
     if (value <= 10) return "#22c55e"; // green
     if (value <= 30) return "#f59e0b"; // yellow
@@ -67,6 +70,7 @@ const DebtDetails = () => {
   };
 
   const handleDelete = async () => {
+    setLoading(true);
     try {
       const token = await getAccessToken();
       const res = await fetch(`${url}/credit/${params.id}`, {
@@ -89,12 +93,14 @@ const DebtDetails = () => {
     } catch (err) {
       Alert.alert("Error", "Could not delete item");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const navigation = useNavigation();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -147,6 +153,21 @@ const DebtDetails = () => {
       style={[styles.container, { backgroundColor: "rgb(242, 242, 242)" }]}
     >
       <View style={{ height: 90 }} />
+
+      {loading ? (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 10,
+            marginBottom: 10,
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ marginRight: 5 }}>Processing deletion ...</Text>
+          <ActivityIndicator size={20} color="gray" />
+        </View>
+      ) : null}
 
       <Text style={[styles.name, { color: "#000" }]}>{name}</Text>
 
