@@ -6,6 +6,8 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -84,206 +86,221 @@ const SignupScreen = () => {
   };
 
   return (
-    <ScrollView
-      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      //keyboardVerticalOffset={90} // adjust if header overlaps
     >
-      <View style={{ height: "20%" }} />
-
-      <Image
-        source={require("../../../assets/images/icon-monivue.png")}
-        style={{ width: 100, height: 100, alignSelf: "center" }}
-      />
-
-      <Text
-        style={[
-          { fontWeight: "700", fontSize: 32, textAlign: "center" },
-          isDarkMode ? styles.lightText : styles.darkText,
-        ]}
+      <ScrollView
+        style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
       >
-        Create Account
-      </Text>
-      <Text
-        style={[
-          { textAlign: "center", marginTop: 10 },
-          isDarkMode ? styles.lightText : styles.darkText,
-        ]}
-      >
-        Start managing your budget today
-      </Text>
+        <View style={{ height: "20%" }} />
 
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Monthly Income
-      </Text>
-      <CurrencyInput
-        style={[
-          styles.input,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-        value={income}
-        //onChangeValue={setIncome}
-        onChangeValue={(val) => {
-          setIncome(val);
-          if (val !== null) setIncomeWarning(false);
-        }}
-        prefix="$"
-        delimiter=","
-        separator="."
-        precision={2}
-        minValue={0}
-        placeholder="$0.00"
-        placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
-        //showPositiveSign
-        //onChangeText={(formattedValue) => {
-        //  console.log(formattedValue);
-        //}}
-      />
-      {incomeWarning && (
-        <Text style={styles.warning}>* Field Missing Value</Text>
-      )}
+        <Image
+          source={require("../../../assets/images/icon-monivue.png")}
+          style={{ width: 100, height: 100, alignSelf: "center" }}
+        />
 
-      {/* Email Input */}
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Email
-      </Text>
-      <TextInput
-        style={[
-          styles.input,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-        placeholder="Email"
-        value={email}
-        placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
-        onChangeText={(val) => {
-          setEmail(val);
-          if (val.trim() !== "") {
-            (setEmailWarning(false), setEmailIncorrectWarning(false));
-          }
-        }}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      {emailWarning && (
-        <Text style={styles.warning}>* Field Missing Value</Text>
-      )}
-      {emailIncorrectWarning && (
-        <Text style={styles.warning}>* Incorrect Email. Try again.</Text>
-      )}
+        <Text
+          style={[
+            { fontWeight: "700", fontSize: 32, textAlign: "center" },
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Create Account
+        </Text>
+        <Text
+          style={[
+            { textAlign: "center", marginTop: 10 },
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Start managing your budget today
+        </Text>
 
-      {/* Password Input with Toggle */}
-
-      <View>
         <Text
           style={[
             styles.title,
             isDarkMode ? styles.lightText : styles.darkText,
           ]}
         >
-          Password
+          Monthly Income
         </Text>
-        <View
+        <CurrencyInput
           style={[
             styles.input,
-            { flexDirection: "row", justifyContent: "space-between" },
             isDarkMode ? styles.darkField : styles.lightField,
           ]}
-        >
-          <TextInput
-            //style={styles.input}
-            style={[
-              { width: "90%" },
-              isDarkMode ? styles.darkField : styles.lightField,
-            ]}
-            placeholder="Password"
-            value={password}
-            placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
-            onChangeText={(val) => {
-              setPassword(val);
-              if (val.trim() !== "") {
-                (setPasswordWarning(false), setPasswordIncorrectWarning(false));
-              }
-            }}
-            secureTextEntry={!isPasswordVisible} // Toggles visibility
-          />
-          <TouchableOpacity
-            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-          >
-            {isPasswordVisible ? (
-              <SymbolView
-                name={{ ios: "eye.slash" }}
-                tintColor={isDarkMode ? "white" : "black"}
-                size={20}
-              />
-            ) : (
-              <SymbolView
-                name={{ ios: "eye" }}
-                tintColor={isDarkMode ? "white" : "black"}
-                size={20}
-              />
-            )}
-          </TouchableOpacity>
-        </View>
-        {passwordWarning && (
+          value={income}
+          //onChangeValue={setIncome}
+          onChangeValue={(val) => {
+            setIncome(val);
+            if (val !== null) setIncomeWarning(false);
+          }}
+          prefix="$"
+          delimiter=","
+          separator="."
+          precision={2}
+          minValue={0}
+          placeholder="$0.00"
+          placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
+          //showPositiveSign
+          //onChangeText={(formattedValue) => {
+          //  console.log(formattedValue);
+          //}}
+        />
+        {incomeWarning && (
           <Text style={styles.warning}>* Field Missing Value</Text>
         )}
-        {passwordIncorrectWarning && (
-          <Text style={[styles.warning, { width: "90%" }]}>
-            * Min 8 chars, 1 upper, 1 lower, 1 number, 1 special char
-          </Text>
-        )}
-      </View>
 
-      <TouchableOpacity
-        onPress={processButton} //router.replace("/(tabs)/(index)")}
-      >
-        <LinearGradient
-          colors={["#00a440", "#007e53"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.button}
-        >
-          {!loading ? (
-            <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
-              Sign up
-            </Text>
-          ) : (
-            <ActivityIndicator size={20} color="lightgray" />
-          )}
-        </LinearGradient>
-      </TouchableOpacity>
-
-      <View style={{ flexDirection: "row", alignSelf: "center" }}>
+        {/* Email Input */}
         <Text
-          style={{
-            marginTop: 20,
-            textAlign: "center",
-            fontSize: 15,
-            color: "gray",
-          }}
+          style={[
+            styles.title,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
         >
-          Already have an account?{"   "}
+          Email
         </Text>
+        <TextInput
+          style={[
+            styles.input,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          placeholder="Email"
+          value={email}
+          placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
+          onChangeText={(val) => {
+            setEmail(val);
+            if (val.trim() !== "") {
+              (setEmailWarning(false), setEmailIncorrectWarning(false));
+            }
+          }}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        {emailWarning && (
+          <Text style={styles.warning}>* Field Missing Value</Text>
+        )}
+        {emailIncorrectWarning && (
+          <Text style={styles.warning}>* Incorrect Email. Try again.</Text>
+        )}
+
+        {/* Password Input with Toggle */}
+
+        <View>
+          <Text
+            style={[
+              styles.title,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Password
+          </Text>
+          <View
+            style={[
+              styles.input,
+              { flexDirection: "row", justifyContent: "space-between" },
+              isDarkMode ? styles.darkField : styles.lightField,
+            ]}
+          >
+            <TextInput
+              //style={styles.input}
+              style={[
+                { width: "90%" },
+                isDarkMode ? styles.darkField : styles.lightField,
+              ]}
+              placeholder="Password"
+              value={password}
+              placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
+              onChangeText={(val) => {
+                setPassword(val);
+                if (val.trim() !== "") {
+                  (setPasswordWarning(false),
+                    setPasswordIncorrectWarning(false));
+                }
+              }}
+              secureTextEntry={!isPasswordVisible} // Toggles visibility
+            />
+            <TouchableOpacity
+              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+            >
+              {isPasswordVisible ? (
+                <SymbolView
+                  name={{ ios: "eye.slash" }}
+                  tintColor={isDarkMode ? "white" : "black"}
+                  size={20}
+                />
+              ) : (
+                <SymbolView
+                  name={{ ios: "eye" }}
+                  tintColor={isDarkMode ? "white" : "black"}
+                  size={20}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+          {passwordWarning && (
+            <Text style={styles.warning}>* Field Missing Value</Text>
+          )}
+          {passwordIncorrectWarning && (
+            <Text style={[styles.warning, { width: "90%" }]}>
+              * Min 8 chars, 1 upper, 1 lower, 1 number, 1 special char
+            </Text>
+          )}
+        </View>
+
         <TouchableOpacity
-          onPress={() => router.back()}
-          style={{ flexDirection: "row", alignSelf: "center" }}
+          onPress={processButton} //router.replace("/(tabs)/(index)")}
         >
+          <LinearGradient
+            colors={["#00a440", "#007e53"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.button}
+          >
+            {!loading ? (
+              <Text
+                style={{ color: "#fff", textAlign: "center", fontSize: 18 }}
+              >
+                Sign up
+              </Text>
+            ) : (
+              <ActivityIndicator size={20} color="lightgray" />
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <View style={{ flexDirection: "row", alignSelf: "center" }}>
           <Text
             style={{
               marginTop: 20,
               textAlign: "center",
               fontSize: 15,
-              color: "green",
-              fontWeight: "600",
+              color: "gray",
             }}
           >
-            Sign in
+            Already have an account?{"   "}
           </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={{ flexDirection: "row", alignSelf: "center" }}
+          >
+            <Text
+              style={{
+                marginTop: 20,
+                textAlign: "center",
+                fontSize: 15,
+                color: "green",
+                fontWeight: "600",
+              }}
+            >
+              Sign in
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

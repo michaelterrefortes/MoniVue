@@ -4,6 +4,8 @@ import {
   ActivityIndicator,
   Alert,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -157,122 +159,127 @@ const DebtDetails = () => {
   }, [navigation, editing, isDarkMode]);
 
   return (
-    <ScrollView
-      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      //keyboardVerticalOffset={90} // adjust if header overlaps
     >
-      <View style={{ height: 90 }} />
+      <ScrollView
+        style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+      >
+        <View style={{ height: 90 }} />
 
-      {loading ? (
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: 10,
-            marginBottom: 10,
-            flexDirection: "row",
-          }}
-        >
-          <Text
-            style={[
-              { marginRight: 5 },
-              isDarkMode ? styles.lightText : styles.darkText,
-            ]}
+        {loading ? (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 10,
+              marginBottom: 10,
+              flexDirection: "row",
+            }}
           >
-            Processing deletion ...
-          </Text>
-          <ActivityIndicator size={20} color="gray" />
-        </View>
-      ) : null}
+            <Text
+              style={[
+                { marginRight: 5 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Processing deletion ...
+            </Text>
+            <ActivityIndicator size={20} color="gray" />
+          </View>
+        ) : null}
 
-      <Text
-        style={[styles.name, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        {name}
-      </Text>
-
-      <View
-        style={[
-          styles.balanceCard,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-      >
-        <Text style={styles.labelBalance}>Balance</Text>
         <Text
-          style={[
-            styles.balanceText,
-            isDarkMode ? styles.lightText : styles.darkText,
-          ]}
+          style={[styles.name, isDarkMode ? styles.lightText : styles.darkText]}
         >
-          {formatMoney(balance)}
+          {name}
         </Text>
-      </View>
-      <View style={styles.content}>
+
         <View
           style={[
-            styles.squares,
+            styles.balanceCard,
             isDarkMode ? styles.darkField : styles.lightField,
           ]}
         >
-          <Text style={styles.label}>Limit</Text>
+          <Text style={styles.labelBalance}>Balance</Text>
           <Text
             style={[
-              styles.text,
+              styles.balanceText,
               isDarkMode ? styles.lightText : styles.darkText,
             ]}
           >
-            {formatMoney(limit)}
+            {formatMoney(balance)}
           </Text>
         </View>
-        <View
-          style={[
-            styles.squares,
-            isDarkMode ? styles.darkField : styles.lightField,
-          ]}
-        >
-          <Text style={styles.label}>APR</Text>
-          <Text
+        <View style={styles.content}>
+          <View
             style={[
-              styles.text,
-              isDarkMode ? styles.lightText : styles.darkText,
-            ]}
-          >
-            {apr}%
-          </Text>
-        </View>
-      </View>
-
-      <View
-        style={[
-          styles.rectangle,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-      >
-        <Text style={styles.label}>Utilization</Text>
-
-        <View style={styles.headerRow}>
-          <Text
-            style={[
-              styles.percentText,
+              styles.squares,
               isDarkMode ? styles.darkField : styles.lightField,
             ]}
           >
-            {percentage.toFixed(2)}% used
-          </Text>
-        </View>
-
-        <View style={[styles.progressBarBackground]}>
+            <Text style={styles.label}>Limit</Text>
+            <Text
+              style={[
+                styles.text,
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              {formatMoney(limit)}
+            </Text>
+          </View>
           <View
             style={[
-              styles.progressBarFill,
-              {
-                width: percentage > 100 ? 100 : `${percentage}%`,
-                backgroundColor: getUtilizationColor(percentage),
-                //backgroundColor: "#ffffff",
-              },
+              styles.squares,
+              isDarkMode ? styles.darkField : styles.lightField,
             ]}
-          />
+          >
+            <Text style={styles.label}>APR</Text>
+            <Text
+              style={[
+                styles.text,
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              {apr}%
+            </Text>
+          </View>
         </View>
-        {/*<AnimatedCircularProgress
+
+        <View
+          style={[
+            styles.rectangle,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
+          <Text style={styles.label}>Utilization</Text>
+
+          <View style={styles.headerRow}>
+            <Text
+              style={[
+                styles.percentText,
+                isDarkMode ? styles.darkField : styles.lightField,
+              ]}
+            >
+              {percentage.toFixed(2)}% used
+            </Text>
+          </View>
+
+          <View style={[styles.progressBarBackground]}>
+            <View
+              style={[
+                styles.progressBarFill,
+                {
+                  width: percentage > 100 ? 100 : `${percentage}%`,
+                  backgroundColor: getUtilizationColor(percentage),
+                  //backgroundColor: "#ffffff",
+                },
+              ]}
+            />
+          </View>
+          {/*<AnimatedCircularProgress
           size={80}
           width={9}
           backgroundWidth={5}
@@ -296,218 +303,225 @@ const DebtDetails = () => {
             </Text>
           )}
         </AnimatedCircularProgress>*/}
-      </View>
+        </View>
 
-      <View style={styles.content}>
-        <View
-          style={[
-            styles.squares,
-            isDarkMode ? styles.darkField : styles.lightField,
-          ]}
-        >
-          <Text style={styles.label}>Min Payment</Text>
-          <Text
+        <View style={styles.content}>
+          <View
             style={[
-              styles.text,
-              isDarkMode ? styles.lightText : styles.darkText,
+              styles.squares,
+              isDarkMode ? styles.darkField : styles.lightField,
             ]}
           >
-            {formatMoney(minimum)}
-          </Text>
-        </View>
-        <View
-          style={[
-            styles.squares,
-            isDarkMode ? styles.darkField : styles.lightField,
-          ]}
-        >
-          <Text style={styles.label}>Due Date</Text>
-          <Text
-            style={[
-              styles.text,
-              isDarkMode ? styles.lightText : styles.darkText,
-            ]}
-          >
-            {validateDate(date)}
-          </Text>
-        </View>
-      </View>
-
-      <View
-        style={[
-          styles.input,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-      >
-        <Text style={styles.labelBalance}>Monthly Payment Calculator</Text>
-
-        <CurrencyInput
-          style={[
-            styles.inputText,
-            isDarkMode ? styles.lightText : styles.darkText,
-          ]}
-          value={payment}
-          onChangeValue={setPayment}
-          prefix="$"
-          delimiter=","
-          separator="."
-          precision={2}
-          minValue={0}
-          placeholder="$0.00"
-          placeholderTextColor={isDarkMode ? "gray" : "lightgrey"}
-          returnKeyType="done"
-          onSubmitEditing={Keyboard.dismiss}
-          onEndEditing={() => {
-            if (payment === null) {
-              setInterestMonths({});
-            } else if (payment === 0) {
-              setInterestMonths({});
-              Alert.alert("Error", "Payment cannot be zero. Try again.");
-            } else {
-              setInterestMonths(
-                calculateInterest(
-                  Number(balance),
-                  Number(apr),
-                  Number(payment),
-                ),
-              );
-            }
-          }}
-          //showPositiveSign
-          //onChangeText={(formattedValue) => {
-          //  console.log(formattedValue);
-          //}}
-        />
-        {Object.keys(interestMonths).length !== 0 ? (
-          <>
-            <View style={styles.content}>
-              <View
-                style={[
-                  styles.squares2,
-                  {
-                    shadowColor: "#000",
-                  },
-                  isDarkMode ? styles.darkField : styles.lightField,
-                ]}
-              >
-                <Text style={styles.label}>Interest Payed</Text>
-                <Text
-                  style={[
-                    styles.text,
-                    isDarkMode ? styles.lightText : styles.darkText,
-                  ]}
-                >
-                  {formatMoney(interestMonths.interest)}
-                </Text>
-              </View>
-              <View
-                style={[
-                  styles.squares2,
-                  {
-                    shadowColor: "#000",
-                  },
-                  isDarkMode ? styles.darkField : styles.lightField,
-                ]}
-              >
-                <Text style={styles.label}>Total Months</Text>
-                <Text
-                  style={[
-                    styles.text,
-                    isDarkMode ? styles.lightText : styles.darkText,
-                  ]}
-                >
-                  {interestMonths.months}
-                </Text>
-              </View>
-            </View>
-
-            <View
+            <Text style={styles.label}>Min Payment</Text>
+            <Text
               style={[
-                styles.squares2,
-                { width: "83%" },
-                isDarkMode ? styles.darkField : styles.lightField,
+                styles.text,
+                isDarkMode ? styles.lightText : styles.darkText,
               ]}
             >
-              <Text style={styles.label}>Interest Plot</Text>
-              <View
-                style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}
-              >
-                <PieChart
-                  radius={90}
-                  innerRadius={60}
-                  innerCircleColor={isDarkMode ? "#2f2f2f" : "white"}
-                  data={[
+              {formatMoney(minimum)}
+            </Text>
+          </View>
+          <View
+            style={[
+              styles.squares,
+              isDarkMode ? styles.darkField : styles.lightField,
+            ]}
+          >
+            <Text style={styles.label}>Due Date</Text>
+            <Text
+              style={[
+                styles.text,
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              {validateDate(date)}
+            </Text>
+          </View>
+        </View>
+
+        <View
+          style={[
+            styles.input,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
+          <Text style={styles.labelBalance}>Monthly Payment Calculator</Text>
+
+          <CurrencyInput
+            style={[
+              styles.inputText,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+            value={payment}
+            onChangeValue={setPayment}
+            prefix="$"
+            delimiter=","
+            separator="."
+            precision={2}
+            minValue={0}
+            placeholder="$0.00"
+            placeholderTextColor={isDarkMode ? "gray" : "lightgrey"}
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
+            onEndEditing={() => {
+              if (payment === null) {
+                setInterestMonths({});
+              } else if (payment === 0) {
+                setInterestMonths({});
+                Alert.alert("Error", "Payment cannot be zero. Try again.");
+              } else {
+                setInterestMonths(
+                  calculateInterest(
+                    Number(balance),
+                    Number(apr),
+                    Number(payment),
+                  ),
+                );
+              }
+            }}
+            //showPositiveSign
+            //onChangeText={(formattedValue) => {
+            //  console.log(formattedValue);
+            //}}
+          />
+          {Object.keys(interestMonths).length !== 0 ? (
+            <>
+              <View style={styles.content}>
+                <View
+                  style={[
+                    styles.squares2,
                     {
-                      key: 1,
-                      label: "Balance",
-                      value:
-                        (Number(balance) /
-                          (Number(balance) + Number(interestMonths.interest))) *
-                        100,
-                      color: "#66BB6A",
+                      shadowColor: "#000",
                     },
-                    {
-                      key: 2,
-                      label: "Interest",
-                      value:
-                        (Number(interestMonths.interest) /
-                          (Number(balance) + Number(interestMonths.interest))) *
-                        100,
-                      color: "#F48FB1",
-                    },
+                    isDarkMode ? styles.darkField : styles.lightField,
                   ]}
-                  donut
-                />
+                >
+                  <Text style={styles.label}>Interest Payed</Text>
+                  <Text
+                    style={[
+                      styles.text,
+                      isDarkMode ? styles.lightText : styles.darkText,
+                    ]}
+                  >
+                    {formatMoney(interestMonths.interest)}
+                  </Text>
+                </View>
+                <View
+                  style={[
+                    styles.squares2,
+                    {
+                      shadowColor: "#000",
+                    },
+                    isDarkMode ? styles.darkField : styles.lightField,
+                  ]}
+                >
+                  <Text style={styles.label}>Total Months</Text>
+                  <Text
+                    style={[
+                      styles.text,
+                      isDarkMode ? styles.lightText : styles.darkText,
+                    ]}
+                  >
+                    {interestMonths.months}
+                  </Text>
+                </View>
               </View>
 
-              <View style={{ flexDirection: "row", alignSelf: "center" }}>
+              <View
+                style={[
+                  styles.squares2,
+                  { width: "83%" },
+                  isDarkMode ? styles.darkField : styles.lightField,
+                ]}
+              >
+                <Text style={styles.label}>Interest Plot</Text>
                 <View
                   style={{
-                    height: 10,
-                    width: 10,
-                    borderRadius: 5,
-                    backgroundColor: "#66BB6A",
-                    marginRight: 10,
+                    alignSelf: "center",
+                    marginBottom: 15,
+                    marginTop: 10,
                   }}
-                />
-                <Text style={styles.label}>
-                  Balance:{" "}
-                  {(
-                    (Number(balance) /
-                      (Number(balance) + Number(interestMonths.interest))) *
-                    100
-                  ).toFixed(0)}
-                  %
-                </Text>
-              </View>
+                >
+                  <PieChart
+                    radius={90}
+                    innerRadius={60}
+                    innerCircleColor={isDarkMode ? "#2f2f2f" : "white"}
+                    data={[
+                      {
+                        key: 1,
+                        label: "Balance",
+                        value:
+                          (Number(balance) /
+                            (Number(balance) +
+                              Number(interestMonths.interest))) *
+                          100,
+                        color: "#66BB6A",
+                      },
+                      {
+                        key: 2,
+                        label: "Interest",
+                        value:
+                          (Number(interestMonths.interest) /
+                            (Number(balance) +
+                              Number(interestMonths.interest))) *
+                          100,
+                        color: "#F48FB1",
+                      },
+                    ]}
+                    donut
+                  />
+                </View>
 
-              <View style={{ flexDirection: "row", alignSelf: "center" }}>
-                <View
-                  style={{
-                    height: 10,
-                    width: 10,
-                    borderRadius: 5,
-                    backgroundColor: "#F48FB1",
-                    marginRight: 10,
-                  }}
-                />
-                <Text style={styles.label}>
-                  Interest:{" "}
-                  {(
-                    (Number(interestMonths.interest) /
-                      (Number(balance) + Number(interestMonths.interest))) *
-                    100
-                  ).toFixed(0)}
-                  %
-                </Text>
-              </View>
-            </View>
-          </>
-        ) : null}
-      </View>
+                <View style={{ flexDirection: "row", alignSelf: "center" }}>
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      borderRadius: 5,
+                      backgroundColor: "#66BB6A",
+                      marginRight: 10,
+                    }}
+                  />
+                  <Text style={styles.label}>
+                    Balance:{" "}
+                    {(
+                      (Number(balance) /
+                        (Number(balance) + Number(interestMonths.interest))) *
+                      100
+                    ).toFixed(0)}
+                    %
+                  </Text>
+                </View>
 
-      <View style={{ height: 50 }} />
-    </ScrollView>
+                <View style={{ flexDirection: "row", alignSelf: "center" }}>
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      borderRadius: 5,
+                      backgroundColor: "#F48FB1",
+                      marginRight: 10,
+                    }}
+                  />
+                  <Text style={styles.label}>
+                    Interest:{" "}
+                    {(
+                      (Number(interestMonths.interest) /
+                        (Number(balance) + Number(interestMonths.interest))) *
+                      100
+                    ).toFixed(0)}
+                    %
+                  </Text>
+                </View>
+              </View>
+            </>
+          ) : null}
+        </View>
+
+        <View style={{ height: 50 }} />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

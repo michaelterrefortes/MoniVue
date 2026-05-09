@@ -4,6 +4,8 @@ import { useContext, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,7 +14,7 @@ import {
   View,
 } from "react-native";
 import CurrencyInput from "react-native-currency-input";
-import Dropdown from "../../../components/Dropdown";
+import PickerComponent from "../../../components/Picker";
 import { DebtContext } from "../../../context/DebtContext";
 import { addSpending } from "../../../services/api";
 
@@ -45,7 +47,7 @@ const AddSpending = () => {
 
   const [name, setName] = useState("");
   const [amount, setAmount] = useState(null);
-  const [type, setType] = useState("");
+  const [type, setType] = useState("1");
   const [date, setDate] = useState(new Date());
 
   const [nameWarning, setNameWarning] = useState(false);
@@ -141,123 +143,160 @@ const AddSpending = () => {
     { label: "Others", value: "14" },
   ]);
 
+  const options = [
+    "Food & Dining",
+    "Groceries",
+    "Transport",
+    "Gas",
+    "Shopping",
+    "Entertainment",
+    "Subscriptions",
+    "Health & Fitness",
+    "Travel",
+    "Education",
+    "Personal Care",
+    "Gifts & Donations",
+    "Bills & Fees",
+    "Others",
+  ];
+  const [selectedTag, setSelectedTag] = useState(options[0]);
+
   return (
-    <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
-      <View
-        style={[
-          { height: 60, width: "100%" },
-          isDarkMode ? styles.darkBg : styles.lightBg,
-        ]}
-      />
-      {loading ? (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      //keyboardVerticalOffset={90} // adjust if header overlaps
+    >
+      <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
         <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: 10,
-            flexDirection: "row",
-          }}
-        >
-          <Text
-            style={[
-              { marginRight: 5 },
-              isDarkMode ? styles.lightText : styles.darkText,
-            ]}
+          style={[
+            { height: 60, width: "100%" },
+            isDarkMode ? styles.darkBg : styles.lightBg,
+          ]}
+        />
+        {loading ? (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 10,
+              flexDirection: "row",
+            }}
           >
-            Processing addition ...
-          </Text>
-          <ActivityIndicator size={20} color="gray" />
+            <Text
+              style={[
+                { marginRight: 5 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Processing addition ...
+            </Text>
+            <ActivityIndicator size={20} color="gray" />
+          </View>
+        ) : null}
+        <Text
+          style={[
+            styles.title,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Name
+        </Text>
+
+        <TextInput
+          style={[
+            styles.input,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onChangeText={(val) => {
+            setName(val);
+            if (val.trim() !== "") setNameWarning(false); // Clear error while typing
+          }}
+          placeholderTextColor={"gray"}
+          value={name}
+          placeholder="Name"
+          //keyboardType="numeric"
+        />
+        {nameWarning ? (
+          <Text style={styles.warning}>*Field value missing</Text>
+        ) : null}
+
+        <Text
+          style={[
+            styles.title,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Amount
+        </Text>
+        <CurrencyInput
+          style={[
+            styles.input,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          value={amount}
+          onChangeValue={(val) => {
+            setPriceWarningNumber(false);
+            setAmount(val);
+          }}
+          prefix="$"
+          delimiter=","
+          separator="."
+          precision={2}
+          minValue={0}
+          placeholder="$0.00"
+          placeholderTextColor={"grey"}
+          //showPositiveSign
+          //onChangeText={(formattedValue) => {
+          //  console.log(formattedValue);
+          //}}
+        />
+        {priceWarning ? (
+          <Text style={styles.warning}>*Field value missing</Text>
+        ) : null}
+
+        {priceWarningNumber ? (
+          <Text style={styles.warning}>*Amount cannot be zero. Try again</Text>
+        ) : null}
+
+        <Text
+          style={[
+            styles.title,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Date
+        </Text>
+
+        <View
+          style={[
+            styles.input2,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
+          <Text style={{ color: "grey" }}>Date:</Text>
+          <View style={{ transform: [{ scale: 0.85 }] }}>
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onValueChange={(event, selectedDate) => setDate(selectedDate)}
+              //maximumDate={new Date()}
+              //minimumDate={new Date(2024, 11)}
+              //maximumDate={new Date(2026, 5, 3)}
+            />
+          </View>
         </View>
-      ) : null}
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Name
-      </Text>
-      <TextInput
-        style={[
-          styles.input,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-        onChangeText={(val) => {
-          setName(val);
-          if (val.trim() !== "") setNameWarning(false); // Clear error while typing
-        }}
-        placeholderTextColor={"gray"}
-        value={name}
-        placeholder="Name"
-        //keyboardType="numeric"
-      />
-      {nameWarning ? (
-        <Text style={styles.warning}>*Field value missing</Text>
-      ) : null}
 
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Amount
-      </Text>
-      <CurrencyInput
-        style={[
-          styles.input,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-        value={amount}
-        onChangeValue={(val) => {
-          setPriceWarningNumber(false);
-          setAmount(val);
-        }}
-        prefix="$"
-        delimiter=","
-        separator="."
-        precision={2}
-        minValue={0}
-        placeholder="$0.00"
-        placeholderTextColor={"grey"}
-        //showPositiveSign
-        //onChangeText={(formattedValue) => {
-        //  console.log(formattedValue);
-        //}}
-      />
-      {priceWarning ? (
-        <Text style={styles.warning}>*Field value missing</Text>
-      ) : null}
-
-      {priceWarningNumber ? (
-        <Text style={styles.warning}>*Amount cannot be zero. Try again</Text>
-      ) : null}
-
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Date
-      </Text>
-
-      <View
-        style={[
-          styles.input2,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-      >
-        <Text style={{ color: "grey" }}>Date:</Text>
-        <View style={{ transform: [{ scale: 0.85 }] }}>
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onValueChange={(event, selectedDate) => setDate(selectedDate)}
-            //maximumDate={new Date()}
-            //minimumDate={new Date(2024, 11)}
-            //maximumDate={new Date(2026, 5, 3)}
-          />
-        </View>
-      </View>
-
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Category
-      </Text>
+        <Text
+          style={[
+            styles.title,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Category
+        </Text>
+        {/*
       <Dropdown
         open={open}
         type={type}
@@ -265,14 +304,34 @@ const AddSpending = () => {
         setOpen={setOpen}
         setType={setType}
         setItems={setItems}
-      />
+      />*/}
 
-      {typeWarning ? (
-        <Text style={styles.warning}>*Field value missing</Text>
-      ) : null}
+        <View
+          style={[
+            styles.input2,
+            isDarkMode ? styles.darkField : styles.lightField,
+            {
+              //flexDirection: "row",
+              justifyContent: "flex-end",
+              //alignItems: "center",
+            },
+          ]}
+        >
+          <PickerComponent
+            selectedTag={selectedTag}
+            setSelectedTag={setSelectedTag}
+            setType={setType}
+            options={options}
+          />
+        </View>
 
-      <View style={{ height: 70 }} />
-    </ScrollView>
+        {typeWarning ? (
+          <Text style={styles.warning}>*Field value missing</Text>
+        ) : null}
+
+        <View style={{ height: 70 }} />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

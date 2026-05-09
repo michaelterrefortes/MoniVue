@@ -3,6 +3,8 @@ import { SymbolView } from "expo-symbols";
 import { useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -56,98 +58,105 @@ const ChangePassword = () => {
   };
 
   return (
-    <ScrollView
-      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      //keyboardVerticalOffset={90} // adjust if header overlaps
     >
-      <View style={{ height: 250 }} />
-      <View
-        style={[
-          styles.button,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
+      <ScrollView
+        style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
       >
-        <View style={{ flexDirection: "row" }}>
-          <TextInput
-            //style={styles.input}
-            style={{ width: "90%" }}
-            placeholder="New Password"
-            value={password}
-            onChangeText={(val) => {
-              setPassword(val);
-              if (val.trim() !== "") {
-                (setPasswordWarning(false), setPasswordIncorrectWarning(false));
-              }
-            }}
-            secureTextEntry={!isPasswordVisible} // Toggles visibility
-          />
-          <TouchableOpacity
-            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-          >
-            {isPasswordVisible ? (
-              <SymbolView
-                name={{ ios: "eye.slash" }}
-                tintColor={isDarkMode ? "white" : "#000"}
-                size={20}
-              />
-            ) : (
-              <SymbolView
-                name={{ ios: "eye" }}
-                tintColor={isDarkMode ? "white" : "#000"}
-                size={20}
-              />
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {passwordWarning && (
-        <Text style={styles.warning}>* Field Missing Value</Text>
-      )}
-      {passwordIncorrectWarning && (
-        <Text style={[styles.warning, { width: "90%" }]}>
-          * Min 8 chars, 1 upper, 1 lower, 1 number, 1 special char
-        </Text>
-      )}
-
-      <TouchableOpacity
-        style={[
-          styles.button,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-        onPress={handleUpdate}
-      >
-        <Text
+        <View style={{ height: 250 }} />
+        <View
           style={[
-            styles.buttonTextRegular,
-            { color: isDarkMode ? "lightblue" : "blue" },
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
           ]}
         >
-          Update Password
-        </Text>
-      </TouchableOpacity>
+          <View style={{ flexDirection: "row" }}>
+            <TextInput
+              //style={styles.input}
+              style={{ width: "90%" }}
+              placeholder="New Password"
+              value={password}
+              onChangeText={(val) => {
+                setPassword(val);
+                if (val.trim() !== "") {
+                  (setPasswordWarning(false),
+                    setPasswordIncorrectWarning(false));
+                }
+              }}
+              secureTextEntry={!isPasswordVisible} // Toggles visibility
+            />
+            <TouchableOpacity
+              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+            >
+              {isPasswordVisible ? (
+                <SymbolView
+                  name={{ ios: "eye.slash" }}
+                  tintColor={isDarkMode ? "white" : "#000"}
+                  size={20}
+                />
+              ) : (
+                <SymbolView
+                  name={{ ios: "eye" }}
+                  tintColor={isDarkMode ? "white" : "#000"}
+                  size={20}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
 
-      {loading ? (
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            //marginTop: 10,
-            marginBottom: 10,
-            flexDirection: "row",
-          }}
+        {passwordWarning && (
+          <Text style={styles.warning}>* Field Missing Value</Text>
+        )}
+        {passwordIncorrectWarning && (
+          <Text style={[styles.warning, { width: "90%" }]}>
+            * Min 8 chars, 1 upper, 1 lower, 1 number, 1 special char
+          </Text>
+        )}
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={handleUpdate}
         >
           <Text
             style={[
-              { marginRight: 5 },
-              isDarkMode ? styles.lightText : styles.darkText,
+              styles.buttonTextRegular,
+              { color: isDarkMode ? "lightblue" : "blue" },
             ]}
           >
-            Processing request ...
+            Update Password
           </Text>
-          <ActivityIndicator size={20} color="gray" />
-        </View>
-      ) : null}
-    </ScrollView>
+        </TouchableOpacity>
+
+        {loading ? (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              //marginTop: 10,
+              marginBottom: 10,
+              flexDirection: "row",
+            }}
+          >
+            <Text
+              style={[
+                { marginRight: 5 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Processing request ...
+            </Text>
+            <ActivityIndicator size={20} color="gray" />
+          </View>
+        ) : null}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

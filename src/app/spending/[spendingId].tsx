@@ -97,7 +97,7 @@ const SpendingDetails = () => {
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity
             onPress={() =>
-              router.push({
+              router.replace({
                 pathname: "spending/editSpending",
                 params: {
                   id: params.id,

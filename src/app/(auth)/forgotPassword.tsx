@@ -4,6 +4,8 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -59,69 +61,80 @@ const forgotPassword = () => {
   };
 
   return (
-    <ScrollView
-      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      //keyboardVerticalOffset={90} // adjust if header overlaps
     >
-      <View style={{ height: 150 }} />
-
-      <Text
-        style={[
-          { fontWeight: "700", fontSize: 32, textAlign: "center" },
-          isDarkMode ? styles.lightText : styles.darkText,
-        ]}
+      <ScrollView
+        style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
       >
-        Reset Password
-      </Text>
+        <View style={{ height: 150 }} />
 
-      {/* Email Input */}
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Email
-      </Text>
-      <TextInput
-        style={[
-          styles.input,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-        placeholder="Email"
-        placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
-        value={email}
-        onChangeText={(val) => {
-          setEmail(val);
-          if (val.trim() !== "") {
-            (setEmailWarning(false), setEmailIncorrectWarning(false));
-          }
-        }}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      {emailWarning && (
-        <Text style={styles.warning}>* Field Missing Value</Text>
-      )}
-      {emailIncorrectWarning && (
-        <Text style={styles.warning}>* Incorrect Email. Try again.</Text>
-      )}
-
-      <TouchableOpacity
-        onPress={processButton} //router.replace("/(tabs)/(index)")}
-      >
-        <LinearGradient
-          colors={["#2b5bfc", "#921ffa"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.button}
+        <Text
+          style={[
+            { fontWeight: "700", fontSize: 32, textAlign: "center" },
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
         >
-          {!loading ? (
-            <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
-              Reset Password
-            </Text>
-          ) : (
-            <ActivityIndicator size={20} color="lightgray" />
-          )}
-        </LinearGradient>
-      </TouchableOpacity>
-    </ScrollView>
+          Reset Password
+        </Text>
+
+        {/* Email Input */}
+        <Text
+          style={[
+            styles.title,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Email
+        </Text>
+        <TextInput
+          style={[
+            styles.input,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          placeholder="Email"
+          placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
+          value={email}
+          onChangeText={(val) => {
+            setEmail(val);
+            if (val.trim() !== "") {
+              (setEmailWarning(false), setEmailIncorrectWarning(false));
+            }
+          }}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        {emailWarning && (
+          <Text style={styles.warning}>* Field Missing Value</Text>
+        )}
+        {emailIncorrectWarning && (
+          <Text style={styles.warning}>* Incorrect Email. Try again.</Text>
+        )}
+
+        <TouchableOpacity
+          onPress={processButton} //router.replace("/(tabs)/(index)")}
+        >
+          <LinearGradient
+            colors={["#2b5bfc", "#921ffa"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.button}
+          >
+            {!loading ? (
+              <Text
+                style={{ color: "#fff", textAlign: "center", fontSize: 18 }}
+              >
+                Reset Password
+              </Text>
+            ) : (
+              <ActivityIndicator size={20} color="lightgray" />
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

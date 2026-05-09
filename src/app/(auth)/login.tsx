@@ -6,6 +6,8 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -65,152 +67,180 @@ const LoginScreen = () => {
   };
 
   return (
-    <ScrollView
-      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      //keyboardVerticalOffset={90} // adjust if header overlaps
     >
-      <View style={{ height: "30%" }} />
-
-      <Image
-        source={require("../../../assets/images/icon-monivue.png")}
-        style={{ width: 100, height: 100, alignSelf: "center" }}
-      />
-
-      <Text
-        style={[
-          { fontWeight: "700", fontSize: 32, textAlign: "center" },
-          isDarkMode ? styles.lightText : styles.darkText,
-        ]}
+      <ScrollView
+        style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
       >
-        Welcome Back
-      </Text>
-      <Text
-        style={[
-          { textAlign: "center", marginTop: 10 },
-          isDarkMode ? styles.lightText : styles.darkText,
-        ]}
-      >
-        Sign in to manage your budget
-      </Text>
-      {/* Email Input */}
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Email
-      </Text>
-      <TextInput
-        style={[
-          styles.input,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-        placeholder="Email"
-        placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
-        value={email}
-        onChangeText={(val) => {
-          setEmail(val);
-          if (val.trim() !== "") {
-            (setEmailWarning(false), setEmailIncorrectWarning(false));
-          }
-        }}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      {emailWarning && (
-        <Text style={styles.warning}>* Field Missing Value</Text>
-      )}
-      {emailIncorrectWarning && (
-        <Text style={styles.warning}>* Incorrect Email. Try again.</Text>
-      )}
+        <View style={{ height: "30%" }} />
 
-      {/* Password Input with Toggle */}
+        <Image
+          source={require("../../../assets/images/icon-monivue.png")}
+          style={{ width: 100, height: 100, alignSelf: "center" }}
+        />
 
-      <View>
+        <Text
+          style={[
+            { fontWeight: "700", fontSize: 32, textAlign: "center" },
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Welcome Back
+        </Text>
+        <Text
+          style={[
+            { textAlign: "center", marginTop: 10 },
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Sign in to manage your budget
+        </Text>
+        {/* Email Input */}
         <Text
           style={[
             styles.title,
             isDarkMode ? styles.lightText : styles.darkText,
           ]}
         >
-          Password
+          Email
         </Text>
-        <View
+        <TextInput
           style={[
             styles.input,
             isDarkMode ? styles.darkField : styles.lightField,
-            { flexDirection: "row", justifyContent: "space-between" },
           ]}
-        >
-          <TextInput
-            //style={styles.input}
-            style={[
-              { width: "90%" },
-              isDarkMode ? styles.darkField : styles.lightField,
-            ]}
-            placeholder="Password"
-            value={password}
-            placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
-            onChangeText={(val) => {
-              setPassword(val);
-              if (val.trim() !== "") {
-                setPasswordWarning(false);
-              }
-            }}
-            secureTextEntry={!isPasswordVisible} // Toggles visibility
-          />
-          <TouchableOpacity
-            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-          >
-            {isPasswordVisible ? (
-              <SymbolView
-                name={{ ios: "eye.slash" }}
-                tintColor={isDarkMode ? "white" : "black"}
-                size={20}
-              />
-            ) : (
-              <SymbolView
-                name={{ ios: "eye" }}
-                tintColor={isDarkMode ? "white" : "black"}
-                size={20}
-              />
-            )}
-          </TouchableOpacity>
-        </View>
-        {passwordWarning && (
+          placeholder="Email"
+          placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
+          value={email}
+          onChangeText={(val) => {
+            setEmail(val);
+            if (val.trim() !== "") {
+              (setEmailWarning(false), setEmailIncorrectWarning(false));
+            }
+          }}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        {emailWarning && (
           <Text style={styles.warning}>* Field Missing Value</Text>
         )}
-      </View>
+        {emailIncorrectWarning && (
+          <Text style={styles.warning}>* Incorrect Email. Try again.</Text>
+        )}
 
-      <TouchableOpacity
-        onPress={processButton} //router.replace("/(tabs)/(index)")}
-      >
-        <LinearGradient
-          colors={["#2b5bfc", "#921ffa"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.button}
-        >
-          {!loading ? (
-            <Text style={{ color: "#fff", textAlign: "center", fontSize: 18 }}>
-              Sign in
-            </Text>
-          ) : (
-            <ActivityIndicator size={20} color="lightgray" />
+        {/* Password Input with Toggle */}
+
+        <View>
+          <Text
+            style={[
+              styles.title,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Password
+          </Text>
+          <View
+            style={[
+              styles.input,
+              isDarkMode ? styles.darkField : styles.lightField,
+              { flexDirection: "row", justifyContent: "space-between" },
+            ]}
+          >
+            <TextInput
+              //style={styles.input}
+              style={[
+                { width: "90%" },
+                isDarkMode ? styles.darkField : styles.lightField,
+              ]}
+              placeholder="Password"
+              value={password}
+              placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
+              onChangeText={(val) => {
+                setPassword(val);
+                if (val.trim() !== "") {
+                  setPasswordWarning(false);
+                }
+              }}
+              secureTextEntry={!isPasswordVisible} // Toggles visibility
+            />
+            <TouchableOpacity
+              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+            >
+              {isPasswordVisible ? (
+                <SymbolView
+                  name={{ ios: "eye.slash" }}
+                  tintColor={isDarkMode ? "white" : "black"}
+                  size={20}
+                />
+              ) : (
+                <SymbolView
+                  name={{ ios: "eye" }}
+                  tintColor={isDarkMode ? "white" : "black"}
+                  size={20}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+          {passwordWarning && (
+            <Text style={styles.warning}>* Field Missing Value</Text>
           )}
-        </LinearGradient>
-      </TouchableOpacity>
+        </View>
 
-      <View style={{ flexDirection: "row", alignSelf: "center" }}>
-        <Text
-          style={{
-            marginTop: 20,
-            textAlign: "center",
-            fontSize: 15,
-            color: "gray",
-          }}
-        >
-          Don't have an account?{"   "}
-        </Text>
         <TouchableOpacity
-          onPress={() => router.push("/(auth)/signup")}
+          onPress={processButton} //router.replace("/(tabs)/(index)")}
+        >
+          <LinearGradient
+            colors={["#2b5bfc", "#921ffa"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.button}
+          >
+            {!loading ? (
+              <Text
+                style={{ color: "#fff", textAlign: "center", fontSize: 18 }}
+              >
+                Sign in
+              </Text>
+            ) : (
+              <ActivityIndicator size={20} color="lightgray" />
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <View style={{ flexDirection: "row", alignSelf: "center" }}>
+          <Text
+            style={{
+              marginTop: 20,
+              textAlign: "center",
+              fontSize: 15,
+              color: "gray",
+            }}
+          >
+            Don't have an account?{"   "}
+          </Text>
+          <TouchableOpacity
+            onPress={() => router.push("/(auth)/signup")}
+            style={{ flexDirection: "row", alignSelf: "center" }}
+          >
+            <Text
+              style={{
+                marginTop: 20,
+                textAlign: "center",
+                fontSize: 15,
+                color: "blue",
+                fontWeight: "600",
+              }}
+            >
+              Sign up
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity
+          onPress={() => router.push("/(auth)/forgotPassword")}
           style={{ flexDirection: "row", alignSelf: "center" }}
         >
           <Text
@@ -222,28 +252,11 @@ const LoginScreen = () => {
               fontWeight: "600",
             }}
           >
-            Sign up
+            Forgot Password?
           </Text>
         </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        onPress={() => router.push("/(auth)/forgotPassword")}
-        style={{ flexDirection: "row", alignSelf: "center" }}
-      >
-        <Text
-          style={{
-            marginTop: 20,
-            textAlign: "center",
-            fontSize: 15,
-            color: "blue",
-            fontWeight: "600",
-          }}
-        >
-          Forgot Password?
-        </Text>
-      </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

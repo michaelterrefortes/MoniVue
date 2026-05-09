@@ -2,6 +2,8 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -51,80 +53,86 @@ const ChangeEmail = () => {
   };
 
   return (
-    <ScrollView
-      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      //keyboardVerticalOffset={90} // adjust if header overlaps
     >
-      <View style={{ height: 250 }} />
-      <View
-        style={[
-          styles.button,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
+      <ScrollView
+        style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
       >
-        <TextInput
-          placeholder="New email"
-          value={email}
-          onChangeText={(val) => {
-            setEmail(val);
-            if (val.trim() !== "") {
-              (setEmailWarning(false), setEmailIncorrectWarning(false));
-            }
-          }}
-          keyboardType="email-address"
-          autoCapitalize="none"
+        <View style={{ height: 250 }} />
+        <View
           style={[
-            styles.input,
+            styles.button,
             isDarkMode ? styles.darkField : styles.lightField,
           ]}
-        />
-      </View>
-
-      {emailWarning && (
-        <Text style={styles.warning}>* Field Missing Value</Text>
-      )}
-      {emailIncorrectWarning && (
-        <Text style={styles.warning}>* Incorrect Email. Try again.</Text>
-      )}
-
-      <TouchableOpacity
-        style={[
-          styles.button,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-        onPress={handleUpdate}
-      >
-        <Text
-          style={[
-            styles.buttonTextRegular,
-            { color: isDarkMode ? "lightblue" : "blue" },
-          ]}
         >
-          Update Email
-        </Text>
-      </TouchableOpacity>
+          <TextInput
+            placeholder="New email"
+            value={email}
+            onChangeText={(val) => {
+              setEmail(val);
+              if (val.trim() !== "") {
+                (setEmailWarning(false), setEmailIncorrectWarning(false));
+              }
+            }}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            style={[
+              styles.input,
+              isDarkMode ? styles.darkField : styles.lightField,
+            ]}
+          />
+        </View>
 
-      {loading ? (
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            //marginTop: 10,
-            marginBottom: 10,
-            flexDirection: "row",
-          }}
+        {emailWarning && (
+          <Text style={styles.warning}>* Field Missing Value</Text>
+        )}
+        {emailIncorrectWarning && (
+          <Text style={styles.warning}>* Incorrect Email. Try again.</Text>
+        )}
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={handleUpdate}
         >
           <Text
             style={[
-              { marginRight: 5 },
-              isDarkMode ? styles.lightText : styles.darkText,
+              styles.buttonTextRegular,
+              { color: isDarkMode ? "lightblue" : "blue" },
             ]}
           >
-            Processing request ...
+            Update Email
           </Text>
-          <ActivityIndicator size={20} color="gray" />
-        </View>
-      ) : null}
-    </ScrollView>
+        </TouchableOpacity>
+
+        {loading ? (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              //marginTop: 10,
+              marginBottom: 10,
+              flexDirection: "row",
+            }}
+          >
+            <Text
+              style={[
+                { marginRight: 5 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Processing request ...
+            </Text>
+            <ActivityIndicator size={20} color="gray" />
+          </View>
+        ) : null}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

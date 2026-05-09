@@ -4,6 +4,8 @@ import { useContext, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,7 +14,7 @@ import {
   View,
 } from "react-native";
 import CurrencyInput from "react-native-currency-input";
-import Dropdown from "../../../components/Dropdown";
+import PickerComponent from "../../../components/Picker";
 import { DebtContext } from "../../../context/DebtContext";
 import { addBills } from "../../../services/api";
 
@@ -27,7 +29,7 @@ const AddBill = () => {
   const [name, setName] = useState("");
   const [variation, setVariation] = useState(null);
   const [price, setPrice] = useState(null);
-  const [type, setType] = useState("");
+  const [type, setType] = useState("1");
   const [date, setDate] = useState(new Date());
 
   const [nameWarning, setNameWarning] = useState(false);
@@ -141,59 +143,70 @@ const AddBill = () => {
   const [selectedTag, setSelectedTag] = useState(options[0]);
 
   return (
-    <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
-      <View style={{ height: 60, width: "100%" }} />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      //keyboardVerticalOffset={90} // adjust if header overlaps
+    >
+      <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
+        <View style={{ height: 60, width: "100%" }} />
 
-      {loading ? (
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: 10,
-            flexDirection: "row",
-          }}
-        >
-          <Text
-            style={[
-              { marginRight: 5 },
-              isDarkMode ? styles.lightText : styles.darkText,
-            ]}
+        {loading ? (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 10,
+              flexDirection: "row",
+            }}
           >
-            Processing addition ...
-          </Text>
-          <ActivityIndicator size={20} color="gray" />
-        </View>
-      ) : null}
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Bill Name
-      </Text>
-      <TextInput
-        style={[
-          styles.input,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-        onChangeText={(val) => {
-          setName(val);
-          if (val.trim() !== "") setNameWarning(false); // Clear error while typing
-        }}
-        placeholderTextColor={"gray"}
-        value={name}
-        placeholder="Name"
-        //keyboardType="numeric"
-      />
-      {nameWarning ? (
-        <Text style={styles.warning}>*Field value missing</Text>
-      ) : null}
+            <Text
+              style={[
+                { marginRight: 5 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Processing addition ...
+            </Text>
+            <ActivityIndicator size={20} color="gray" />
+          </View>
+        ) : null}
+        <Text
+          style={[
+            styles.title,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Bill Name
+        </Text>
+        <TextInput
+          style={[
+            styles.input,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onChangeText={(val) => {
+            setName(val);
+            if (val.trim() !== "") setNameWarning(false); // Clear error while typing
+          }}
+          placeholderTextColor={"gray"}
+          value={name}
+          placeholder="Name"
+          //keyboardType="numeric"
+        />
+        {nameWarning ? (
+          <Text style={styles.warning}>*Field value missing</Text>
+        ) : null}
 
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Price
-      </Text>
+        <Text
+          style={[
+            styles.title,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Price
+        </Text>
 
-      {/*
+        {/*
       <TextInput
         style={[styles.input, { backgroundColor: "#fff" }]}
         onChangeText={(val) => {
@@ -206,42 +219,45 @@ const AddBill = () => {
         keyboardType="numeric"
       />*/}
 
-      <CurrencyInput
-        style={[
-          styles.input,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-        value={price}
-        onChangeValue={(val) => {
-          setPriceWarningNumber(false);
-          setPrice(val);
-        }}
-        prefix="$"
-        delimiter=","
-        separator="."
-        precision={2}
-        minValue={0}
-        placeholder="$0.00"
-        placeholderTextColor={"grey"}
-        //showPositiveSign
-        //onChangeText={(formattedValue) => {
-        //  console.log(formattedValue);
-        //}}
-      />
-      {priceWarning ? (
-        <Text style={styles.warning}>*Field value missing</Text>
-      ) : null}
+        <CurrencyInput
+          style={[
+            styles.input,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          value={price}
+          onChangeValue={(val) => {
+            setPriceWarningNumber(false);
+            setPrice(val);
+          }}
+          prefix="$"
+          delimiter=","
+          separator="."
+          precision={2}
+          minValue={0}
+          placeholder="$0.00"
+          placeholderTextColor={"grey"}
+          //showPositiveSign
+          //onChangeText={(formattedValue) => {
+          //  console.log(formattedValue);
+          //}}
+        />
+        {priceWarning ? (
+          <Text style={styles.warning}>*Field value missing</Text>
+        ) : null}
 
-      {priceWarningNumber ? (
-        <Text style={styles.warning}>*Price cannot be zero. Try again</Text>
-      ) : null}
+        {priceWarningNumber ? (
+          <Text style={styles.warning}>*Price cannot be zero. Try again</Text>
+        ) : null}
 
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Monthly Bill Variation
-      </Text>
-      {/*<TextInput
+        <Text
+          style={[
+            styles.title,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Monthly Bill Variation
+        </Text>
+        {/*<TextInput
         style={[styles.input, { backgroundColor: "#fff" }]}
         onChangeText={(val) => {
           setVariation(val);
@@ -252,56 +268,63 @@ const AddBill = () => {
         placeholder="Variation: 0.00"
         keyboardType="numeric"
       />*/}
-      <CurrencyInput
-        style={[
-          styles.input,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-        value={variation}
-        onChangeValue={setVariation}
-        prefix="$"
-        delimiter=","
-        separator="."
-        precision={2}
-        minValue={0}
-        placeholder="$0.00"
-        placeholderTextColor={"grey"}
-        //showPositiveSign
-        //onChangeText={(formattedValue) => {
-        //  console.log(formattedValue);
-        //}}
-      />
-      {variationWarning ? (
-        <Text style={styles.warning}>*Field value missing</Text>
-      ) : null}
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Bill Due Date
-      </Text>
+        <CurrencyInput
+          style={[
+            styles.input,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          value={variation}
+          onChangeValue={setVariation}
+          prefix="$"
+          delimiter=","
+          separator="."
+          precision={2}
+          minValue={0}
+          placeholder="$0.00"
+          placeholderTextColor={"grey"}
+          //showPositiveSign
+          //onChangeText={(formattedValue) => {
+          //  console.log(formattedValue);
+          //}}
+        />
+        {variationWarning ? (
+          <Text style={styles.warning}>*Field value missing</Text>
+        ) : null}
+        <Text
+          style={[
+            styles.title,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Bill Due Date
+        </Text>
 
-      <View
-        style={[
-          styles.input2,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-      >
-        <Text style={{ color: "grey" }}>Due Date:</Text>
-        <View style={{ transform: [{ scale: 0.85 }] }}>
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onValueChange={(event, selectedDate) => setDate(selectedDate)}
-          />
+        <View
+          style={[
+            styles.input2,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
+          <Text style={{ color: "grey" }}>Due Date:</Text>
+          <View style={{ transform: [{ scale: 0.85 }] }}>
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onValueChange={(event, selectedDate) => setDate(selectedDate)}
+            />
+          </View>
         </View>
-      </View>
 
-      <Text
-        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
-      >
-        Bill Category
-      </Text>
+        <Text
+          style={[
+            styles.title,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Bill Category
+        </Text>
+        {/*
       <Dropdown
         open={open}
         type={type}
@@ -309,27 +332,40 @@ const AddBill = () => {
         setOpen={setOpen}
         setType={setType}
         setItems={setItems}
-      />
+      />>*/}
 
-      {/*
-      <View
-        style={[
-          styles.input2,
-          isDarkMode ? styles.darkField : styles.lightField,
-          {
-            flexDirection: "row",
-            justifyContent: "flex-end",
-            alignItems: "center",
-          },
-        ]}
-      >
+        <View
+          style={[
+            styles.input2,
+            isDarkMode ? styles.darkField : styles.lightField,
+            {
+              //flexDirection: "row",
+              justifyContent: "flex-end",
+              //alignItems: "center",
+            },
+          ]}
+        >
+          <PickerComponent
+            selectedTag={selectedTag}
+            setSelectedTag={setSelectedTag}
+            setType={setType}
+            options={options}
+          />
+          {/*
         <Host matchContents>
           <Picker
-            modifiers={[pickerStyle("menu")]}
+            modifiers={[
+              pickerStyle("menu"),
+              frame({ width: 200, alignment: "trailing" }),
+              //foregroundStyle({ type: "color", color: "#000" }),
+              //background("#FF6B6B"),
+            ]}
             label="Select a Catgory"
             selection={selectedTag}
             onSelectionChange={(selection) => {
               setSelectedTag(selection);
+              const index = options.findIndex((tag) => tag === selectedTag) + 1;
+              setType(String(index));
             }}
           >
             {options.map((option) => (
@@ -338,14 +374,15 @@ const AddBill = () => {
               </Text2>
             ))}
           </Picker>
-        </Host>
-      </View>*/}
-      {typeWarning ? (
-        <Text style={styles.warning}>*Field value missing</Text>
-      ) : null}
+        </Host>*/}
+        </View>
+        {typeWarning ? (
+          <Text style={styles.warning}>*Field value missing</Text>
+        ) : null}
 
-      <View style={{ height: 70 }} />
-    </ScrollView>
+        <View style={{ height: 70 }} />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

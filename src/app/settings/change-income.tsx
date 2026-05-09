@@ -3,6 +3,8 @@ import { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -52,83 +54,89 @@ const ChangeIncome = () => {
   };
 
   return (
-    <ScrollView
-      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      //keyboardVerticalOffset={90} // adjust if header overlaps
     >
-      <View style={{ height: 250 }} />
-      <View
-        style={[
-          styles.button,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
+      <ScrollView
+        style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
       >
-        <CurrencyInput
+        <View style={{ height: 250 }} />
+        <View
           style={[
-            styles.input,
+            styles.button,
             isDarkMode ? styles.darkField : styles.lightField,
           ]}
-          value={localIncome}
-          //onChangeValue={setIncome}
-          onChangeValue={(val) => {
-            setLocalIncome(val);
-            if (val !== null) setIncomeWarning(false);
-          }}
-          prefix="$"
-          delimiter=","
-          separator="."
-          precision={2}
-          minValue={0}
-          placeholder="$0.00"
-          placeholderTextColor={"grey"}
-          //showPositiveSign
-          //onChangeText={(formattedValue) => {
-          //  console.log(formattedValue);
-          //}}
-        />
-      </View>
-      {incomeWarning && (
-        <Text style={styles.warning}>* Field Missing Value</Text>
-      )}
-
-      <TouchableOpacity
-        style={[
-          styles.button,
-          isDarkMode ? styles.darkField : styles.lightField,
-        ]}
-        onPress={handleUpdate}
-      >
-        <Text
-          style={[
-            styles.buttonTextRegular,
-            { color: isDarkMode ? "lightblue" : "blue" },
-          ]}
         >
-          Update Income
-        </Text>
-      </TouchableOpacity>
+          <CurrencyInput
+            style={[
+              styles.input,
+              isDarkMode ? styles.darkField : styles.lightField,
+            ]}
+            value={localIncome}
+            //onChangeValue={setIncome}
+            onChangeValue={(val) => {
+              setLocalIncome(val);
+              if (val !== null) setIncomeWarning(false);
+            }}
+            prefix="$"
+            delimiter=","
+            separator="."
+            precision={2}
+            minValue={0}
+            placeholder="$0.00"
+            placeholderTextColor={"grey"}
+            //showPositiveSign
+            //onChangeText={(formattedValue) => {
+            //  console.log(formattedValue);
+            //}}
+          />
+        </View>
+        {incomeWarning && (
+          <Text style={styles.warning}>* Field Missing Value</Text>
+        )}
 
-      {loading ? (
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            //marginTop: 10,
-            marginBottom: 10,
-            flexDirection: "row",
-          }}
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={handleUpdate}
         >
           <Text
             style={[
-              { marginRight: 5 },
-              isDarkMode ? styles.lightText : styles.darkText,
+              styles.buttonTextRegular,
+              { color: isDarkMode ? "lightblue" : "blue" },
             ]}
           >
-            Processing update ...
+            Update Income
           </Text>
-          <ActivityIndicator size={20} color="gray" />
-        </View>
-      ) : null}
-    </ScrollView>
+        </TouchableOpacity>
+
+        {loading ? (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              //marginTop: 10,
+              marginBottom: 10,
+              flexDirection: "row",
+            }}
+          >
+            <Text
+              style={[
+                { marginRight: 5 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Processing update ...
+            </Text>
+            <ActivityIndicator size={20} color="gray" />
+          </View>
+        ) : null}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
