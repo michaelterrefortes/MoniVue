@@ -124,9 +124,26 @@ const AddBill = () => {
     { label: "Others", value: "11" },
   ]);
 
+  const options = [
+    "Mortgage",
+    "Rent",
+    "Auto Loan",
+    "Utilities",
+    "Auto Insurance",
+    "Cable & Internet",
+    "Health Insurance",
+    "Mobile",
+    "Life Insurance",
+    "Alarm & Security",
+    "Others",
+  ];
+
+  const [selectedTag, setSelectedTag] = useState(options[0]);
+
   return (
     <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
       <View style={{ height: 60, width: "100%" }} />
+
       {loading ? (
         <View
           style={{
@@ -293,6 +310,36 @@ const AddBill = () => {
         setType={setType}
         setItems={setItems}
       />
+
+      {/*
+      <View
+        style={[
+          styles.input2,
+          isDarkMode ? styles.darkField : styles.lightField,
+          {
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            alignItems: "center",
+          },
+        ]}
+      >
+        <Host matchContents>
+          <Picker
+            modifiers={[pickerStyle("menu")]}
+            label="Select a Catgory"
+            selection={selectedTag}
+            onSelectionChange={(selection) => {
+              setSelectedTag(selection);
+            }}
+          >
+            {options.map((option) => (
+              <Text2 key={option} modifiers={[tag(option)]}>
+                {option}
+              </Text2>
+            ))}
+          </Picker>
+        </Host>
+      </View>*/}
       {typeWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
       ) : null}
