@@ -39,7 +39,7 @@ const DebtInfo = () => {
   const [limitWarning, setLimitWarning] = useState(false);
   const [minimumWarning, setMinimumWarning] = useState(false);
   const [limitWarningNumber, setLimitWarningNumber] = useState(false);
-
+  const [warningMinimumLow, setWarningMinimumLow] = useState(false);
   //const [dateWarning, setDateWarning] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -104,6 +104,11 @@ const DebtInfo = () => {
     }
 
     if (hasError) return;
+
+    if (Number(minimum) < Number(balance) * (Number(apr) / 100 / 12)) {
+      setWarningMinimumLow(true);
+      return;
+    }
 
     setLoading(true);
 
@@ -321,7 +326,9 @@ const DebtInfo = () => {
             isDarkMode ? styles.darkField : styles.lightField,
           ]}
           value={minimum}
-          onChangeValue={setMinimum}
+          onChangeValue={(val) => {
+            (setMinimum(val), setWarningMinimumLow(false));
+          }}
           prefix="$"
           delimiter=","
           separator="."
@@ -336,6 +343,13 @@ const DebtInfo = () => {
         />
         {minimumWarning ? (
           <Text style={styles.warning}>*Field value missing</Text>
+        ) : null}
+
+        {warningMinimumLow ? (
+          <Text style={styles.warning}>
+            *Minimum needs to be $
+            {Math.ceil(Number(balance) * (Number(apr) / 100 / 12))} or higher
+          </Text>
         ) : null}
 
         <Text

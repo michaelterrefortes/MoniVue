@@ -24,6 +24,12 @@ import { DebtContext } from "../../../context/DebtContext";
 import { getAccessToken } from "../../../services/auth";
 import { calculateInterest } from "../../../services/calculate";
 
+function convertMonthsToYears(totalMonths) {
+  const years = Math.floor(totalMonths / 12);
+  const months = totalMonths % 12;
+  return `${years} years and ${months} months`;
+}
+
 const DebtDetails = () => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
@@ -42,7 +48,7 @@ const DebtDetails = () => {
   const [interestMonths, setInterestMonths] = useState({});
 
   const percentage = (Number(balance) / Number(limit)) * 100;
-
+  const [warningMinimumLow, setWarningMinimumLow] = useState(false);
   const [editing, setEditing] = useState(false);
 
   //console.log(percentage);
@@ -371,6 +377,15 @@ const DebtDetails = () => {
                 setInterestMonths({});
                 Alert.alert("Error", "Payment cannot be zero. Try again.");
               } else {
+                if (
+                  Number(payment) <
+                  Number(balance) * (Number(apr) / 100 / 12)
+                ) {
+                  setWarningMinimumLow(true);
+                  setInterestMonths({});
+                  return;
+                }
+                setWarningMinimumLow(false);
                 setInterestMonths(
                   calculateInterest(
                     Number(balance),
@@ -385,6 +400,12 @@ const DebtDetails = () => {
             //  console.log(formattedValue);
             //}}
           />
+          {warningMinimumLow ? (
+            <Text style={styles.warning}>
+              *Minimum needs to be $
+              {Math.ceil(Number(balance) * (Number(apr) / 100 / 12))} or higher
+            </Text>
+          ) : null}
           {Object.keys(interestMonths).length !== 0 ? (
             <>
               <View style={styles.content}>
@@ -423,7 +444,9 @@ const DebtDetails = () => {
                       isDarkMode ? styles.lightText : styles.darkText,
                     ]}
                   >
-                    {interestMonths.months}
+                    {interestMonths.months < 13
+                      ? interestMonths.months
+                      : convertMonthsToYears(interestMonths.months)}
                   </Text>
                 </View>
               </View>
@@ -538,6 +561,13 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
+  },
+  warning: {
+    color: "red",
+    //paddingLeft: 30,
+    alignSelf: "center",
+    //paddingBottom: 10,
+    marginTop: 5,
   },
   name: {
     fontWeight: "500",
