@@ -3,13 +3,14 @@ import { addWeeks, endOfWeek, format, startOfWeek, subWeeks } from "date-fns";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -51,6 +52,9 @@ const SpendingTab = () => {
     updateWeek,
     updateYear,
   } = useContext(DebtContext);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   const year = new Date().getFullYear();
 
@@ -207,7 +211,11 @@ const SpendingTab = () => {
                 })
               }
             >
-              <SymbolView name={{ ios: "plus" }} tintColor="black" size={20} />
+              <SymbolView
+                name={{ ios: "plus" }}
+                tintColor={isDarkMode ? "#fff" : "#000"}
+                size={20}
+              />
             </TouchableOpacity>
           ),
         },
@@ -282,7 +290,10 @@ const SpendingTab = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["left", "right"]}>
+    <SafeAreaView
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+      edges={["left", "right"]}
+    >
       {selected === 0 ? (
         <FlatList
           refreshing={refreshing}
@@ -320,7 +331,14 @@ const SpendingTab = () => {
           ListHeaderComponent={() => {
             return (
               <>
-                <Text style={{ marginLeft: 20 }}>Track your expenses</Text>
+                <Text
+                  style={[
+                    { marginLeft: 20 },
+                    isDarkMode ? styles.lightText : styles.darkText,
+                  ]}
+                >
+                  Track your expenses
+                </Text>
                 <LinearGradient
                   colors={["#9e1df0", "#da108b"]}
                   start={{ x: 0, y: 0 }}
@@ -339,10 +357,18 @@ const SpendingTab = () => {
                     {formatMoney(localTotalSpending)}
                   </Text>
                 </LinearGradient>
-                <View style={styles.spendingBalance}>
+                <View
+                  style={[
+                    styles.spendingBalance,
+                    isDarkMode ? styles.darkField : styles.lightField,
+                  ]}
+                >
                   <View style={styles.datePickerCard}>
                     <TouchableOpacity
-                      style={styles.buttonLeft}
+                      style={[
+                        styles.buttonLeft,
+                        isDarkMode ? styles.darkField : styles.lightField,
+                      ]}
                       onPress={() => changeMonth(-1)}
                     >
                       <SymbolView
@@ -353,18 +379,24 @@ const SpendingTab = () => {
                     </TouchableOpacity>
 
                     <Text
-                      style={{
-                        fontSize: 20,
-                        textAlign: "center",
-                        justifyContent: "center",
-                        fontWeight: "500",
-                      }}
+                      style={[
+                        {
+                          fontSize: 20,
+                          textAlign: "center",
+                          justifyContent: "center",
+                          fontWeight: "500",
+                        },
+                        isDarkMode ? styles.lightText : styles.darkText,
+                      ]}
                     >
                       {formatMonth(date)}
                     </Text>
 
                     <TouchableOpacity
-                      style={styles.buttonRight}
+                      style={[
+                        styles.buttonRight,
+                        isDarkMode ? styles.darkField : styles.lightField,
+                      ]}
                       onPress={() => changeMonth(1)}
                     >
                       <SymbolView
@@ -401,7 +433,12 @@ const SpendingTab = () => {
                   </View>
                 )}
                 {localSpending.length === 0 && !loadingMonthly ? (
-                  <Text style={{ textAlign: "center", marginTop: 20 }}>
+                  <Text
+                    style={[
+                      { textAlign: "center", marginTop: 20 },
+                      isDarkMode ? styles.lightText : styles.darkText,
+                    ]}
+                  >
                     No Spending
                   </Text>
                 ) : null}
@@ -446,7 +483,14 @@ const SpendingTab = () => {
           ListHeaderComponent={() => {
             return (
               <>
-                <Text style={{ marginLeft: 20 }}>Track your expenses</Text>
+                <Text
+                  style={[
+                    { marginLeft: 20 },
+                    isDarkMode ? styles.lightText : styles.darkText,
+                  ]}
+                >
+                  Track your expenses
+                </Text>
                 <LinearGradient
                   colors={["#9e1df0", "#da108b"]}
                   start={{ x: 0, y: 0 }}
@@ -465,10 +509,18 @@ const SpendingTab = () => {
                     {formatMoney(weeklyTotal)}
                   </Text>
                 </LinearGradient>
-                <View style={styles.spendingBalance}>
+                <View
+                  style={[
+                    styles.spendingBalance,
+                    isDarkMode ? styles.darkField : styles.lightField,
+                  ]}
+                >
                   <View style={[styles.datePickerCard]}>
                     <TouchableOpacity
-                      style={styles.buttonLeft}
+                      style={[
+                        styles.buttonLeft,
+                        isDarkMode ? styles.darkField : styles.lightField,
+                      ]}
                       onPress={() => setCurrentWeek(subWeeks(currentWeek, 1))}
                     >
                       <SymbolView
@@ -479,18 +531,24 @@ const SpendingTab = () => {
                     </TouchableOpacity>
 
                     <Text
-                      style={{
-                        fontSize: 20,
-                        textAlign: "center",
-                        justifyContent: "center",
-                        fontWeight: "500",
-                      }}
+                      style={[
+                        {
+                          fontSize: 20,
+                          textAlign: "center",
+                          justifyContent: "center",
+                          fontWeight: "500",
+                        },
+                        isDarkMode ? styles.lightText : styles.darkText,
+                      ]}
                     >
                       {format(start, "MMM d")} - {format(end, "MMM d, yyyy")}
                     </Text>
 
                     <TouchableOpacity
-                      style={styles.buttonRight}
+                      style={[
+                        styles.buttonRight,
+                        isDarkMode ? styles.darkField : styles.lightField,
+                      ]}
                       onPress={() => setCurrentWeek(addWeeks(currentWeek, 1))}
                     >
                       <SymbolView
@@ -528,7 +586,12 @@ const SpendingTab = () => {
                 )}
 
                 {weekly.length === 0 && !loadingWeekly ? (
-                  <Text style={{ textAlign: "center", marginTop: 20 }}>
+                  <Text
+                    style={[
+                      { textAlign: "center", marginTop: 20 },
+                      isDarkMode ? styles.lightText : styles.darkText,
+                    ]}
+                  >
                     No spending
                   </Text>
                 ) : null}
@@ -544,7 +607,14 @@ const SpendingTab = () => {
             onRefresh={handleRefresh}
             ListHeaderComponent={
               <>
-                <Text style={{ marginLeft: 20 }}>Track your expenses</Text>
+                <Text
+                  style={[
+                    { marginLeft: 20 },
+                    isDarkMode ? styles.lightText : styles.darkText,
+                  ]}
+                >
+                  Track your expenses
+                </Text>
                 <LinearGradient
                   colors={["#9e1df0", "#da108b"]}
                   start={{ x: 0, y: 0 }}
@@ -563,10 +633,18 @@ const SpendingTab = () => {
                     {formatMoney(yearTotal)}
                   </Text>
                 </LinearGradient>
-                <View style={[styles.spendingBalance]}>
+                <View
+                  style={[
+                    styles.spendingBalance,
+                    isDarkMode ? styles.darkField : styles.lightField,
+                  ]}
+                >
                   <View style={[styles.datePickerCard]}>
                     <TouchableOpacity
-                      style={styles.buttonLeft}
+                      style={[
+                        styles.buttonLeft,
+                        isDarkMode ? styles.darkField : styles.lightField,
+                      ]}
                       onPress={() => {
                         setSelectedYear((prev) => prev - 1);
                       }}
@@ -579,18 +657,24 @@ const SpendingTab = () => {
                     </TouchableOpacity>
 
                     <Text
-                      style={{
-                        fontSize: 20,
-                        textAlign: "center",
-                        justifyContent: "center",
-                        fontWeight: "500",
-                      }}
+                      style={[
+                        {
+                          fontSize: 20,
+                          textAlign: "center",
+                          justifyContent: "center",
+                          fontWeight: "500",
+                        },
+                        isDarkMode ? styles.lightText : styles.darkText,
+                      ]}
                     >
                       {selectedYear}
                     </Text>
 
                     <TouchableOpacity
-                      style={styles.buttonRight}
+                      style={[
+                        styles.buttonRight,
+                        isDarkMode ? styles.darkField : styles.lightField,
+                      ]}
                       onPress={() => {
                         setSelectedYear((prev) => prev + 1);
                       }}
@@ -650,6 +734,14 @@ const SpendingTab = () => {
 export default SpendingTab;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
     //marginTop: 150,

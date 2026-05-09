@@ -1,11 +1,13 @@
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   ActivityIndicator,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { validateEmail } from "../../../constants/functions";
@@ -13,6 +15,9 @@ import { supabase } from "../../../services/auth";
 
 const ChangeEmail = () => {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   const [email, setEmail] = useState("");
   const [emailWarning, setEmailWarning] = useState(false);
 
@@ -46,8 +51,16 @@ const ChangeEmail = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.button}>
+    <ScrollView
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+    >
+      <View style={{ height: 250 }} />
+      <View
+        style={[
+          styles.button,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+      >
         <TextInput
           placeholder="New email"
           value={email}
@@ -59,7 +72,10 @@ const ChangeEmail = () => {
           }}
           keyboardType="email-address"
           autoCapitalize="none"
-          style={styles.input}
+          style={[
+            styles.input,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
         />
       </View>
 
@@ -70,8 +86,21 @@ const ChangeEmail = () => {
         <Text style={styles.warning}>* Incorrect Email. Try again.</Text>
       )}
 
-      <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-        <Text style={styles.buttonTextRegular}>Update Email</Text>
+      <TouchableOpacity
+        style={[
+          styles.button,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+        onPress={handleUpdate}
+      >
+        <Text
+          style={[
+            styles.buttonTextRegular,
+            { color: isDarkMode ? "lightblue" : "blue" },
+          ]}
+        >
+          Update Email
+        </Text>
       </TouchableOpacity>
 
       {loading ? (
@@ -84,21 +113,36 @@ const ChangeEmail = () => {
             flexDirection: "row",
           }}
         >
-          <Text style={{ marginRight: 5 }}>Processing request ...</Text>
+          <Text
+            style={[
+              { marginRight: 5 },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Processing request ...
+          </Text>
           <ActivityIndicator size={20} color="gray" />
         </View>
       ) : null}
-    </View>
+    </ScrollView>
   );
 };
 
 export default ChangeEmail;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    //justifyContent: "center",
+    //alignItems: "center",
     backgroundColor: "rgb(242, 242, 242)",
   },
   warning: {

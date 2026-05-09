@@ -1,8 +1,8 @@
 import { useRouter } from "expo-router";
-import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
+import { SymbolView } from "expo-symbols";
 import { formatMoney, validateDate } from "../constants/functions";
 
 const getUtilizationColor = (value) => {
@@ -32,9 +32,24 @@ const CardDebts = ({ item, params, utilization, index }) => {
         end={{ x: 1, y: 1 }}
         style={[styles.card, styles.shadow]}
       >
-        <Text style={[styles.cardTitle, { color: "white" }]}>
-          {item.credit_name}
-        </Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Text style={[styles.cardTitle, { color: "white" }]}>
+            {item.credit_name}
+          </Text>
+
+          <SymbolView
+            name={{ ios: "chevron.right" }}
+            tintColor="white"
+            size={18}
+            style={{ alignSelf: "center" }}
+          />
+        </View>
 
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <View>
@@ -153,7 +168,7 @@ const styles = StyleSheet.create({
 
   container: {
     marginTop: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.12)",
+    //backgroundColor: "rgba(255, 255, 255, 0.12)",
     padding: 16,
     borderRadius: 12,
   },

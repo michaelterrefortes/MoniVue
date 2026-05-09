@@ -1,6 +1,6 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import React, { useContext, useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useColorScheme,
   View,
 } from "react-native";
 import CurrencyInput from "react-native-currency-input";
@@ -18,6 +19,9 @@ import { editBills } from "../../../services/api";
 const EditBill = () => {
   const { bills, setBills } = useContext(DebtContext);
   const params = useLocalSearchParams();
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   const router = useRouter();
 
@@ -143,7 +147,7 @@ const EditBill = () => {
   ]);
 
   return (
-    <ScrollView style={{ backgroundColor: "rgb(242, 242, 242)" }}>
+    <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
       <View style={{ height: 60, width: "100%" }} />
 
       {loading ? (
@@ -155,14 +159,28 @@ const EditBill = () => {
             flexDirection: "row",
           }}
         >
-          <Text style={{ marginRight: 5 }}>Processing editing ...</Text>
+          <Text
+            style={[
+              { marginRight: 5 },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Processing editing ...
+          </Text>
           <ActivityIndicator size={20} color="gray" />
         </View>
       ) : null}
 
-      <Text style={[styles.title, { color: "#000" }]}>Bill Name</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Bill Name
+      </Text>
       <TextInput
-        style={[styles.input, { backgroundColor: "#fff" }]}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         onChangeText={(val) => {
           setName(val);
           if (val.trim() !== "") setNameWarning(false); // Clear error while typing
@@ -176,7 +194,11 @@ const EditBill = () => {
         <Text style={styles.warning}>*Field value missing</Text>
       ) : null}
 
-      <Text style={[styles.title, { color: "#000" }]}>Price</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Price
+      </Text>
       {/*
       <TextInput
         style={[styles.input, { backgroundColor: "#fff" }]}
@@ -190,7 +212,10 @@ const EditBill = () => {
         keyboardType="numeric"
       />*/}
       <CurrencyInput
-        style={[styles.input, { backgroundColor: "#fff" }]}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         value={price}
         onChangeValue={(val) => {
           setPriceWarningNumber(false);
@@ -216,7 +241,9 @@ const EditBill = () => {
         <Text style={styles.warning}>*Price cannot be zero. Try again</Text>
       ) : null}
 
-      <Text style={[styles.title, { color: "#000" }]}>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
         Monthly Bill Variation
       </Text>
       {/*
@@ -232,7 +259,10 @@ const EditBill = () => {
         keyboardType="numeric"
       />*/}
       <CurrencyInput
-        style={[styles.input, { backgroundColor: "#fff" }]}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         value={variation}
         onChangeValue={setVariation}
         prefix="$"
@@ -250,9 +280,18 @@ const EditBill = () => {
       {variationWarning ? (
         <Text style={styles.warning}>*Field value missing</Text>
       ) : null}
-      <Text style={[styles.title, { color: "#000" }]}>Bill Due Date</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Bill Due Date
+      </Text>
 
-      <View style={[styles.input2, { backgroundColor: "#fff" }]}>
+      <View
+        style={[
+          styles.input2,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+      >
         <Text style={{ color: "grey" }}>Due Date:</Text>
         <View style={{ transform: [{ scale: 0.85 }] }}>
           <DateTimePicker
@@ -264,7 +303,11 @@ const EditBill = () => {
         </View>
       </View>
 
-      <Text style={[styles.title, { color: "#000" }]}>Bill Category</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Bill Category
+      </Text>
       <Dropdown
         open={open}
         type={type}
@@ -285,6 +328,14 @@ const EditBill = () => {
 export default EditBill;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#1d1d1d" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.2)",

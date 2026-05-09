@@ -1,14 +1,24 @@
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
 import { categoriesSpending } from "../constants/categories";
 import { formatMoney } from "../constants/functions";
 
 const Card = ({ item, params }) => {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
   return (
-    <TouchableOpacity style={styles.card} onPress={() => router.push(params)}>
+    <TouchableOpacity
+      style={[styles.card, isDarkMode ? styles.darkField : styles.lightField]}
+      onPress={() => router.push(params)}
+    >
       <View style={styles.cardLeft}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           {/* ICON */}
@@ -33,7 +43,14 @@ const Card = ({ item, params }) => {
 
           {/* TEXT */}
           <View style={{ marginLeft: 10 }}>
-            <Text style={styles.cardTitle}>{item.spending_name}</Text>
+            <Text
+              style={[
+                styles.cardTitle,
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              {item.spending_name}
+            </Text>
             <Text style={{ fontSize: 12, color: "grey" }}>
               {categoriesSpending[item.type_spending].name}
             </Text>
@@ -42,7 +59,14 @@ const Card = ({ item, params }) => {
       </View>
 
       <View style={styles.cardRight}>
-        <Text style={styles.cardPrice}>{formatMoney(item.amount)}</Text>
+        <Text
+          style={[
+            styles.cardPrice,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          {formatMoney(item.amount)}
+        </Text>
         <Text style={styles.cardDate}>
           {new Intl.DateTimeFormat("en-US", {
             month: "short",
@@ -64,6 +88,14 @@ const Card = ({ item, params }) => {
 export default Card;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   card: {
     backgroundColor: "#fff",
     padding: 12,

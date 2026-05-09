@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -11,6 +11,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import CurrencyInput from "react-native-currency-input";
@@ -21,6 +22,9 @@ import { supabase } from "../../../services/auth";
 const SignupScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   const [income, setIncome] = useState(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -80,7 +84,9 @@ const SignupScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+    >
       <View style={{ height: "20%" }} />
 
       <Image
@@ -88,16 +94,33 @@ const SignupScreen = () => {
         style={{ width: 100, height: 100, alignSelf: "center" }}
       />
 
-      <Text style={{ fontWeight: "700", fontSize: 32, textAlign: "center" }}>
+      <Text
+        style={[
+          { fontWeight: "700", fontSize: 32, textAlign: "center" },
+          isDarkMode ? styles.lightText : styles.darkText,
+        ]}
+      >
         Create Account
       </Text>
-      <Text style={{ textAlign: "center", marginTop: 10 }}>
+      <Text
+        style={[
+          { textAlign: "center", marginTop: 10 },
+          isDarkMode ? styles.lightText : styles.darkText,
+        ]}
+      >
         Start managing your budget today
       </Text>
 
-      <Text style={styles.title}>Monthly Income</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Monthly Income
+      </Text>
       <CurrencyInput
-        style={[styles.input, { backgroundColor: "#fff" }]}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         value={income}
         //onChangeValue={setIncome}
         onChangeValue={(val) => {
@@ -110,7 +133,7 @@ const SignupScreen = () => {
         precision={2}
         minValue={0}
         placeholder="$0.00"
-        placeholderTextColor={"lightgrey"}
+        placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
         //showPositiveSign
         //onChangeText={(formattedValue) => {
         //  console.log(formattedValue);
@@ -121,11 +144,19 @@ const SignupScreen = () => {
       )}
 
       {/* Email Input */}
-      <Text style={styles.title}>Email</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Email
+      </Text>
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         placeholder="Email"
         value={email}
+        placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
         onChangeText={(val) => {
           setEmail(val);
           if (val.trim() !== "") {
@@ -145,18 +176,30 @@ const SignupScreen = () => {
       {/* Password Input with Toggle */}
 
       <View>
-        <Text style={styles.title}>Password</Text>
+        <Text
+          style={[
+            styles.title,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          Password
+        </Text>
         <View
           style={[
             styles.input,
             { flexDirection: "row", justifyContent: "space-between" },
+            isDarkMode ? styles.darkField : styles.lightField,
           ]}
         >
           <TextInput
             //style={styles.input}
-            style={{ width: "90%" }}
+            style={[
+              { width: "90%" },
+              isDarkMode ? styles.darkField : styles.lightField,
+            ]}
             placeholder="Password"
             value={password}
+            placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
             onChangeText={(val) => {
               setPassword(val);
               if (val.trim() !== "") {
@@ -171,11 +214,15 @@ const SignupScreen = () => {
             {isPasswordVisible ? (
               <SymbolView
                 name={{ ios: "eye.slash" }}
-                tintColor={"#000"}
+                tintColor={isDarkMode ? "white" : "black"}
                 size={20}
               />
             ) : (
-              <SymbolView name={{ ios: "eye" }} tintColor={"#000"} size={20} />
+              <SymbolView
+                name={{ ios: "eye" }}
+                tintColor={isDarkMode ? "white" : "black"}
+                size={20}
+              />
             )}
           </TouchableOpacity>
         </View>
@@ -209,7 +256,14 @@ const SignupScreen = () => {
       </TouchableOpacity>
 
       <View style={{ flexDirection: "row", alignSelf: "center" }}>
-        <Text style={{ marginTop: 20, textAlign: "center", fontSize: 15 }}>
+        <Text
+          style={{
+            marginTop: 20,
+            textAlign: "center",
+            fontSize: 15,
+            color: "gray",
+          }}
+        >
           Already have an account?{"   "}
         </Text>
         <TouchableOpacity
@@ -236,6 +290,14 @@ const SignupScreen = () => {
 export default SignupScreen;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   title: {
     fontWeight: "bold",
     paddingLeft: 45,

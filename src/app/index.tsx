@@ -1,10 +1,20 @@
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 import { supabase } from "../../services/auth";
 
 export default function Index() {
   const router = useRouter();
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   const [loading, setLoading] = useState(true);
 
@@ -32,19 +42,30 @@ export default function Index() {
   // Splash Screen
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: isDarkMode ? "#000" : "#f2f2f2" },
+        ]}
+      >
         <Image
           source={require("../../assets/images/icon-monivue.png")}
           style={styles.logo}
         />
 
-        <Text style={styles.title}>MoniVue</Text>
+        <Text style={[styles.title, { color: isDarkMode ? "#fff" : "#000" }]}>
+          MoniVue
+        </Text>
 
-        <Text style={styles.subtitle}>Budget Manager App</Text>
+        <Text
+          style={[styles.subtitle, { color: isDarkMode ? "#fff" : "#000" }]}
+        >
+          Budget Manager App
+        </Text>
 
         <ActivityIndicator
           size="large"
-          color="gray"
+          color={isDarkMode ? "gray" : "gray"}
           style={{ marginTop: 30 }}
         />
       </View>
@@ -59,7 +80,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f4f4",
+    backgroundColor: "#f2f2f2",
   },
 
   logo: {
@@ -78,4 +99,9 @@ const styles = StyleSheet.create({
 
     marginTop: 10,
   },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
 });

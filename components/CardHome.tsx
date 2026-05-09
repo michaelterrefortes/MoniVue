@@ -1,9 +1,16 @@
 import { SymbolView } from "expo-symbols";
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
 import { formatMoney } from "../constants/functions";
 
 const CardHome = ({ data, label, color, route, pressable = true }) => {
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
   if (pressable)
     return (
       <TouchableOpacity
@@ -11,6 +18,7 @@ const CardHome = ({ data, label, color, route, pressable = true }) => {
         style={[
           styles.cardSmall,
           { flexDirection: "row", justifyContent: "space-between" },
+          isDarkMode ? styles.darkField : styles.lightField,
         ]}
       >
         <View>
@@ -24,7 +32,12 @@ const CardHome = ({ data, label, color, route, pressable = true }) => {
             />
             <Text style={{ color: color, marginLeft: 10 }}>{label}</Text>
           </View>
-          <Text style={{ fontSize: 20, fontWeight: "500" }}>
+          <Text
+            style={[
+              { fontSize: 20, fontWeight: "500" },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
             {formatMoney(data)}
           </Text>
         </View>
@@ -43,6 +56,7 @@ const CardHome = ({ data, label, color, route, pressable = true }) => {
         style={[
           styles.cardSmall,
           { flexDirection: "row", justifyContent: "space-between" },
+          isDarkMode ? styles.darkField : styles.lightField,
         ]}
       >
         <View>
@@ -56,7 +70,12 @@ const CardHome = ({ data, label, color, route, pressable = true }) => {
             />
             <Text style={{ color: color, marginLeft: 10 }}>{label}</Text>
           </View>
-          <Text style={{ fontSize: 20, fontWeight: "500" }}>
+          <Text
+            style={[
+              { fontSize: 20, fontWeight: "500" },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
             {formatMoney(data)}
           </Text>
         </View>
@@ -67,6 +86,14 @@ const CardHome = ({ data, label, color, route, pressable = true }) => {
 export default CardHome;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   cardSmall: {
     backgroundColor: "#FFFFFF",
     borderRadius: 24,

@@ -1,8 +1,9 @@
-import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, useColorScheme } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 
 const Dropdown = ({ open, type, items, setOpen, setType, setItems }) => {
+  const colorScheme = useColorScheme();
+  const isDarkMode = false;
   return (
     <DropDownPicker
       style={[
@@ -13,7 +14,7 @@ const Dropdown = ({ open, type, items, setOpen, setType, setItems }) => {
           borderBottomRightRadius: 50,
           borderTopLeftRadius: open ? 30 : 50,
           borderTopRightRadius: open ? 30 : 50,
-          backgroundColor: "#fff",
+          backgroundColor: isDarkMode ? "2f2f2f" : "#fff",
         },
       ]}
       open={open}
@@ -27,7 +28,7 @@ const Dropdown = ({ open, type, items, setOpen, setType, setItems }) => {
       dropDownContainerStyle={[
         styles.dropdown,
         {
-          backgroundColor: "#fff",
+          backgroundColor: isDarkMode ? "2f2f2f" : "#fff",
           borderColor: "#fff",
         },
       ]}
@@ -39,6 +40,9 @@ const Dropdown = ({ open, type, items, setOpen, setType, setItems }) => {
       }}
       placeholderStyle={{
         color: "gray",
+      }}
+      textStyle={{
+        color: isDarkMode ? "white" : "black",
       }}
     />
   );

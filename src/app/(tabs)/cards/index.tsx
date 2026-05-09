@@ -1,11 +1,12 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
+  useColorScheme,
   View,
 } from "react-native";
 import {
@@ -25,6 +26,8 @@ const getUtilizationColor = (value) => {
 
 export default function Cards() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   //const [debts, setDebts] = useState([]);
   const {
@@ -96,7 +99,7 @@ export default function Cards() {
 
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: "rgb(242, 242, 242)" }]}
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
       edges={["left", "right"]}
     >
       <FlatList
@@ -133,7 +136,14 @@ export default function Cards() {
         ListFooterComponent={<View style={{ height: 15 }} />}
         ListHeaderComponent={
           <>
-            <Text style={{ marginLeft: 20 }}>Monitor your credit usage</Text>
+            <Text
+              style={[
+                { marginLeft: 20 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Monitor your credit usage
+            </Text>
             <LinearGradient
               colors={["#5536f4", "#7f07dd"]}
               start={{ x: 0, y: 0 }}
@@ -208,7 +218,12 @@ export default function Cards() {
             )}
 
             {debts.length === 0 && !loading ? (
-              <Text style={{ textAlign: "center", marginTop: 20 }}>
+              <Text
+                style={[
+                  { textAlign: "center", marginTop: 20 },
+                  isDarkMode ? styles.lightText : styles.darkText,
+                ]}
+              >
                 No Credit Cards
               </Text>
             ) : null}
@@ -220,6 +235,14 @@ export default function Cards() {
 }
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
     //backgroundColor: "#f5f5f5",
@@ -259,7 +282,7 @@ const styles = StyleSheet.create({
 
   container2: {
     marginTop: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.12)",
+    //backgroundColor: "rgba(255, 255, 255, 0.12)",
     padding: 16,
     borderRadius: 12,
   },

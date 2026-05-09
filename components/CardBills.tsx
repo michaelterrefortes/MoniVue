@@ -1,15 +1,25 @@
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
 import { categories } from "../constants/categories";
 import { formatMoney, validateDate } from "../constants/functions";
 
 const CardBills = ({ item, params }) => {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   return (
-    <TouchableOpacity style={styles.card} onPress={() => router.push(params)}>
+    <TouchableOpacity
+      style={[styles.card, isDarkMode ? styles.darkField : styles.lightField]}
+      onPress={() => router.push(params)}
+    >
       <View style={styles.cardLeft}>
         <View style={styles.leftContent}>
           <View
@@ -26,7 +36,14 @@ const CardBills = ({ item, params }) => {
           </View>
 
           <View style={styles.textContainer}>
-            <Text style={styles.cardTitle}>{item.bill_name}</Text>
+            <Text
+              style={[
+                styles.cardTitle,
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              {item.bill_name}
+            </Text>
             <Text style={styles.cardCategory}>
               {categories[item.type_bill].name}
             </Text>
@@ -35,7 +52,14 @@ const CardBills = ({ item, params }) => {
       </View>
 
       <View style={styles.cardRight}>
-        <Text style={styles.cardPrice}>{formatMoney(item.price)}</Text>
+        <Text
+          style={[
+            styles.cardPrice,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          {formatMoney(item.price)}
+        </Text>
         <Text style={styles.cardDate}>
           Due: {validateDate(Number(item.payment_date))}
         </Text>
@@ -57,6 +81,14 @@ const CardBills = ({ item, params }) => {
 export default CardBills;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   card: {
     backgroundColor: "#fff",
     padding: 12,

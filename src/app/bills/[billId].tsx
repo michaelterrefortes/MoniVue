@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useContext, useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { categories } from "../../../constants/categories";
@@ -19,6 +20,8 @@ import { getAccessToken } from "../../../services/auth";
 const BillDetails = () => {
   const params = useLocalSearchParams();
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
   const { bills, setBills } = useContext(DebtContext);
   //console.log(params);
 
@@ -108,7 +111,11 @@ const BillDetails = () => {
               marginRight: 10,
             }}
           >
-            <SymbolView name={{ ios: "pencil" }} tintColor={"#000"} size={20} />
+            <SymbolView
+              name={{ ios: "pencil" }}
+              tintColor={isDarkMode ? "white" : "black"}
+              size={20}
+            />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -121,19 +128,22 @@ const BillDetails = () => {
               alignItems: "center",
             }}
           >
-            <SymbolView name={{ ios: "trash" }} tintColor={"#000"} size={20} />
+            <SymbolView name={{ ios: "trash" }} tintColor={"red"} size={20} />
           </TouchableOpacity>
         </View>
       ),
     });
-  }, [navigation]);
+  }, [navigation, isDarkMode]);
 
   const [layout, setLayout] = useState({ width: 0, height: 0 });
   return (
     <ScrollView
       style={[
         styles.container,
-        { backgroundColor: layout.height > 600 ? "#f2f2f2" : "" },
+        {
+          backgroundColor:
+            layout.height > 600 ? (isDarkMode ? "#1d1d1d" : "#f2f2f2") : "",
+        },
       ]}
       onLayout={(event) => {
         const { width, height } = event.nativeEvent.layout;
@@ -151,26 +161,45 @@ const BillDetails = () => {
             flexDirection: "row",
           }}
         >
-          <Text style={{ marginRight: 5 }}>Processing deletion ...</Text>
+          <Text
+            style={[
+              { marginRight: 5 },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Processing deletion ...
+          </Text>
           <ActivityIndicator size={20} color="gray" />
         </View>
       ) : null}
 
       <Text
-        style={{
-          fontWeight: "500",
-          fontSize: 28,
-          paddingTop: 10,
-          paddingLeft: 50,
-          color: "#000",
-        }}
+        style={[
+          {
+            fontWeight: "500",
+            fontSize: 28,
+            paddingTop: 10,
+            paddingLeft: 50,
+          },
+          isDarkMode ? styles.lightText : styles.darkText,
+        ]}
       >
         {name}
       </Text>
 
-      <View style={[styles.billsBalance, { backgroundColor: "#fff" }]}>
+      <View
+        style={[
+          styles.billsBalance,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+      >
         <Text style={styles.label}>Due Date: {validateDate(Number(date))}</Text>
-        <Text style={[styles.textBills, { color: "#000" }]}>
+        <Text
+          style={[
+            styles.textBills,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
           {formatMoney(price)}
         </Text>
         {variable !== 0 ? (
@@ -183,7 +212,12 @@ const BillDetails = () => {
         ) : null}
       </View>
       <View style={styles.content}>
-        <View style={[styles.squares, { backgroundColor: "#fff" }]}>
+        <View
+          style={[
+            styles.squares,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
           <Text style={styles.label}>Type</Text>
 
           <View
@@ -207,9 +241,19 @@ const BillDetails = () => {
             {categoryName}
           </Text>
         </View>
-        <View style={[styles.squares, { backgroundColor: "#fff" }]}>
+        <View
+          style={[
+            styles.squares,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
           <Text style={styles.label}>Variation</Text>
-          <Text style={[styles.text, { color: "#000" }]}>
+          <Text
+            style={[
+              styles.text,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
             {formatMoney(variable)}
           </Text>
         </View>
@@ -221,6 +265,14 @@ const BillDetails = () => {
 export default BillDetails;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#1d1d1d" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
     //backgroundColor: "#f2f2f2",

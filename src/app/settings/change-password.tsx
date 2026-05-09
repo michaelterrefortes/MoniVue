@@ -1,12 +1,14 @@
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   ActivityIndicator,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { validatePassword } from "../../../constants/functions";
@@ -14,6 +16,9 @@ import { supabase } from "../../../services/auth";
 
 const ChangePassword = () => {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   const [password, setPassword] = useState("");
   const [passwordWarning, setPasswordWarning] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -51,8 +56,16 @@ const ChangePassword = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.button}>
+    <ScrollView
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+    >
+      <View style={{ height: 250 }} />
+      <View
+        style={[
+          styles.button,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+      >
         <View style={{ flexDirection: "row" }}>
           <TextInput
             //style={styles.input}
@@ -73,11 +86,15 @@ const ChangePassword = () => {
             {isPasswordVisible ? (
               <SymbolView
                 name={{ ios: "eye.slash" }}
-                tintColor={"#000"}
+                tintColor={isDarkMode ? "white" : "#000"}
                 size={20}
               />
             ) : (
-              <SymbolView name={{ ios: "eye" }} tintColor={"#000"} size={20} />
+              <SymbolView
+                name={{ ios: "eye" }}
+                tintColor={isDarkMode ? "white" : "#000"}
+                size={20}
+              />
             )}
           </TouchableOpacity>
         </View>
@@ -92,8 +109,21 @@ const ChangePassword = () => {
         </Text>
       )}
 
-      <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-        <Text style={styles.buttonTextRegular}>Update Password</Text>
+      <TouchableOpacity
+        style={[
+          styles.button,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+        onPress={handleUpdate}
+      >
+        <Text
+          style={[
+            styles.buttonTextRegular,
+            { color: isDarkMode ? "lightblue" : "blue" },
+          ]}
+        >
+          Update Password
+        </Text>
       </TouchableOpacity>
 
       {loading ? (
@@ -106,21 +136,36 @@ const ChangePassword = () => {
             flexDirection: "row",
           }}
         >
-          <Text style={{ marginRight: 5 }}>Processing request ...</Text>
+          <Text
+            style={[
+              { marginRight: 5 },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Processing request ...
+          </Text>
           <ActivityIndicator size={20} color="gray" />
         </View>
       ) : null}
-    </View>
+    </ScrollView>
   );
 };
 
 export default ChangePassword;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    //justifyContent: "center",
+    //alignItems: "center",
     //backgroundColor: "rgb(242, 242, 242)",
   },
 

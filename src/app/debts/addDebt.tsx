@@ -1,5 +1,5 @@
 import { router, useNavigation } from "expo-router";
-import React, { useContext, useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useColorScheme,
   View,
 } from "react-native";
 
@@ -18,6 +19,8 @@ import { addCreditCard } from "../../../services/api";
 
 const DebtInfo = () => {
   //console.log(params.setData);
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   const { debts, setDebts } = useContext(DebtContext);
 
@@ -125,7 +128,7 @@ const DebtInfo = () => {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: "rgb(242, 242, 242)" }}>
+    <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
       <View style={{ height: 100, width: "100%" }} />
       {loading ? (
         <View
@@ -137,7 +140,14 @@ const DebtInfo = () => {
             flexDirection: "row",
           }}
         >
-          <Text style={{ marginRight: 5 }}>Processing addition ...</Text>
+          <Text
+            style={[
+              { marginRight: 5 },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Processing addition ...
+          </Text>
           <ActivityIndicator size={20} color="gray" />
         </View>
       ) : null}
@@ -145,10 +155,7 @@ const DebtInfo = () => {
         <Text
           style={[
             styles.numberBalance,
-            {
-              backgroundColor: "#fff",
-              color: "#000",
-            },
+            isDarkMode ? styles.darkField : styles.lightField,
           ]}
         >
           {formatMoney(0)}
@@ -157,19 +164,23 @@ const DebtInfo = () => {
         <Text
           style={[
             styles.numberBalance,
-            {
-              backgroundColor: "#fff",
-              color: "#000",
-            },
+            isDarkMode ? styles.darkField : styles.lightField,
           ]}
         >
           {formatMoney(balance)}
         </Text>
       )}
 
-      <Text style={[styles.title, { color: "#000" }]}>Credit Card Name</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Credit Card Name
+      </Text>
       <TextInput
-        style={[styles.input, { backgroundColor: "#fff" }]}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         onChangeText={(val) => {
           setName(val);
           if (val.trim() !== "") setNameWarning(false); // Clear error while typing
@@ -183,9 +194,16 @@ const DebtInfo = () => {
         <Text style={styles.warning}>*Field value missing</Text>
       ) : null}
 
-      <Text style={[styles.title, { color: "#000" }]}>Credit Balance</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Credit Balance
+      </Text>
       <CurrencyInput
-        style={[styles.input, { backgroundColor: "#fff" }]}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         value={balance}
         onChangeValue={setBalance}
         prefix="$"
@@ -204,9 +222,16 @@ const DebtInfo = () => {
         <Text style={styles.warning}>*Field value missing</Text>
       ) : null}
 
-      <Text style={[styles.title, { color: "#000" }]}>Credit Limit</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Credit Limit
+      </Text>
       <CurrencyInput
-        style={[styles.input, { backgroundColor: "#fff" }]}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         value={limit}
         onChangeValue={(val) => {
           setLimitWarningNumber(false);
@@ -232,9 +257,16 @@ const DebtInfo = () => {
         <Text style={styles.warning}>*Limit cannot be zero. Try again</Text>
       ) : null}
 
-      <Text style={[styles.title, { color: "#000" }]}>APR</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        APR
+      </Text>
       <CurrencyInput
-        style={[styles.input, { backgroundColor: "#fff" }]}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         value={apr}
         onChangeValue={setApr}
         prefix=""
@@ -254,9 +286,16 @@ const DebtInfo = () => {
         <Text style={styles.warning}>*Field value missing</Text>
       ) : null}
 
-      <Text style={[styles.title, { color: "#000" }]}>Minimum Payment</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Minimum Payment
+      </Text>
       <CurrencyInput
-        style={[styles.input, { backgroundColor: "#fff" }]}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         value={minimum}
         onChangeValue={setMinimum}
         prefix="$"
@@ -275,11 +314,18 @@ const DebtInfo = () => {
         <Text style={styles.warning}>*Field value missing</Text>
       ) : null}
 
-      <Text style={[styles.title, { color: "#000" }]}>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
         Due Date for Payment
       </Text>
 
-      <View style={[styles.input2, { backgroundColor: "#fff" }]}>
+      <View
+        style={[
+          styles.input2,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+      >
         <Text style={{ color: "grey" }}>Due Date:</Text>
         <View style={{ transform: [{ scale: 0.85 }] }}>
           <DateTimePicker
@@ -299,6 +345,14 @@ const DebtInfo = () => {
 export default DebtInfo;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#1d1d1d" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   numberBalance: {
     backgroundColor: "#fff",
     paddingHorizontal: 15,

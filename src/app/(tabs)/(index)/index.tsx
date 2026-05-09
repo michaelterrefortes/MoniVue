@@ -1,12 +1,13 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
+  useColorScheme,
   View,
 } from "react-native";
 import { PieChart } from "react-native-gifted-charts";
@@ -61,6 +62,9 @@ const formatDataType = (monthlyData, total) => {
 
 const Index = () => {
   const router = useRouter();
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   const {
     totalDebts,
@@ -129,7 +133,7 @@ const Index = () => {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: "rgb(242, 242, 242)" }]}
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -142,7 +146,14 @@ const Index = () => {
         </View>
       ) : (
         <>
-          <Text style={{ marginBottom: 10 }}>Track your monthly finances</Text>
+          <Text
+            style={[
+              { marginBottom: 10 },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Track your monthly finances
+          </Text>
 
           <View
             style={{
@@ -241,11 +252,22 @@ const Index = () => {
               /day
             </Text>
           </LinearGradient>
-          <View style={[styles.card, { marginTop: 10 }]}>
+          <View
+            style={[
+              styles.card,
+              { marginTop: 10 },
+              isDarkMode ? styles.darkField : styles.lightField,
+            ]}
+          >
             <Text style={[styles.label, { textAlign: "left" }]}>
               Monthly Spending:
             </Text>
-            <Text style={{ fontWeight: "bold" }}>
+            <Text
+              style={[
+                { fontWeight: "bold" },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
               {new Date().toLocaleDateString("en-US", { month: "short" })}{" "}
               {new Date().getFullYear()}
             </Text>
@@ -267,7 +289,13 @@ const Index = () => {
               )}
             </View>
           </View>
-          <View style={[styles.card, { marginTop: 10, marginBottom: 15 }]}>
+          <View
+            style={[
+              styles.card,
+              { marginTop: 10, marginBottom: 15 },
+              isDarkMode ? styles.darkField : styles.lightField,
+            ]}
+          >
             <Text style={[styles.label, { textAlign: "left" }]}>
               Spending Categories:
             </Text>
@@ -278,11 +306,18 @@ const Index = () => {
                 <PieChart
                   radius={90}
                   innerRadius={60}
+                  innerCircleColor={isDarkMode ? "#2f2f2f" : "#fff"}
                   data={formatDataType(spending, totalSpending)}
                   donut
                 />
               ) : (
-                <PieChart radius={90} innerRadius={60} data={[]} donut />
+                <PieChart
+                  radius={90}
+                  innerRadius={60}
+                  data={[]}
+                  innerCircleColor={isDarkMode ? "#2f2f2f" : "#fff"}
+                  donut
+                />
               )}
             </View>
             {formatDataType(spending, totalSpending)?.map((item, index) => {
@@ -316,6 +351,14 @@ const Index = () => {
 export default Index;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 24,

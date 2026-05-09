@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router/build/hooks";
-import React, { useContext, useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 //import CircularPicker from "react-native-circular-picker";
@@ -22,6 +23,9 @@ import { getAccessToken } from "../../../services/auth";
 import { calculateInterest } from "../../../services/calculate";
 
 const DebtDetails = () => {
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   const params = useLocalSearchParams();
   const router = useRouter();
   const { debts, setDebts } = useContext(DebtContext);
@@ -128,7 +132,11 @@ const DebtDetails = () => {
               marginRight: 10,
             }}
           >
-            <SymbolView name={{ ios: "pencil" }} tintColor={"#000"} size={20} />
+            <SymbolView
+              name={{ ios: "pencil" }}
+              tintColor={isDarkMode ? "white" : "black"}
+              size={20}
+            />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -141,16 +149,16 @@ const DebtDetails = () => {
               alignItems: "center",
             }}
           >
-            <SymbolView name={{ ios: "trash" }} tintColor={"#000"} size={20} />
+            <SymbolView name={{ ios: "trash" }} tintColor={"red"} size={20} />
           </TouchableOpacity>
         </View>
       ),
     });
-  }, [navigation, editing]);
+  }, [navigation, editing, isDarkMode]);
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: "rgb(242, 242, 242)" }]}
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
     >
       <View style={{ height: 90 }} />
 
@@ -164,38 +172,89 @@ const DebtDetails = () => {
             flexDirection: "row",
           }}
         >
-          <Text style={{ marginRight: 5 }}>Processing deletion ...</Text>
+          <Text
+            style={[
+              { marginRight: 5 },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Processing deletion ...
+          </Text>
           <ActivityIndicator size={20} color="gray" />
         </View>
       ) : null}
 
-      <Text style={[styles.name, { color: "#000" }]}>{name}</Text>
+      <Text
+        style={[styles.name, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        {name}
+      </Text>
 
-      <View style={[styles.balanceCard, { backgroundColor: "#fff" }]}>
+      <View
+        style={[
+          styles.balanceCard,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+      >
         <Text style={styles.labelBalance}>Balance</Text>
-        <Text style={[styles.balanceText, { color: "#000" }]}>
+        <Text
+          style={[
+            styles.balanceText,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
           {formatMoney(balance)}
         </Text>
       </View>
       <View style={styles.content}>
-        <View style={[styles.squares, { backgroundColor: "#fff" }]}>
+        <View
+          style={[
+            styles.squares,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
           <Text style={styles.label}>Limit</Text>
-          <Text style={[styles.text, { color: "#000" }]}>
+          <Text
+            style={[
+              styles.text,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
             {formatMoney(limit)}
           </Text>
         </View>
-        <View style={[styles.squares, { backgroundColor: "#fff" }]}>
+        <View
+          style={[
+            styles.squares,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
           <Text style={styles.label}>APR</Text>
-          <Text style={[styles.text, { color: "#000" }]}>{apr}%</Text>
+          <Text
+            style={[
+              styles.text,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            {apr}%
+          </Text>
         </View>
       </View>
 
-      <View style={[styles.rectangle, { backgroundColor: "#fff" }]}>
+      <View
+        style={[
+          styles.rectangle,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+      >
         <Text style={styles.label}>Utilization</Text>
 
         <View style={styles.headerRow}>
           <Text
-            style={[styles.percentText, { color: "#000", fontWeight: "500" }]}
+            style={[
+              styles.percentText,
+              isDarkMode ? styles.darkField : styles.lightField,
+            ]}
           >
             {percentage.toFixed(2)}% used
           </Text>
@@ -240,25 +299,53 @@ const DebtDetails = () => {
       </View>
 
       <View style={styles.content}>
-        <View style={[styles.squares, { backgroundColor: "#fff" }]}>
+        <View
+          style={[
+            styles.squares,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
           <Text style={styles.label}>Min Payment</Text>
-          <Text style={[styles.text, { color: "#000" }]}>
+          <Text
+            style={[
+              styles.text,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
             {formatMoney(minimum)}
           </Text>
         </View>
-        <View style={[styles.squares, { backgroundColor: "#fff" }]}>
+        <View
+          style={[
+            styles.squares,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
           <Text style={styles.label}>Due Date</Text>
-          <Text style={[styles.text, { color: "#000" }]}>
+          <Text
+            style={[
+              styles.text,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
             {validateDate(date)}
           </Text>
         </View>
       </View>
 
-      <View style={[styles.input, { backgroundColor: "#fff" }]}>
+      <View
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+      >
         <Text style={styles.labelBalance}>Monthly Payment Calculator</Text>
 
         <CurrencyInput
-          style={[styles.inputText, { color: "#000" }]}
+          style={[
+            styles.inputText,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
           value={payment}
           onChangeValue={setPayment}
           prefix="$"
@@ -267,7 +354,7 @@ const DebtDetails = () => {
           precision={2}
           minValue={0}
           placeholder="$0.00"
-          placeholderTextColor={"lightgrey"}
+          placeholderTextColor={isDarkMode ? "gray" : "lightgrey"}
           returnKeyType="done"
           onSubmitEditing={Keyboard.dismiss}
           onEndEditing={() => {
@@ -298,13 +385,18 @@ const DebtDetails = () => {
                 style={[
                   styles.squares2,
                   {
-                    backgroundColor: "#fff",
                     shadowColor: "#000",
                   },
+                  isDarkMode ? styles.darkField : styles.lightField,
                 ]}
               >
                 <Text style={styles.label}>Interest Payed</Text>
-                <Text style={[styles.text, { color: "#000" }]}>
+                <Text
+                  style={[
+                    styles.text,
+                    isDarkMode ? styles.lightText : styles.darkText,
+                  ]}
+                >
                   {formatMoney(interestMonths.interest)}
                 </Text>
               </View>
@@ -312,19 +404,30 @@ const DebtDetails = () => {
                 style={[
                   styles.squares2,
                   {
-                    backgroundColor: "#fff",
                     shadowColor: "#000",
                   },
+                  isDarkMode ? styles.darkField : styles.lightField,
                 ]}
               >
                 <Text style={styles.label}>Total Months</Text>
-                <Text style={[styles.text, { color: "#000" }]}>
+                <Text
+                  style={[
+                    styles.text,
+                    isDarkMode ? styles.lightText : styles.darkText,
+                  ]}
+                >
                   {interestMonths.months}
                 </Text>
               </View>
             </View>
 
-            <View style={[styles.squares2, { width: "83%" }]}>
+            <View
+              style={[
+                styles.squares2,
+                { width: "83%" },
+                isDarkMode ? styles.darkField : styles.lightField,
+              ]}
+            >
               <Text style={styles.label}>Interest Plot</Text>
               <View
                 style={{ alignSelf: "center", marginBottom: 15, marginTop: 10 }}
@@ -332,6 +435,7 @@ const DebtDetails = () => {
                 <PieChart
                   radius={90}
                   innerRadius={60}
+                  innerCircleColor={isDarkMode ? "#2f2f2f" : "white"}
                   data={[
                     {
                       key: 1,
@@ -410,6 +514,14 @@ const DebtDetails = () => {
 export default DebtDetails;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#1d1d1d" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
   },

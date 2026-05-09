@@ -1,6 +1,6 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import React, { useContext, useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useColorScheme,
   View,
 } from "react-native";
 import CurrencyInput from "react-native-currency-input";
@@ -36,6 +37,9 @@ const AddSpending = () => {
   const { setUpdateMonth, setUpdateWeek, setUpdateYear } =
     useContext(DebtContext);
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   const params = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
 
@@ -138,8 +142,13 @@ const AddSpending = () => {
   ]);
 
   return (
-    <ScrollView>
-      <View style={{ height: 60, width: "100%" }} />
+    <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
+      <View
+        style={[
+          { height: 60, width: "100%" },
+          isDarkMode ? styles.darkBg : styles.lightBg,
+        ]}
+      />
       {loading ? (
         <View
           style={{
@@ -149,13 +158,27 @@ const AddSpending = () => {
             flexDirection: "row",
           }}
         >
-          <Text style={{ marginRight: 5 }}>Processing addition ...</Text>
+          <Text
+            style={[
+              { marginRight: 5 },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Processing addition ...
+          </Text>
           <ActivityIndicator size={20} color="gray" />
         </View>
       ) : null}
-      <Text style={styles.title}>Name</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Name
+      </Text>
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         onChangeText={(val) => {
           setName(val);
           if (val.trim() !== "") setNameWarning(false); // Clear error while typing
@@ -169,9 +192,16 @@ const AddSpending = () => {
         <Text style={styles.warning}>*Field value missing</Text>
       ) : null}
 
-      <Text style={styles.title}>Amount</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Amount
+      </Text>
       <CurrencyInput
-        style={[styles.input, { backgroundColor: "#fff" }]}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         value={amount}
         onChangeValue={(val) => {
           setPriceWarningNumber(false);
@@ -197,9 +227,18 @@ const AddSpending = () => {
         <Text style={styles.warning}>*Amount cannot be zero. Try again</Text>
       ) : null}
 
-      <Text style={styles.title}>Date</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Date
+      </Text>
 
-      <View style={styles.input2}>
+      <View
+        style={[
+          styles.input2,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+      >
         <Text style={{ color: "grey" }}>Date:</Text>
         <View style={{ transform: [{ scale: 0.85 }] }}>
           <DateTimePicker
@@ -214,7 +253,11 @@ const AddSpending = () => {
         </View>
       </View>
 
-      <Text style={styles.title}>Category</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Category
+      </Text>
       <Dropdown
         open={open}
         type={type}
@@ -236,6 +279,14 @@ const AddSpending = () => {
 export default AddSpending;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#1d1d1d" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.2)",

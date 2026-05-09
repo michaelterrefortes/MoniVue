@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 
@@ -35,8 +36,14 @@ const Index = () => {
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
 
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={{ height: 150 }} />
 
       {/* Logo */}
@@ -46,7 +53,14 @@ const Index = () => {
       />
 
       {/* App Title */}
-      <Text style={styles.appTitle}>MoniVue</Text>
+      <Text
+        style={[
+          styles.appTitle,
+          isDarkMode ? styles.lightText : styles.darkText,
+        ]}
+      >
+        MoniVue
+      </Text>
 
       <Text style={styles.subtitle}>A Budget Manager App</Text>
 
@@ -111,6 +125,11 @@ const Index = () => {
 export default Index;
 
 const styles = StyleSheet.create({
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
     padding: 20,
@@ -133,7 +152,7 @@ const styles = StyleSheet.create({
   subtitle: {
     textAlign: "center",
     marginTop: 10,
-    color: "#666",
+    color: "gray",
     fontSize: 16,
   },
 
@@ -203,7 +222,7 @@ const styles = StyleSheet.create({
 
   signupText: {
     fontSize: 15,
-    color: "#333",
+    color: "gray",
   },
 
   signupButton: {

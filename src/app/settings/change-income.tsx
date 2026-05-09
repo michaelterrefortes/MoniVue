@@ -1,11 +1,13 @@
 import { useRouter } from "expo-router";
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import CurrencyInput from "react-native-currency-input";
@@ -14,6 +16,9 @@ import { updateProfile } from "../../../services/api";
 
 const ChangeIncome = () => {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   const { income, setIncome } = useContext(DebtContext);
   const [localIncome, setLocalIncome] = useState(null);
   const [incomeWarning, setIncomeWarning] = useState(false);
@@ -47,10 +52,21 @@ const ChangeIncome = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.button}>
+    <ScrollView
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+    >
+      <View style={{ height: 250 }} />
+      <View
+        style={[
+          styles.button,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+      >
         <CurrencyInput
-          style={[styles.input, { backgroundColor: "#fff" }]}
+          style={[
+            styles.input,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
           value={localIncome}
           //onChangeValue={setIncome}
           onChangeValue={(val) => {
@@ -63,7 +79,7 @@ const ChangeIncome = () => {
           precision={2}
           minValue={0}
           placeholder="$0.00"
-          placeholderTextColor={"lightgrey"}
+          placeholderTextColor={"grey"}
           //showPositiveSign
           //onChangeText={(formattedValue) => {
           //  console.log(formattedValue);
@@ -74,8 +90,21 @@ const ChangeIncome = () => {
         <Text style={styles.warning}>* Field Missing Value</Text>
       )}
 
-      <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-        <Text style={styles.buttonTextRegular}>Update Income</Text>
+      <TouchableOpacity
+        style={[
+          styles.button,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+        onPress={handleUpdate}
+      >
+        <Text
+          style={[
+            styles.buttonTextRegular,
+            { color: isDarkMode ? "lightblue" : "blue" },
+          ]}
+        >
+          Update Income
+        </Text>
       </TouchableOpacity>
 
       {loading ? (
@@ -88,22 +117,37 @@ const ChangeIncome = () => {
             flexDirection: "row",
           }}
         >
-          <Text style={{ marginRight: 5 }}>Processing update ...</Text>
+          <Text
+            style={[
+              { marginRight: 5 },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Processing update ...
+          </Text>
           <ActivityIndicator size={20} color="gray" />
         </View>
       ) : null}
-    </View>
+    </ScrollView>
   );
 };
 
 export default ChangeIncome;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgb(242, 242, 242)",
+    //justifyContent: "center",
+    //alignItems: "center",
+    //backgroundColor: "rgb(242, 242, 242)",
   },
   warning: {
     color: "red",

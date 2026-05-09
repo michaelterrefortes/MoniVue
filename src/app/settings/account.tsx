@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { url } from "../../../constants/url";
@@ -16,6 +17,9 @@ import { getAccessToken, supabase } from "../../../services/auth";
 const Account = () => {
   const router = useRouter();
   const [email, setEmail] = useState<string | null>(null);
+
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   const [loadingSignout, setLoadingSignout] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
@@ -124,44 +128,120 @@ const Account = () => {
   };
 
   return (
-    <ScrollView>
-      <View style={{ height: 200 }} />
-      <View style={styles.container}>
-        <TouchableOpacity style={styles.button} onPress={handleEmail}>
-          <Text style={styles.buttonTextRegular}>Contact Us</Text>
+    <ScrollView style={isDarkMode ? styles.darkBg : styles.lightBg}>
+      <View
+        style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+      >
+        <View style={{ height: 200 }} />
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={handleEmail}
+        >
+          <Text
+            style={[
+              styles.buttonTextRegular,
+              { color: isDarkMode ? "lightblue" : "blue" },
+            ]}
+          >
+            Contact Us
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleLink}>
-          <Text style={styles.buttonTextRegular}>Privacy Policy</Text>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={handleLink}
+        >
+          <Text
+            style={[
+              styles.buttonTextRegular,
+              { color: isDarkMode ? "lightblue" : "blue" },
+            ]}
+          >
+            Privacy Policy
+          </Text>
         </TouchableOpacity>
 
-        <View style={styles.button}>
+        <View
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
           <Text style={styles.label}>Email</Text>
-          <Text style={styles.value}>{email ?? "Loading..."}</Text>
+          <Text
+            style={[
+              styles.value,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            {email ?? "Loading..."}
+          </Text>
         </View>
 
         <TouchableOpacity
-          style={styles.button}
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
           onPress={() => router.push("/settings/change-income")}
         >
-          <Text style={styles.buttonTextRegular}>Change Monthly Income</Text>
+          <Text
+            style={[
+              styles.buttonTextRegular,
+              { color: isDarkMode ? "lightblue" : "blue" },
+            ]}
+          >
+            Change Monthly Income
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.button}
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
           onPress={() => router.push("/settings/change-email")}
         >
-          <Text style={styles.buttonTextRegular}>Change Email</Text>
+          <Text
+            style={[
+              styles.buttonTextRegular,
+              { color: isDarkMode ? "lightblue" : "blue" },
+            ]}
+          >
+            Change Email
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.button}
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
           onPress={() => router.push("/settings/change-password")}
         >
-          <Text style={styles.buttonTextRegular}>Change Password</Text>
+          <Text
+            style={[
+              styles.buttonTextRegular,
+              { color: isDarkMode ? "lightblue" : "blue" },
+            ]}
+          >
+            Change Password
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleSignOut}>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={handleSignOut}
+        >
           <Text style={styles.buttonText}>Sign Out</Text>
         </TouchableOpacity>
 
@@ -175,12 +255,25 @@ const Account = () => {
               flexDirection: "row",
             }}
           >
-            <Text style={{ marginRight: 5 }}>Processing request ...</Text>
+            <Text
+              style={[
+                { marginRight: 5 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Processing request ...
+            </Text>
             <ActivityIndicator size={20} color="gray" />
           </View>
         ) : null}
 
-        <TouchableOpacity style={styles.button} onPress={confirmDelete}>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+          onPress={confirmDelete}
+        >
           <Text style={styles.buttonText}>Delete Account and Data</Text>
         </TouchableOpacity>
 
@@ -194,7 +287,14 @@ const Account = () => {
               flexDirection: "row",
             }}
           >
-            <Text style={{ marginRight: 5 }}>Processing addition ...</Text>
+            <Text
+              style={[
+                { marginRight: 5 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Processing addition ...
+            </Text>
             <ActivityIndicator size={20} color="gray" />
           </View>
         ) : null}
@@ -206,6 +306,14 @@ const Account = () => {
 export default Account;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
     justifyContent: "center",

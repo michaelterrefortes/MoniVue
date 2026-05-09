@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import React, { useContext, useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { categoriesSpending } from "../../../constants/categories";
@@ -17,6 +18,9 @@ import { DebtContext } from "../../../context/DebtContext";
 import { getAccessToken } from "../../../services/auth";
 
 const SpendingDetails = () => {
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   const params = useLocalSearchParams();
   const router = useRouter();
   const { setUpdateMonth, setUpdateWeek, setUpdateYear } =
@@ -118,7 +122,11 @@ const SpendingDetails = () => {
               marginRight: 10,
             }}
           >
-            <SymbolView name={{ ios: "pencil" }} tintColor="black" size={20} />
+            <SymbolView
+              name={{ ios: "pencil" }}
+              tintColor={isDarkMode ? "white" : "black"}
+              size={20}
+            />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -131,12 +139,12 @@ const SpendingDetails = () => {
               alignItems: "center",
             }}
           >
-            <SymbolView name={{ ios: "trash" }} tintColor="black" size={20} />
+            <SymbolView name={{ ios: "trash" }} tintColor={"red"} size={20} />
           </TouchableOpacity>
         </View>
       ),
     });
-  }, [navigation, editing]);
+  }, [navigation, editing, isDarkMode]);
 
   //console.log(params);
 
@@ -145,7 +153,10 @@ const SpendingDetails = () => {
     <ScrollView
       style={[
         styles.container,
-        { backgroundColor: layout.height > 600 ? "#f2f2f2" : "" },
+        {
+          backgroundColor:
+            layout.height > 600 ? (isDarkMode ? "#1d1d1d" : "#f2f2f2") : "",
+        },
       ]}
       onLayout={(event) => {
         const { width, height } = event.nativeEvent.layout;
@@ -163,27 +174,54 @@ const SpendingDetails = () => {
             flexDirection: "row",
           }}
         >
-          <Text style={{ marginRight: 5 }}>Processing deletion ...</Text>
+          <Text
+            style={[
+              { marginRight: 5 },
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            Processing deletion ...
+          </Text>
           <ActivityIndicator size={20} color="gray" />
         </View>
       ) : null}
       <Text
-        style={{
-          fontWeight: "500",
-          fontSize: 28,
-          paddingTop: 10,
-          paddingLeft: 50,
-        }}
+        style={[
+          {
+            fontWeight: "500",
+            fontSize: 28,
+            paddingTop: 10,
+            paddingLeft: 50,
+          },
+          isDarkMode ? styles.lightText : styles.darkText,
+        ]}
       >
         {name}
       </Text>
 
-      <View style={styles.spendingBalance}>
+      <View
+        style={[
+          styles.spendingBalance,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
+      >
         <Text style={styles.label}>Amount</Text>
-        <Text style={styles.textAmount}>{formatMoney(amount)}</Text>
+        <Text
+          style={[
+            styles.textAmount,
+            isDarkMode ? styles.lightText : styles.darkText,
+          ]}
+        >
+          {formatMoney(amount)}
+        </Text>
       </View>
       <View style={styles.content}>
-        <View style={styles.squares}>
+        <View
+          style={[
+            styles.squares,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
           <Text style={styles.label}>Type</Text>
 
           <View
@@ -203,9 +241,21 @@ const SpendingDetails = () => {
             {categoryName}
           </Text>
         </View>
-        <View style={styles.squares}>
+        <View
+          style={[
+            styles.squares,
+            isDarkMode ? styles.darkField : styles.lightField,
+          ]}
+        >
           <Text style={styles.label}>Date</Text>
-          <Text style={styles.text}>{dateString(date)}</Text>
+          <Text
+            style={[
+              styles.text,
+              isDarkMode ? styles.lightText : styles.darkText,
+            ]}
+          >
+            {dateString(date)}
+          </Text>
         </View>
       </View>
     </ScrollView>
@@ -215,6 +265,14 @@ const SpendingDetails = () => {
 export default SpendingDetails;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#1d1d1d" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
     //backgroundColor: "#f2f2f2",

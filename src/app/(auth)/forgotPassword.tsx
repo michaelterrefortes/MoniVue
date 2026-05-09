@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -9,6 +9,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 
@@ -16,6 +17,9 @@ import { validateEmail } from "../../../constants/functions";
 import { supabase } from "../../../services/auth";
 
 const forgotPassword = () => {
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+
   const [email, setEmail] = useState("");
 
   const router = useRouter();
@@ -55,18 +59,33 @@ const forgotPassword = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+    >
       <View style={{ height: 150 }} />
 
-      <Text style={{ fontWeight: "700", fontSize: 32, textAlign: "center" }}>
+      <Text
+        style={[
+          { fontWeight: "700", fontSize: 32, textAlign: "center" },
+          isDarkMode ? styles.lightText : styles.darkText,
+        ]}
+      >
         Reset Password
       </Text>
 
       {/* Email Input */}
-      <Text style={styles.title}>Email</Text>
+      <Text
+        style={[styles.title, isDarkMode ? styles.lightText : styles.darkText]}
+      >
+        Email
+      </Text>
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkField : styles.lightField,
+        ]}
         placeholder="Email"
+        placeholderTextColor={isDarkMode ? "lightgray" : "gray"}
         value={email}
         onChangeText={(val) => {
           setEmail(val);
@@ -109,6 +128,14 @@ const forgotPassword = () => {
 export default forgotPassword;
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   title: {
     fontWeight: "bold",
     paddingLeft: 45,

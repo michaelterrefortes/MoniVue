@@ -1,9 +1,11 @@
 import { Stack } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, useColorScheme } from "react-native";
 import { DebtProvider } from "../../context/DebtContext";
 
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
   return (
     <DebtProvider>
       <Stack screenOptions={{ headerShown: false }}>
@@ -145,7 +147,7 @@ export default function RootLayout() {
               >
                 <SymbolView
                   name={{ ios: "xmark" }}
-                  tintColor={"#000"}
+                  tintColor={isDarkMode ? "#fff" : "#000"}
                   size={20}
                 />
               </TouchableOpacity>
@@ -183,7 +185,7 @@ export default function RootLayout() {
               >
                 <SymbolView
                   name={{ ios: "xmark" }}
-                  tintColor={"#000"}
+                  tintColor={isDarkMode ? "#fff" : "#000"}
                   size={20}
                 />
               </TouchableOpacity>
@@ -220,7 +222,7 @@ export default function RootLayout() {
               >
                 <SymbolView
                   name={{ ios: "xmark" }}
-                  tintColor="black"
+                  tintColor={isDarkMode ? "#fff" : "#000"}
                   size={20}
                 />
               </TouchableOpacity>
@@ -259,7 +261,7 @@ export default function RootLayout() {
               >
                 <SymbolView
                   name={{ ios: "xmark" }}
-                  tintColor="black"
+                  tintColor={isDarkMode ? "#fff" : "#000"}
                   size={20}
                 />
               </TouchableOpacity>
@@ -298,7 +300,7 @@ export default function RootLayout() {
               >
                 <SymbolView
                   name={{ ios: "xmark" }}
-                  tintColor="black"
+                  tintColor={isDarkMode ? "#fff" : "#000"}
                   size={20}
                 />
               </TouchableOpacity>
@@ -337,7 +339,7 @@ export default function RootLayout() {
               >
                 <SymbolView
                   name={{ ios: "xmark" }}
-                  tintColor="black"
+                  tintColor={isDarkMode ? "#fff" : "#000"}
                   size={20}
                 />
               </TouchableOpacity>
@@ -376,7 +378,7 @@ export default function RootLayout() {
               >
                 <SymbolView
                   name={{ ios: "xmark" }}
-                  tintColor="black"
+                  tintColor={isDarkMode ? "#fff" : "#000"}
                   size={20}
                 />
               </TouchableOpacity>
@@ -415,7 +417,7 @@ export default function RootLayout() {
               >
                 <SymbolView
                   name={{ ios: "xmark" }}
-                  tintColor="black"
+                  tintColor={isDarkMode ? "#fff" : "#000"}
                   size={20}
                 />
               </TouchableOpacity>
@@ -453,7 +455,7 @@ export default function RootLayout() {
               >
                 <SymbolView
                   name={{ ios: "xmark" }}
-                  tintColor="black"
+                  tintColor={isDarkMode ? "#fff" : "#000"}
                   size={20}
                 />
               </TouchableOpacity>

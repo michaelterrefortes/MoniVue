@@ -6,6 +6,7 @@ import {
   FlatList,
   StyleSheet,
   Text,
+  useColorScheme,
   View,
 } from "react-native";
 import {
@@ -19,6 +20,8 @@ import { fetchBills } from "../../../../services/api";
 
 export default function BillsTab() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   const { bills, setBills, setTotalBills, totalBills } =
     useContext(DebtContext);
@@ -68,7 +71,10 @@ export default function BillsTab() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["left", "right"]}>
+    <SafeAreaView
+      style={[styles.container, isDarkMode ? styles.darkBg : styles.lightBg]}
+      edges={["left", "right"]}
+    >
       <FlatList
         data={bills}
         refreshing={refreshing}
@@ -77,7 +83,14 @@ export default function BillsTab() {
         ListFooterComponent={<View style={{ height: 15 }} />}
         ListHeaderComponent={
           <>
-            <Text style={{ marginLeft: 20 }}>Manage your monthly payments</Text>
+            <Text
+              style={[
+                { marginLeft: 20 },
+                isDarkMode ? styles.lightText : styles.darkText,
+              ]}
+            >
+              Manage your monthly payments
+            </Text>
             <LinearGradient
               colors={["#ff6400", "#eb1102"]}
               start={{ x: 0, y: 0 }}
@@ -109,7 +122,12 @@ export default function BillsTab() {
             )}
 
             {bills.length === 0 && !loading ? (
-              <Text style={{ textAlign: "center", marginTop: 20 }}>
+              <Text
+                style={[
+                  { textAlign: "center", marginTop: 20 },
+                  isDarkMode ? styles.lightText : styles.darkText,
+                ]}
+              >
                 No Bills
               </Text>
             ) : null}
@@ -137,6 +155,14 @@ export default function BillsTab() {
 }
 
 const styles = StyleSheet.create({
+  darkField: { backgroundColor: "#2f2f2f", color: "white" },
+  lightField: { backgroundColor: "#fff", color: "black" },
+
+  darkBg: { backgroundColor: "#000" },
+  lightBg: { backgroundColor: "#f2f2f2" },
+  lightText: { color: "white" },
+  darkText: { color: "black" },
+
   container: {
     flex: 1,
   },
