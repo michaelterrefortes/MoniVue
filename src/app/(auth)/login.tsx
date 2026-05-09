@@ -1,12 +1,13 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Image,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -35,6 +36,19 @@ const LoginScreen = () => {
   const [emailIncorrectWarning, setEmailIncorrectWarning] = useState(false);
 
   const [loading, setLoading] = useState(false);
+
+  const handleLink = useCallback(async () => {
+    // Check if the link is supported
+    const linkUrl = `https://monivue.onrender.com/privacy-policy`;
+    const supported = await Linking.canOpenURL(linkUrl);
+
+    if (supported) {
+      // Open the URL
+      await Linking.openURL(linkUrl);
+    } else {
+      Alert.alert(`Don't know how to open this URL: ${linkUrl}`);
+    }
+  }, []);
 
   const processButton = async () => {
     let warning = false;
@@ -253,6 +267,23 @@ const LoginScreen = () => {
             }}
           >
             Forgot Password?
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[{ flexDirection: "row", alignSelf: "center" }]}
+          onPress={handleLink}
+        >
+          <Text
+            style={{
+              marginTop: 20,
+              textAlign: "center",
+              fontSize: 15,
+              color: "blue",
+              fontWeight: "600",
+            }}
+          >
+            Privacy Policy
           </Text>
         </TouchableOpacity>
       </ScrollView>
