@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Dimensions,
   Image,
@@ -37,7 +37,7 @@ const Index = () => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={{ height: 80 }} />
+      <View style={{ height: 150 }} />
 
       {/* Logo */}
       <Image
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    //backgroundColor: "#fff",
   },
 
   logo: {
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
 
   card: {
     width: width - 40,
-    backgroundColor: "#f5f7ff",
+    backgroundColor: "#d7dfff",
     borderRadius: 25,
     padding: 25,
     marginRight: 10,

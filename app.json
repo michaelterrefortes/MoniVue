@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
 
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/icon-monivue.icon",
       "bundleIdentifier": "com.mterrefortes.monivue"
     },
 
@@ -37,7 +37,7 @@
         {
           "backgroundColor": "#f4f4f4",
 
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/icon-monivue.png",
 
           "imageWidth": 120,
 
