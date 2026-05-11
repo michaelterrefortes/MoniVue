@@ -136,7 +136,7 @@ const DebtInfo = () => {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={[{ flex: 1 }, isDarkMode ? styles.darkBg : styles.lightBg]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       //keyboardVerticalOffset={90} // adjust if header overlaps
     >
