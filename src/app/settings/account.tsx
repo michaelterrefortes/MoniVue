@@ -103,7 +103,7 @@ const Account = () => {
 
   const handleEmail = async () => {
     // Check if the link is supported
-    const email = "monivue.support@gmail.com";
+    const email = "mt.apps.support@gmail.com";
     const subject = "Contact Us";
     const body = "Hello Support team,";
 
